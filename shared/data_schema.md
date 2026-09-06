@@ -13,7 +13,7 @@ Each dataset record represents one specific package version.
 
 | Field | Description |
 |---|---|
-| package_id | Unique identifier for the package/version |
+| package_id | Deterministic identifier in the format package_name==version |
 | package_name | Name of the Python package |
 | version | Specific package version |
 | label | 0 = benign, 1 = malicious |
@@ -68,3 +68,25 @@ are treated as separate package/version records.
 
 Package/version identifiers will later be used by the ML pipeline for
 leakage-safe dataset splitting.
+
+---
+
+## Package ID Format
+
+The package_id must uniquely identify a specific package version.
+
+Format:
+
+package_name==version
+
+Example:
+
+requests==2.31.0
+
+---
+
+## ML Feature Restriction
+
+malicious_evidence is documentation only.
+
+It must never be used as an input feature for the machine-learning model.
