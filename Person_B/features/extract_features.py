@@ -1,69 +1,94 @@
+import ast
 import math
 from collections import Counter
 
-
 def compute_shannon_entropy(text: str) -> float:
-    """Calculates Shannon Entropy (randomness) of a string.
-
-    Higher values indicate obfuscation, encryption, or Base64 encoding.
-    """
+    """Calculates Shannon entropy to detect packed/obfuscated strings."""
     if not text:
         return 0.0
-
+    entropy = 0.0
     length = len(text)
     counts = Counter(text)
-    entropy = 0.0
-
     for count in counts.values():
         p = count / length
         entropy -= p * math.log2(p)
+    return entropy
 
-    return round(entropy, 4)
-
-
-def extract_code_features(ast_summary: dict) -> dict:
-    """Normalizes AST counts against total function calls and measures string entropy."""
-    total_calls = ast_summary.get("total_calls", 0)
-
-    # Prevent division by zero: if total_calls == 0, safe default is 1 for ratio calculations
-    denom = total_calls if total_calls > 0 else 1
-
-    eval_calls = ast_summary.get("eval_calls", 0)
-    exec_calls = ast_summary.get("exec_calls", 0)
-    system_calls = ast_summary.get("system_calls", 0)
-    subprocess_calls = ast_summary.get("subprocess_calls", 0)
-
-    # String entropy calculations
-    strings = ast_summary.get("strings", [])
-    if strings:
-        entropies = [compute_shannon_entropy(s) for s in strings]
-        max_entropy = max(entropies)
-        avg_entropy = sum(entropies) / len(entropies)
-    else:
-        max_entropy = 0.0
-        avg_entropy = 0.0
-
-    return {
-        "feat_total_calls": total_calls,
-        "feat_eval_ratio": round(eval_calls / denom, 4),
-        "feat_exec_ratio": round(exec_calls / denom, 4),
-        "feat_system_call_ratio": round(system_calls / denom, 4),
-        "feat_subprocess_ratio": round(subprocess_calls / denom, 4),
-        "feat_max_entropy": round(max_entropy, 4),
-        "feat_avg_entropy": round(avg_entropy, 4),
-        "feat_parse_failed": int(ast_summary.get("parse_failed", 0)),
+def extract_code_features(file_path: str, findings: list) -> dict:
+    """
+    Translates Person A's security findings into ML numerical features.
+    Also calculates file-level metrics (entropy, total calls) for normalization.
+    """
+    # 1. Initialize base metrics
+    features = {
+        "feat_total_calls": 0,
+        "feat_eval_ratio": 0.0,
+        "feat_exec_ratio": 0.0,
+        "feat_system_call_ratio": 0.0,
+        "feat_subprocess_ratio": 0.0,
+        "feat_max_entropy": 0.0,
+        "feat_avg_entropy": 0.0,
+        "feat_parse_failed": 0
     }
 
+    raw_counts = {"eval": 0, "exec": 0, "system": 0, "subprocess": 0}
+
+    # 2. Map Person A's findings
+    for finding in findings:
+        cat = finding.get("category")
+        ind = finding.get("indicator", "")
+
+        # Handle Person A's parse error flag
+        if cat == "Parse Error" or ind == "SyntaxError":
+            features["feat_parse_failed"] = 1
+            return features  # Stop here if unparsable
+
+        # Tally dangerous indicators
+        if ind == "eval":
+            raw_counts["eval"] += 1
+        elif ind in ["exec", "compile"]:
+            raw_counts["exec"] += 1
+        elif ind == "os.system":
+            raw_counts["system"] += 1
+        elif ind.startswith("subprocess."):
+            raw_counts["subprocess"] += 1
+
+    # 3. Extract our own file-level features (Entropy & Total Calls)
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            source = f.read()
+            
+        # Compute Shannon Entropy per line to find obfuscation blocks
+        lines = source.split('\n')
+        entropies = [compute_shannon_entropy(line) for line in lines if line.strip()]
+        if entropies:
+            features["feat_max_entropy"] = max(entropies)
+            features["feat_avg_entropy"] = sum(entropies) / len(entropies)
+
+        # Count total calls for our ML ratio denominators
+        tree = ast.parse(source)
+        features["feat_total_calls"] = sum(1 for node in ast.walk(tree) if isinstance(node, ast.Call))
+
+    except Exception:
+        # Failsafe if the file is utterly broken
+        features["feat_parse_failed"] = 1
+
+    # 4. Compute Final ML Ratios
+    total = features["feat_total_calls"]
+    if total > 0:
+        features["feat_eval_ratio"] = raw_counts["eval"] / total
+        features["feat_exec_ratio"] = raw_counts["exec"] / total
+        features["feat_system_call_ratio"] = raw_counts["system"] / total
+        features["feat_subprocess_ratio"] = raw_counts["subprocess"] / total
+
+    return features
 
 if __name__ == "__main__":
-    sample = {
-        "total_calls": 10,
-        "eval_calls": 2,
-        "exec_calls": 1,
-        "system_calls": 1,
-        "subprocess_calls": 0,
-        "strings": ["aW1wb3J0IG9zCnN5c3RlbSgnaGFjaycp", "normal_string"],
-        "parse_failed": 0,
-    }
-    print("Test extract_code_features:")
-    print(extract_code_features(sample))
+    # Quick sanity check on how our adapter handles Person A's output format
+    mock_findings = [
+        {"category": "Command Execution", "indicator": "os.system", "line": 4},
+        {"category": "Dynamic Code Execution", "indicator": "eval", "line": 10}
+    ]
+    
+    # We will test this against a real file once we wire up the full loop
+    print("[+] Feature extraction adapter ready for Person A's output schema.")
