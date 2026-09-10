@@ -1,0 +1,1 @@
+code = compile("print('test')", "<string>", "exec")
