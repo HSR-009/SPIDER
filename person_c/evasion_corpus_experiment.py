@@ -41,6 +41,7 @@ SAMPLES = {
         "transformations": {
             "Base64": lambda source: base64_disguise(source),
             "ROT13": lambda source: rot13_disguise(source),
+            "getattr": lambda source: getattr_disguise("subprocess", "run", "['whoami']"),
             "Delayed Trigger": lambda source: delay_disguise(source, 3),
         },
     },
@@ -53,6 +54,7 @@ SAMPLES = {
         "transformations": {
             "Base64": lambda source: base64_disguise(source),
             "ROT13": lambda source: rot13_disguise(source),
+            "getattr": lambda source: getattr_disguise("__builtins__", "exec", "code"),
             "Delayed Trigger": lambda source: delay_disguise(source, 3),
         },
     },
