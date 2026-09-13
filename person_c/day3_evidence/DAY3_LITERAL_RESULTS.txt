@@ -1,0 +1,74 @@
+﻿SPIDER - DAY 3 EVASION EVIDENCE
+================================
+
+Analyzer:
+Person_A.ast_analyzer.analyzer.analyze_file
+
+Scope:
+Static AST analysis only. Generated samples were analyzed as source text and were NOT executed.
+
+VERIFIED EVASION RESULTS
+========================
+
+1. system_command.py + getattr
+   RESULT: CONFIRMED EVASION
+   Findings: []
+
+2. subprocess_call.py + getattr
+   RESULT: CONFIRMED EVASION
+   Findings: []
+
+3. encoded_exec.py + getattr
+   RESULT: DETECTED
+   Finding:
+   Obfuscation | base64.b64decode | MEDIUM
+   Line: 3
+
+The encoded_exec + getattr case was initially reported as an evasion because
+the generated file incorrectly omitted the original Base64 assignment.
+The corrected transformed source preserves that assignment, and the analyzer
+correctly detects base64.b64decode. Therefore it is NOT an evasion.
+
+SUMMARY
+=======
+
+Applicable experiment pairs: 13
+Confirmed successful evasions: 2
+Confirmed non-evasions/detected: 11
+
+Attack Success Rate (ASR):
+2 / 13 = 15.38%
+
+CONFIRMED EVASION TECHNIQUES
+============================
+
+- getattr against os.system
+- getattr against subprocess.run
+
+STRING SPLIT COVERAGE
+=====================
+
+String Split was attempted only on system_command.py.
+It was not attempted on subprocess_call.py or encoded_exec.py.
+This was a corpus-coverage choice, not a hard syntax limitation.
+
+BASE64 OBSERVATION
+==================
+
+The Base64 transformations for system_command.py and subprocess_call.py
+produce the same base64.b64decode + exec findings. This is expected because
+the transformation wraps the original source as encoded data that is later
+dynamically executed, causing both original execution mechanisms to collapse
+into the same detectable execution primitive.
+
+EVIDENCE FILE
+=============
+
+Corrected encoded_exec + getattr source:
+person_c/day3_evidence/encoded_exec/encoded_exec_getattr_fixed.py
+
+IMPORTANT
+=========
+
+The previous 3/13 and 23.08% result is INVALID and must not be used.
+The verified Day 3 result is 2/13 confirmed evasions with ASR 15.38%.
