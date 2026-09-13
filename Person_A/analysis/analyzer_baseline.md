@@ -85,3 +85,47 @@ It does not perform:
 - sandbox execution
 - bytecode analysis
 - symbolic execution
+
+## Day 4 — Adversarial Testing Result
+
+Person C tested the baseline analyzer against defined disguise techniques.
+
+### Confirmed Evasions
+
+Two successful evasions were confirmed:
+
+- `system_command + getattr`
+- `subprocess_call + getattr`
+
+These transformations bypassed the corresponding direct AST indicator
+matching.
+
+### Non-Evasion
+
+`encoded_exec + getattr` was not counted as an evasion because the
+`base64.b64decode` indicator remained detectable.
+
+Therefore, the modified sample still produced a security finding.
+
+### Current Result
+
+- Confirmed evasions: 2
+- Applicable tests: 13
+- Attack Success Rate (ASR): 15.38%
+
+### Known Baseline Limitation
+
+The current AST analyzer does not resolve dynamic indirection through
+`getattr()`.
+
+This is documented as a baseline limitation and will be relevant to the
+defense and re-testing phase.
+
+### Testing Coverage Note
+
+String Split was tested only against `system_command.py` in the current
+toy-sample corpus. It was not tested against `subprocess_call.py` or
+`encoded_exec.py`.
+
+This represents a corpus-coverage limitation, not a confirmed syntax
+limitation of the technique.
