@@ -46,3 +46,15 @@ when building ML features.
 
 The normal security categories remain the seven categories defined in the
 security taxonomy.
+
+## Confirmed Package Name
+
+The actual Person A package folder in this repository is:
+
+- `Person_A`
+
+All imports must use:
+
+`Person_A.ast_analyzer.analyzer`
+
+The casing should be preserved exactly.
