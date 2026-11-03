@@ -72,7 +72,7 @@ def build_feature_table():
     # Keep provenance/diagnostic fields in the table; training code explicitly excludes them.
     metadata = ["package_id", "package_name", "group_id", "version", "analyzer_version", "label"]
     columns = metadata + feature_columns(vocabulary) + DIAGNOSTIC_COLUMNS
-    df = df[columns].fillna(0)
+    df = df[columns]\n    numeric_columns = feature_columns(vocabulary) + DIAGNOSTIC_COLUMNS\n    df[numeric_columns] = df[numeric_columns].fillna(0)
     out = processed / "feature_table.csv"
     df.to_csv(out, index=False)
     (processed / "top40_indicators.json").write_text(json.dumps(vocabulary, indent=2), encoding="utf-8")
