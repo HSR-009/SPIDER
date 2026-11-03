@@ -1,30 +1,23 @@
+# Environments
 env/
 venv/
 .venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-data/raw_safe/
-data/raw_malicious/
-data/
-*.joblib
-*.png
-# SPIDER generated scan outputs and local backups
+
+# Operating system and editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
 *.bak
 *.bak.*
-data/processed/malicious_scan*.jsonl
-data/raw/git branch --show-current
-Test-Path Person_A\pipeline\fetch_benign.py
-Test-Path Person_A\pipeline\scan_benign.py
-Test-Path data\processed\malicious_for_b.jsonl
-Test-Path data\raw\package_index.jsonl
-Get-Content .gitignore
-data/raw/
 
-# Local datasets and generated scan outputs
+# Local datasets and raw archives
 data/raw/
+!data/raw/benign/manifest.jsonl
 data/raw_safe/
 data/raw_malicious/
-data/processed/benign_for_b.jsonl
+
+# Intermediary scan outputs
 data/processed/malicious_scan*.jsonl
-data/raw/

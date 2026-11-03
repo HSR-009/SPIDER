@@ -2,8 +2,7 @@ import base64
 import codecs
 import random
 
-
-def base64_disguise(payload_code):
+def base64_disguise(payload_code: str) -> str:
     encoded = base64.b64encode(
         payload_code.encode("utf-8")
     ).decode("ascii")
@@ -15,8 +14,7 @@ def base64_disguise(payload_code):
         "exec(decoded_code)"
     )
 
-
-def rot13_disguise(payload_code):
+def rot13_disguise(payload_code: str) -> str:
     encoded = codecs.encode(payload_code, "rot_13")
 
     return (
@@ -26,8 +24,7 @@ def rot13_disguise(payload_code):
         "exec(decoded_code)"
     )
 
-
-def getattr_disguise(module, func_name, args_code=""):
+def getattr_disguise(module: str, func_name: str, args_code: str = "") -> str:
     parts = [func_name[i:i + 2] for i in range(0, len(func_name), 2)]
     reconstructed_name = " + ".join(repr(part) for part in parts)
 
@@ -37,8 +34,7 @@ def getattr_disguise(module, func_name, args_code=""):
         f"getattr({module}, function_name)({args_code})"
     )
 
-
-def delay_disguise(payload_code, trigger_count=3):
+def delay_disguise(payload_code: str, trigger_count: int = 3) -> str:
     indented_payload = "\n".join(
         "    " + line for line in payload_code.splitlines()
     )
@@ -50,17 +46,17 @@ def delay_disguise(payload_code, trigger_count=3):
         f"{indented_payload}"
     )
 
-
-def string_split_disguise(sensitive_word):
+def string_split_disguise(sensitive_word: str, seed: int = 42) -> str:
     if not sensitive_word:
         return "''"
 
+    rng = random.Random(seed)
     parts = []
     index = 0
 
     while index < len(sensitive_word):
         remaining = len(sensitive_word) - index
-        size = random.randint(1, min(3, remaining))
+        size = rng.randint(1, min(3, remaining))
         parts.append(sensitive_word[index:index + size])
         index += size
 
