@@ -9,7 +9,7 @@ SECURITY_CATEGORIES = (
     "Obfuscation",
     "Install-Time / Package Execution",
     "Dynamic Code Execution",
-    "File System Access",
+    "Supply-Chain Abuse",
 )
 
 def normalize_package_name(name):
