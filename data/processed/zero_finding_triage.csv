@@ -1,0 +1,167 @@
+package_id,n_py,reason,keywords,odd_ext,py_chars
+1000pip-climber-system-free-download@1000pip climber system free download-1,1,no_risky_keywords,open(,,1024
+1000pip-climber-system-review@1000pip climber system review-1,1,no_risky_keywords,open(,,996
+ai-cypher@0.1.0,2,no_risky_keywords,,.pyd,45
+ai-cypher@0.2.0,2,no_risky_keywords,,.pyd,45
+aioconsol@2.0,1,no_risky_keywords,,,8
+aiohttp-socks4@0.8.24,4,risky_keywords_unflagged,getattr socket,,8643
+aiolrucache@0.1.0,8,no_risky_keywords,,,20903
+aiotoolbox@1.5.2,10,risky_keywords_unflagged,getattr subprocess requests open(,,54706
+aiotoolsbox@1.4.5,10,risky_keywords_unflagged,getattr subprocess urllib open(,,54975
+amazon-boto@1.42.41,39,risky_keywords_unflagged,getattr importlib compile( socket requests open(,,309510
+amplify-python-logging@0.0.0,2,no_risky_keywords,,,211
+anthropy@0.0.1,2,no_risky_keywords,,,125
+anthropy@0.0.3,2,no_risky_keywords,,,91
+anutoolbox123@0.0.1,3,risky_keywords_unflagged,requests open(,,9581
+apidev-coop@1.2.26,234,parse_failed,getattr __import__ importlib base64 socket requests open(,.js,1476131
+asdk-plugin-ai-platform@0.0.1,1,no_risky_keywords,,,292
+asdk-plugin-alphagen@0.0.1,1,no_risky_keywords,,,292
+asdk-plugin-legacy@0.0.1,1,no_risky_keywords,,,292
+async-substrate-interface-sub@1.5.156,28,risky_keywords_unflagged,getattr importlib pickle socket requests,,812979
+async-substrate-interface-sub@1.5.157,28,risky_keywords_unflagged,getattr importlib pickle socket requests,,812979
+async-substrate-interface-upgrade@1.5.17,28,risky_keywords_unflagged,getattr importlib pickle socket requests,,812979
+asyncio-box@1.4.6,10,risky_keywords_unflagged,getattr subprocess urllib open(,,54975
+aws-login0tool@0.0.1,2,no_risky_keywords,,,42
+base-local-planner@0.0.0,2,no_risky_keywords,,,203
+bash8@0.0.0,2,no_risky_keywords,,,177
+bibip-bip@0.1.0,1,no_risky_keywords,,,33
+bigmathutils@0.0.1,4,no_risky_keywords,,,16017
+bitensor-cli@9.9.0,33,risky_keywords_unflagged,getattr importlib eval( socket subprocess urllib webbrowser open(,.js,1028171
+bittensor-burn@1.8.0,4,no_risky_keywords,,.pyd .so,1831
+bittensor-burn@1.8.1,2,no_risky_keywords,,.so,539
+bittensor-burn-alert@1.7.3,2,no_risky_keywords,,.so,557
+bittensor-burn-alert@1.7.4,4,no_risky_keywords,,.pyd .so,1317
+bittensor-burn-alert@1.7.5,4,no_risky_keywords,,.pyd .so,1891
+bittensor-burn-monitor@1.5.0,4,no_risky_keywords,,.pyd .so,2287
+bittensor-burn-monitor@1.5.3,4,no_risky_keywords,,.pyd .so,4779
+bittensor-burn-monitor@1.5.5,2,no_risky_keywords,,.so,187
+bittensor-burn-monitor@1.6.0,4,no_risky_keywords,,.pyd .so,4779
+bittensor-burn-monitor@1.6.3,4,no_risky_keywords,,.pyd .so,3243
+bittensor-burn-monitor@1.6.5,4,no_risky_keywords,,.pyd .so,1143
+bittensor-burn-monitor@1.7.0,4,no_risky_keywords,,.pyd .so,1331
+bittensor-burn-watch@1.3.0,2,no_risky_keywords,,.so,1115
+bittensor-burn-watch@1.3.1,4,no_risky_keywords,,.pyd .so,1131
+bittensor-burn-watch@1.3.2,4,no_risky_keywords,,.pyd .so,2077
+bittensor-burn-watch@1.3.3,4,no_risky_keywords,,.pyd .so,4729
+bittensor-burn-watch@1.3.4,2,no_risky_keywords,,.so,371
+bittensor-emission-tracker@1.0.1,4,no_risky_keywords,,.pyd .so,3854
+botocote@0.0.1,2,no_risky_keywords,,,44
+bramin@0.0.2,7,risky_keywords_unflagged,getattr eval( subprocess open(,.pth,31783
+bramin@0.0.3,7,risky_keywords_unflagged,getattr eval( subprocess open(,.pth,31783
+bramin@0.0.4,7,risky_keywords_unflagged,getattr eval( subprocess open(,.js .pth,31783
+broke-rcl@0.0.0,2,no_risky_keywords,,,1
+bt-burn-watch@1.4.0,2,no_risky_keywords,,.so,185
+btcli@9.9.0,66,risky_keywords_unflagged,getattr importlib eval( socket subprocess urllib webbrowser open(,.js,2054213
+btcli@9.9.3,66,risky_keywords_unflagged,getattr importlib eval( socket subprocess urllib webbrowser open(,.js,2056267
+btcli@9.9.4,33,risky_keywords_unflagged,getattr importlib eval( socket subprocess urllib webbrowser open(,.js,1028418
+bzip@0.98,2,parse_failed,base64 socket distutils open(,,22961
+chat-xdk@0.0.0,2,no_risky_keywords,,,183
+chunqiuwestj-pkg-westj137@0.3.0,1,no_risky_keywords,open(,,898
+coloriv@3.2,8,parse_failed,__import__ exec( compile( base64 pickle requests open(,,28427
+consolecolornew@0.0.3,2,no_risky_keywords,,,400
+cugraph-service-server@0.0.1,2,no_risky_keywords,,,211
+cypress@1.0.0,5,risky_keywords_unflagged,getattr __import__ exec( compile( base64 open(,,63949
+cypress@1.0.1,5,risky_keywords_unflagged,getattr __import__ exec( compile( base64 open(,,63945
+cypress@1.0.2,5,risky_keywords_unflagged,getattr __import__ exec( compile( base64 open(,,63956
+cypress@1.0.3,5,risky_keywords_unflagged,getattr __import__ exec( compile( base64 open(,,63978
+cypress@1.0.4,5,risky_keywords_unflagged,getattr __import__ exec( compile( base64 open(,,63942
+d0rk3r@1.0.4,0,no_python_source,,,0
+d0rk3r@1.0.5,0,no_python_source,,,0
+d0rk3r@1.0.6,0,no_python_source,,,0
+d0rk3r@1.0.7,0,no_python_source,,,0
+d0rk3r@1.0.8,0,no_python_source,,,0
+d0rk3r@1.0.9,0,no_python_source,,,0
+d0rk3r@1.1.0,0,no_python_source,,,0
+d0rk3r@1.1.1,0,no_python_source,,,0
+d0rk3r@1.1.2,0,no_python_source,,,0
+d0rk3r@1.1.3,0,no_python_source,,,0
+d0rk3r@1.1.4,0,no_python_source,,,0
+d0rk3r@1.1.5,0,no_python_source,,,0
+d0rk3r@1.2.0,0,no_python_source,,,0
+d1snakegame@0.1.0,6,no_risky_keywords,,,5403
+dabrius@0.1.0,4,risky_keywords_unflagged,importlib,,807
+dabrius@0.1.1,4,risky_keywords_unflagged,importlib,,1099
+dabrius@0.2.4,14,risky_keywords_unflagged,compile( open(,,14313
+dabrius@0.3.0,14,risky_keywords_unflagged,compile( open(,,14313
+dabrius@0.3.1,14,risky_keywords_unflagged,compile( open(,,15175
+dabrius@0.3.2,14,risky_keywords_unflagged,compile( open(,,15187
+dabrius@0.3.3,14,risky_keywords_unflagged,compile( open(,,15187
+dabrius@0.3.4,14,risky_keywords_unflagged,compile( open(,,15265
+dabrius@0.4.0,14,risky_keywords_unflagged,compile( open(,,14613
+dabrius@0.4.1,14,risky_keywords_unflagged,compile( open(,,13805
+dabrius@1.0.0,14,risky_keywords_unflagged,compile( open(,,14173
+dabrius@1.0.1,14,risky_keywords_unflagged,compile( open(,,14591
+dabrius@1.0.2,14,risky_keywords_unflagged,compile( open(,,14935
+dabrius@1.0.3,14,risky_keywords_unflagged,compile( open(,,15757
+dabrius@1.0.4,14,risky_keywords_unflagged,compile( open(,,15579
+dabrius-utils@0.0.1,38,risky_keywords_unflagged,getattr compile( subprocess urllib os.environ open(,,22396
+dabrius-utils@0.0.2,76,risky_keywords_unflagged,getattr compile( subprocess urllib os.environ open(,,44793
+libgomp@0.1.0,2,no_risky_keywords,,,181
+libhtml5@root,1,no_risky_keywords,,,0
+libopenblas@0.3.21,2,no_risky_keywords,,,191
+libopenblas@0.7,2,no_risky_keywords,,,185
+libpesh@0.1,0,no_python_source,,,0
+makenotion-ppetest@0.0.0,2,no_risky_keywords,,,203
+manin@0.0.1,4,no_risky_keywords,,,1433
+mateplotlib@root,1,no_risky_keywords,,,0
+mathepy@1.0.0,34,no_risky_keywords,,,38417
+mathepy@1.2.0,34,no_risky_keywords,,,38407
+mathepy@2.2.0,44,parse_failed,,,128963
+mathepy@2.5.0,44,parse_failed,,,128947
+mathepy@3.5.0,42,parse_failed,,,127655
+mathepy@4.5.0,42,parse_failed,,,127655
+mathepy@5.5.0,42,no_risky_keywords,,,127655
+mathepy@5.6.0,42,no_risky_keywords,,,127655
+mcp-weather-full@0.8.0,2,no_risky_keywords,,,40979
+mcp-weather-full@0.8.1,2,no_risky_keywords,,,30779
+mcp-weather-full@0.8.3,2,no_risky_keywords,,,31393
+mcp-weather-full@0.8.4,2,no_risky_keywords,,,31397
+mcp-weather-full@0.8.5,2,no_risky_keywords,,,32387
+mcp-weather-full@0.8.9,2,no_risky_keywords,,,23853
+mcp-weather-full@0.9.0,2,no_risky_keywords,,,24721
+mcp-weather-full@0.9.2,2,no_risky_keywords,,,24661
+mcp-weather-full@0.9.3,2,no_risky_keywords,,,24595
+mcp-weather-full@1.0.1,2,no_risky_keywords,,,44929
+minemeld-core@0.0.0,2,no_risky_keywords,,,193
+minizip@0.1.4,4,no_risky_keywords,,,3523
+mistral-evals@999.0.0,3,risky_keywords_unflagged,socket,,2046
+mistral-search-toolkit@999.0.0,2,risky_keywords_unflagged,socket,,1297
+mistral-workflows@999.0.0,2,risky_keywords_unflagged,socket,,769
+mistral-workflows-plugins-mistralai@999.0.0,2,risky_keywords_unflagged,socket,,1323
+mistral-workflows-plugins-webhook@999.0.0,2,risky_keywords_unflagged,socket,,1319
+mkdocs-dataopslive@0.0.0,2,no_risky_keywords,,,203
+modulebuild3240234t@1.0.0,2,no_risky_keywords,,.pyd,37
+modulebuild3240234t@1.0.1,2,no_risky_keywords,,.pyd,105
+modulebuild3240234t@2.0.0,0,no_python_source,,,0
+modulebuild3240234t@3.0.0,2,no_risky_keywords,,.pyd,37
+moneyprinter-api@0.1.0,1,risky_keywords_unflagged,subprocess,,420
+moonbit-metrics-validator@1.0.0,4,risky_keywords_unflagged,compile(,,6783
+moonbit-schema-utils@1.1.0,4,no_risky_keywords,,,8623
+moonbit-schema-utils@1.1.1,4,no_risky_keywords,,,8811
+musl-dev@0.0.0,2,no_risky_keywords,,,183
+mybiubiubiu@0.1.0,4,parse_failed,eval( urllib webbrowser open(,,5218
+mybiubiubiu@0.1.1,4,parse_failed,eval( os.system urllib webbrowser open(,,5249
+mybiubiubiu@0.1.4,3,parse_failed,urllib webbrowser open(,,2482
+myproject234@0.1,2,no_risky_keywords,,,109
+nagios-xi@19.4.0,0,no_python_source,,,0
+nagios-xi@19.5.0,2,risky_keywords_unflagged,socket,,399
+neural-compressor-jax@0.0.0,2,no_risky_keywords,,,209
+neverinstallme@0.1.0,4,no_risky_keywords,,,217
+neverinstallme@0.1.1,4,no_risky_keywords,,,219
+nitro-api66@1.0,1,no_risky_keywords,,,106355
+nmap-python@root,1,no_risky_keywords,,,0
+northstart-sdk@0.1.0,3,no_risky_keywords,,,1188
+noteasonfnsource@1.0.3,1,no_risky_keywords,open(,,1557
+nucbox@0.1.2,22,risky_keywords_unflagged,getattr importlib open(,.pth,73837
+nucbox@0.1.3,22,risky_keywords_unflagged,getattr importlib open(,.js .pth,73837
+numipy@root,1,no_risky_keywords,,,0
+numipy-openvc@aaa.bbb.ccc,1,no_risky_keywords,,,0
+nvidia-clara-sim@0.0.0a0,1,no_risky_keywords,,,0
+openvc@root,1,no_risky_keywords,,,0
+parsimonius@0.11.0,24,risky_keywords_unflagged,getattr eval( compile( pickle open(,,220805
+parsimonius@0.11.1,24,risky_keywords_unflagged,getattr eval( compile( pickle open(,,220805
+parsimonius@0.11.2,24,risky_keywords_unflagged,getattr importlib eval( compile( pickle open(,,224037
+phenopacket-store-toolkit@0.1.7,21,risky_keywords_unflagged,getattr importlib compile( urllib open(,.js .pth,87264
+pipeline-poision-test@1.0.0,0,no_python_source,,,0
+pipeline-poision-test@1.1.0,0,no_python_source,,,0
+pokemon-app-sdk@1.9.12,2,no_risky_keywords,,,197

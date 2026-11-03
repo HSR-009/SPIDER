@@ -9,3 +9,8 @@ data/raw_malicious/
 data/
 *.joblib
 *.png
+# SPIDER generated scan outputs and local backups
+*.bak
+*.bak.*
+data/processed/malicious_scan*.jsonl
+data/raw/
