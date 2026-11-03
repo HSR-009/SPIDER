@@ -1,93 +1,85 @@
-"""Build the real Person_B feature table from the shared JSONL datasets."""
+"""Build Person B's feature table from the shared, versioned JSONL exports."""
 import gzip
 import json
-import re
 import sys
 from pathlib import Path
-
 import pandas as pd
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
-
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 from Person_B.features.extract_features import (
-    BEHAVIOR_FEATURE_COLS, DIAGNOSTIC_FEATURE_COLS, extract_record_features,
+    DIAGNOSTIC_COLUMNS, extract_record_features, normalize_package_name,
+    top_indicator_vocabulary, feature_columns,
 )
 
-def normalize_package_name(name):
-    return re.sub(r"[-_.]+", "-", str(name or "").strip().lower())
-
-def read_jsonl(path, compressed=False):
-    opener = gzip.open if compressed else open
-    rows = []
-    with opener(path, "rt", encoding="utf-8") as handle:
-        for line_no, line in enumerate(handle, 1):
-            if not line.strip():
-                continue
-            try:
-                rows.append(json.loads(line))
-            except json.JSONDecodeError as exc:
-                raise ValueError(f"Invalid JSON in {path}, line {line_no}: {exc}") from exc
-    return rows
+def read_jsonl(path):
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8") as stream:
+        for line_no, line in enumerate(stream, 1):
+            if line.strip():
+                try:
+                    yield json.loads(line)
+                except json.JSONDecodeError as exc:
+                    raise ValueError(f"Invalid JSON at {path}:{line_no}") from exc
 
 def build_feature_table():
-    processed = BASE_DIR / "data" / "processed"
-    malicious_path = processed / "malicious_for_b.jsonl"
-    benign_path = processed / "benign_for_b.jsonl.gz"
-    for path in (malicious_path, benign_path):
-        if not path.exists():
-            raise FileNotFoundError(
-                f"Required dataset not found: {path}\n"
-                "Ensure benign_for_b.jsonl.gz is restored from origin/main."
-            )
+    processed = ROOT / "data" / "processed"
+    paths = [processed / "malicious_for_b.jsonl", processed / "benign_for_b.jsonl.gz"]
+    missing = [str(path) for path in paths if not path.exists()]
+    if missing:
+        raise FileNotFoundError("Missing dataset export(s): " + ", ".join(missing))
+    records = []
+    for path, expected_label in zip(paths, (1, 0)):
+        for record in read_jsonl(path):
+            if int(record.get("label", -1)) != expected_label:
+                raise ValueError(f"Wrong label in {path}: {record.get('package_id')}")
+            records.append(record)
+    if not records:
+        raise ValueError("Both JSONL exports are empty.")
 
-    records = read_jsonl(malicious_path) + read_jsonl(benign_path, compressed=True)
+    ids = [str(r.get("package_id") or "") for r in records]
+    if any(not value for value in ids):
+        raise ValueError("Every record must have package_id.")
+    if len(ids) != len(set(ids)):
+        raise ValueError("Duplicate package_id detected.")
+
+    vocabulary = top_indicator_vocabulary(records, limit=40)
     rows = []
-    seen = set()
-    for index, record in enumerate(records):
-        name = str(record.get("package_name") or "").strip()
-        if not name:
-            raise ValueError(f"Record {index} has no package_name")
-        label = int(record.get("label"))
-        if label not in (0, 1):
-            raise ValueError(f"Unexpected label {label!r} for package {name}")
-        normalized = normalize_package_name(name)
-        key = (normalized, str(record.get("version") or ""))
-        if key in seen:
-            raise ValueError(f"Duplicate package/version record: {key}")
-        seen.add(key)
+    for record in records:
+        package_name = normalize_package_name(record.get("package_name") or record.get("package"))
+        if not package_name:
+            raise ValueError(f"Missing package_name for {record.get('package_id')}")
+        group_id = package_name
         row = {
-            "package_name": name,
-            "normalized_package_name": normalized,
-            "label": label,
+            "package_id": str(record["package_id"]),
+            "package_name": package_name,
+            "group_id": group_id,
+            "version": str(record.get("version") or ""),
+            "analyzer_version": record.get("analyzer_version"),
+            "label": int(record["label"]),
         }
-        row.update(extract_record_features(record))
+        row.update(extract_record_features(record, vocabulary))
         rows.append(row)
 
     df = pd.DataFrame(rows)
-    # Same normalized package must never have contradictory labels.
-    conflicts = df.groupby("normalized_package_name")["label"].nunique()
-    conflicts = conflicts[conflicts > 1]
-    if not conflicts.empty:
-        raise ValueError(f"Contradictory labels for normalized packages: {conflicts.index.tolist()[:10]}")
-
-    # Cross-class overlap is a dataset integrity check, not a feature.
-    names_by_label = {
-        label: set(df.loc[df.label == label, "normalized_package_name"])
-        for label in (0, 1)
-    }
-    overlap = names_by_label[0] & names_by_label[1]
+    if df.groupby("group_id")["label"].nunique().gt(1).any():
+        raise ValueError("A normalized group_id has contradictory labels.")
+    overlap = set(df.loc[df.label == 0, "group_id"]) & set(df.loc[df.label == 1, "group_id"])
     if overlap:
-        raise ValueError(f"Package names occur in both classes: {sorted(overlap)[:10]}")
+        raise ValueError(f"Package groups cross labels: {sorted(overlap)[:10]}")
 
-    ordered = ["package_name", "normalized_package_name"] + BEHAVIOR_FEATURE_COLS + DIAGNOSTIC_FEATURE_COLS + ["label"]
-    df = df[ordered].fillna(0)
-    output = processed / "feature_table.csv"
-    df.to_csv(output, index=False)
-    print(f"Saved {len(df):,} package-version rows to {output}")
-    print("Class counts:", df["label"].value_counts().sort_index().to_dict())
-    print("Unique packages by label:", df.groupby("label")["normalized_package_name"].nunique().to_dict())
+    # Keep provenance/diagnostic fields in the table; training code explicitly excludes them.
+    metadata = ["package_id", "package_name", "group_id", "version", "analyzer_version", "label"]
+    columns = metadata + feature_columns(vocabulary) + DIAGNOSTIC_COLUMNS
+    df = df[columns].fillna(0)
+    out = processed / "feature_table.csv"
+    df.to_csv(out, index=False)
+    (processed / "top40_indicators.json").write_text(json.dumps(vocabulary, indent=2), encoding="utf-8")
+    print(f"Feature table: {out} | rows={len(df)} | groups={df.group_id.nunique()}")
+    print("Labels:", df.label.value_counts().sort_index().to_dict())
+    print("Top-indicator vocabulary size:", len(vocabulary))
+    print("NOTE: analyzer_version is null when it is absent from source exports; it is not inferred.")
     return df
 
 if __name__ == "__main__":
