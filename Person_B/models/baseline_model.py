@@ -80,7 +80,7 @@ def run_baseline():
       for name,result in models.items():
         m=result["frozen_holdout"]; lines.append(f"| {exp} | {name} | {m[chr(112)+chr(114)+chr(95)+chr(97)+chr(117)+chr(99)]:.4f} | {m[chr(114)+chr(111)+chr(99)+chr(95)+chr(97)+chr(117)+chr(99)]:.4f} | {m[chr(112)+chr(114)+chr(101)+chr(99)+chr(105)+chr(115)+chr(105)+chr(111)+chr(110)]:.4f} | {m[chr(114)+chr(101)+chr(99)+chr(97)+chr(108)+chr(108)]:.4f} | {m[chr(102)+chr(49)]:.4f} | {m[chr(102)+chr(112)+chr(114)]:.4f} | {m[chr(116)+chr(110)]} | {m[chr(102)+chr(112)]} | {m[chr(102)+chr(110)]} | {m[chr(116)+chr(112)]} |")
     lines += ["","Provenance notes: group_id is normalized package name; analyzer_version is null because the current source export does not provide it.","n_findings, parse-error count and failed-analysis status are diagnostics, excluded from model inputs.","Top-40 indicator vocabulary is selected by package-presence frequency without labels.","Benign labels are assumed-benign as documented in the shared dataset schema.",""]
-    (RESULTS_DIR/"baseline_v1.md").write_text("\\n".join(lines),encoding="utf-8")
+    (RESULTS_DIR/"baseline_v1.md").write_text("\n".join(lines),encoding="utf-8")
     print("Saved results/baseline_v1.json and results/baseline_v1.md")
 
 if __name__=="__main__": run_baseline()
