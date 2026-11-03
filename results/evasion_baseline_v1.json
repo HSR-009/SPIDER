@@ -1,0 +1,888 @@
+{
+  "metadata": {
+    "total_samples": 10,
+    "scoring_definitions": {
+      "recovered": "Transformed code still triggers the original category & indicator",
+      "different_signal": "Transformed code triggers a generic wrapper finding (e.g. exec), but original behavior is masked",
+      "missed": "Zero findings emitted (complete evasion)"
+    }
+  },
+  "experiments": [
+    {
+      "sample": "compile.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "compile"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "compile.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "compile"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "compile.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "compile"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "compile.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "compile"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "compile"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "eval"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.command.install"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.setup"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.command.install"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.setup"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.command.install"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.setup"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.command.install"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.setup"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.command.install"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.setup"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.command.install"
+        ],
+        [
+          "Install-Time / Package Execution",
+          "setuptools.setup"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Network Activity",
+          "socket"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Network Activity",
+          "socket"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Network Activity",
+          "socket"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Network Activity",
+          "socket"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Network Activity",
+          "socket"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.run"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.run"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.run"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.run"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Command Execution",
+          "subprocess.run"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.run"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.Popen"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.Popen"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.Popen"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.Popen"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Command Execution",
+          "subprocess.Popen"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "subprocess.Popen"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T01_string_split",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T02_base64",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ],
+        [
+          "Obfuscation",
+          "base64.b64decode"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T03_rot13",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Dynamic Code Execution",
+          "exec"
+        ]
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T05_delayed_trigger",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ]
+      ],
+      "transformed_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ]
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T04_getattr",
+      "baseline_findings": [
+        [
+          "Command Execution",
+          "os.system"
+        ]
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    }
+  ],
+  "summary": {
+    "total_tests": 48,
+    "recovered": 14,
+    "different_signal": 16,
+    "missed": 18,
+    "by_technique": {
+      "T01_string_split": {
+        "total": 10,
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 10
+      },
+      "T02_base64": {
+        "total": 10,
+        "recovered": 2,
+        "different_signal": 8,
+        "missed": 0
+      },
+      "T03_rot13": {
+        "total": 10,
+        "recovered": 2,
+        "different_signal": 8,
+        "missed": 0
+      },
+      "T05_delayed_trigger": {
+        "total": 10,
+        "recovered": 10,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "T04_getattr": {
+        "total": 8,
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 8
+      }
+    }
+  }
+}

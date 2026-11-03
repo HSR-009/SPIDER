@@ -1,0 +1,4 @@
+import base64
+encoded_data = 'aW1wb3J0IGJhc2U2NAoKY29kZSA9IGJhc2U2NC5iNjRkZWNvZGUoImNISnBiblFvSjBobGJHeHZKeWs9IikKZXhlYyhjb2RlKQ=='
+decoded_code = base64.b64decode(encoded_data)
+exec(decoded_code)
