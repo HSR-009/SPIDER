@@ -1,95 +1,94 @@
-import os
+"""Build the real Person_B feature table from the shared JSONL datasets."""
+import gzip
+import json
+import re
 import sys
-import pandas as pd
 from pathlib import Path
 
-# Ensure root folder (SPIDER) is available in sys.path
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+import pandas as pd
+
+BASE_DIR = Path(__file__).resolve().parents[2]
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-# 1. Import Person A's real AST parser
-from Person_A.ast_analyzer.analyzer import analyze_file
+from Person_B.features.extract_features import (
+    BEHAVIOR_FEATURE_COLS, DIAGNOSTIC_FEATURE_COLS, extract_record_features,
+)
 
-# 2. Import Person B's feature extractors
-from Person_B.features.extract_features import extract_code_features
-from Person_B.features.metadata_features import fetch_pypi_metadata, compute_typosquat_distance
-from Person_B.models.baseline_model import FEATURE_COLS
+def normalize_package_name(name):
+    return re.sub(r"[-_.]+", "-", str(name or "").strip().lower())
 
-# Mock top packages for Typosquatting checks
-TOP_PACKAGES = ["requests", "urllib3", "numpy", "pandas", "tensorflow", "colorama", "setuptools"]
-
-def process_toy_samples(samples_dir: str):
-    """
-    Crawls the toy_samples directory, runs Person A's analyzer, 
-    and builds the final ML-ready feature table.
-    """
-    records = []
-    
-    # data/toy_samples contains 'clean', 'malicious', 'edge_cases'
-    for label_dir in os.listdir(samples_dir):
-        label_path = os.path.join(samples_dir, label_dir)
-        if not os.path.isdir(label_path):
-            continue
-            
-        # 1 means malicious, 0 means benign (edge cases default to benign for toy testing)
-        is_malicious = 1 if label_dir == "malicious" else 0
-        
-        for file_name in os.listdir(label_path):
-            if not file_name.endswith(".py"):
+def read_jsonl(path, compressed=False):
+    opener = gzip.open if compressed else open
+    rows = []
+    with opener(path, "rt", encoding="utf-8") as handle:
+        for line_no, line in enumerate(handle, 1):
+            if not line.strip():
                 continue
-                
-            file_path = os.path.join(label_path, file_name)
-            # Derive a mock package name from the filename
-            package_name = file_name.replace(".py", "").split("_")[0] 
-            
-            print(f"[*] Processing: {file_path}")
-            
-            # --- PHASE A: Person A's Static Analysis ---
-            findings = analyze_file(file_path)
-            
-            # --- PHASE B: Person B's ML Code Feature Translation ---
-            code_features = extract_code_features(file_path, findings)
-            
-            # --- PHASE C: Person B's Metadata Features ---
-            typosquat_features = compute_typosquat_distance(package_name)
-            metadata = fetch_pypi_metadata(package_name)
-            
-            # --- PHASE D: Merge All Features ---
-            row = {
-                "package_name": package_name,
-                "label": is_malicious
-            }
-            row.update(code_features)
-            row.update(typosquat_features)
-            row.update(metadata)
-            
-            records.append(row)
-            
-    return pd.DataFrame(records)
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"Invalid JSON in {path}, line {line_no}: {exc}") from exc
+    return rows
+
+def build_feature_table():
+    processed = BASE_DIR / "data" / "processed"
+    malicious_path = processed / "malicious_for_b.jsonl"
+    benign_path = processed / "benign_for_b.jsonl.gz"
+    for path in (malicious_path, benign_path):
+        if not path.exists():
+            raise FileNotFoundError(
+                f"Required dataset not found: {path}\n"
+                "Ensure benign_for_b.jsonl.gz is restored from origin/main."
+            )
+
+    records = read_jsonl(malicious_path) + read_jsonl(benign_path, compressed=True)
+    rows = []
+    seen = set()
+    for index, record in enumerate(records):
+        name = str(record.get("package_name") or "").strip()
+        if not name:
+            raise ValueError(f"Record {index} has no package_name")
+        label = int(record.get("label"))
+        if label not in (0, 1):
+            raise ValueError(f"Unexpected label {label!r} for package {name}")
+        normalized = normalize_package_name(name)
+        key = (normalized, str(record.get("version") or ""))
+        if key in seen:
+            raise ValueError(f"Duplicate package/version record: {key}")
+        seen.add(key)
+        row = {
+            "package_name": name,
+            "normalized_package_name": normalized,
+            "label": label,
+        }
+        row.update(extract_record_features(record))
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+    # Same normalized package must never have contradictory labels.
+    conflicts = df.groupby("normalized_package_name")["label"].nunique()
+    conflicts = conflicts[conflicts > 1]
+    if not conflicts.empty:
+        raise ValueError(f"Contradictory labels for normalized packages: {conflicts.index.tolist()[:10]}")
+
+    # Cross-class overlap is a dataset integrity check, not a feature.
+    names_by_label = {
+        label: set(df.loc[df.label == label, "normalized_package_name"])
+        for label in (0, 1)
+    }
+    overlap = names_by_label[0] & names_by_label[1]
+    if overlap:
+        raise ValueError(f"Package names occur in both classes: {sorted(overlap)[:10]}")
+
+    ordered = ["package_name", "normalized_package_name"] + BEHAVIOR_FEATURE_COLS + DIAGNOSTIC_FEATURE_COLS + ["label"]
+    df = df[ordered].fillna(0)
+    output = processed / "feature_table.csv"
+    df.to_csv(output, index=False)
+    print(f"Saved {len(df):,} package-version rows to {output}")
+    print("Class counts:", df["label"].value_counts().sort_index().to_dict())
+    print("Unique packages by label:", df.groupby("label")["normalized_package_name"].nunique().to_dict())
+    return df
 
 if __name__ == "__main__":
-    samples_dir = os.path.join(BASE_DIR, "data", "benchmark_dataset")
-    output_csv = os.path.join(BASE_DIR, "data", "processed", "feature_table.csv")
-    
-    if not os.path.exists(samples_dir):
-        print(f"[!] Cannot find toy samples at {samples_dir}. Did the merge succeed?")
-        sys.exit(1)
-        
-    os.makedirs(os.path.dirname(output_csv), exist_ok=True)
-    
-    print("[*] Starting end-to-end feature extraction pipeline...")
-    df = process_toy_samples(samples_dir)
-    
-    # Ensure all expected columns exist (fill missing with 0)
-    for col in FEATURE_COLS:
-        if col not in df.columns:
-            df[col] = 0
-            
-    # Reorder columns to exactly match our ML model's expected schema
-    final_cols = ["package_name"] + FEATURE_COLS + ["label"]
-    df = df[final_cols]
-    
-    df.to_csv(output_csv, index=False)
-    print(f"\n[+] Successfully built feature table with {len(df)} packages.")
-    print(f"[+] Saved to: {output_csv}")
+    build_feature_table()
