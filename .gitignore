@@ -5,11 +5,20 @@ venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+<<<<<<< HEAD
 
 # Operating system and editor artifacts
 .DS_Store
 Thumbs.db
 *.swp
+=======
+data/raw_safe/
+data/raw_malicious/
+data/
+*.joblib
+*.png
+# SPIDER generated scan outputs and local backups
+>>>>>>> origin/person-a-security
 *.bak
 *.bak.*
 
@@ -21,3 +30,4 @@ data/raw_malicious/
 
 # Intermediary scan outputs
 data/processed/malicious_scan*.jsonl
+data/raw/

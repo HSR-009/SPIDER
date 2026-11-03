@@ -2,7 +2,12 @@ import base64
 import codecs
 import random
 
+<<<<<<< HEAD
 def base64_disguise(payload_code: str) -> str:
+=======
+
+def base64_disguise(payload_code):
+>>>>>>> origin/person-a-security
     encoded = base64.b64encode(
         payload_code.encode("utf-8")
     ).decode("ascii")
@@ -14,7 +19,12 @@ def base64_disguise(payload_code: str) -> str:
         "exec(decoded_code)"
     )
 
+<<<<<<< HEAD
 def rot13_disguise(payload_code: str) -> str:
+=======
+
+def rot13_disguise(payload_code):
+>>>>>>> origin/person-a-security
     encoded = codecs.encode(payload_code, "rot_13")
 
     return (
@@ -24,7 +34,12 @@ def rot13_disguise(payload_code: str) -> str:
         "exec(decoded_code)"
     )
 
+<<<<<<< HEAD
 def getattr_disguise(module: str, func_name: str, args_code: str = "") -> str:
+=======
+
+def getattr_disguise(module, func_name, args_code=""):
+>>>>>>> origin/person-a-security
     parts = [func_name[i:i + 2] for i in range(0, len(func_name), 2)]
     reconstructed_name = " + ".join(repr(part) for part in parts)
 
@@ -34,7 +49,12 @@ def getattr_disguise(module: str, func_name: str, args_code: str = "") -> str:
         f"getattr({module}, function_name)({args_code})"
     )
 
+<<<<<<< HEAD
 def delay_disguise(payload_code: str, trigger_count: int = 3) -> str:
+=======
+
+def delay_disguise(payload_code, trigger_count=3):
+>>>>>>> origin/person-a-security
     indented_payload = "\n".join(
         "    " + line for line in payload_code.splitlines()
     )
@@ -46,18 +66,34 @@ def delay_disguise(payload_code: str, trigger_count: int = 3) -> str:
         f"{indented_payload}"
     )
 
+<<<<<<< HEAD
 def string_split_disguise(sensitive_word: str, seed: int = 42) -> str:
     if not sensitive_word:
         return "''"
 
     rng = random.Random(seed)
+=======
+
+def string_split_disguise(sensitive_word):
+    if not sensitive_word:
+        return "''"
+
+>>>>>>> origin/person-a-security
     parts = []
     index = 0
 
     while index < len(sensitive_word):
         remaining = len(sensitive_word) - index
+<<<<<<< HEAD
         size = rng.randint(1, min(3, remaining))
         parts.append(sensitive_word[index:index + size])
         index += size
 
     return " + ".join(repr(part) for part in parts)
+=======
+        size = random.randint(1, min(3, remaining))
+        parts.append(sensitive_word[index:index + size])
+        index += size
+
+    return " + ".join(repr(part) for part in parts)
+>>>>>>> origin/person-a-security
