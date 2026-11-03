@@ -69,7 +69,7 @@ def process_toy_samples(samples_dir: str):
     return pd.DataFrame(records)
 
 if __name__ == "__main__":
-    samples_dir = os.path.join(BASE_DIR, "data", "toy_samples")
+    samples_dir = os.path.join(BASE_DIR, "data", "benchmark_dataset")
     output_csv = os.path.join(BASE_DIR, "data", "processed", "feature_table.csv")
     
     if not os.path.exists(samples_dir):
