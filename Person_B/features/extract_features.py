@@ -1,94 +1,76 @@
-import ast
-import math
+"""Package-level feature extraction from the supplied static-analysis JSONL records.
+
+This module never executes package code and does not make network requests.
+"""
+import re
 from collections import Counter
 
-def compute_shannon_entropy(text: str) -> float:
-    """Calculates Shannon entropy to detect packed/obfuscated strings."""
-    if not text:
-        return 0.0
-    entropy = 0.0
-    length = len(text)
-    counts = Counter(text)
-    for count in counts.values():
-        p = count / length
-        entropy -= p * math.log2(p)
-    return entropy
+CATEGORY_KEYS = {
+    "network_activity": "Network Activity",
+    "credential_data_access": "Credential / Data Access",
+    "command_execution": "Command Execution",
+    "obfuscation": "Obfuscation",
+    "install_time": "Install-Time / Package Execution",
+    "dynamic_code_execution": "Dynamic Code Execution",
+}
+INDICATOR_PATTERNS = {
+    "eval": ("eval",),
+    "exec": ("exec",),
+    "compile": ("compile",),
+    "os_system": ("os.system",),
+    "subprocess": ("subprocess.", "subprocess"),
+    "http_post": ("requests.post", "httpx.post"),
+    "urlopen": ("urlopen",),
+    "socket": ("socket.", "create_connection"),
+    "base64": ("base64.", "b64decode", "b64encode"),
+    "pickle": ("pickle.", "dill."),
+    "environment_access": ("os.environ", "getenv"),
+}
 
-def extract_code_features(file_path: str, findings: list) -> dict:
-    """
-    Translates Person A's security findings into ML numerical features.
-    Also calculates file-level metrics (entropy, total calls) for normalization.
-    """
-    # 1. Initialize base metrics
-    features = {
-        "feat_total_calls": 0,
-        "feat_eval_ratio": 0.0,
-        "feat_exec_ratio": 0.0,
-        "feat_system_call_ratio": 0.0,
-        "feat_subprocess_ratio": 0.0,
-        "feat_max_entropy": 0.0,
-        "feat_avg_entropy": 0.0,
-        "feat_parse_failed": 0
-    }
+def _normalise(value):
+    return re.sub(r"[^a-z0-9_.]+", "", str(value or "").lower())
 
-    raw_counts = {"eval": 0, "exec": 0, "system": 0, "subprocess": 0}
+def extract_record_features(record):
+    """Convert one package-version JSONL record into numeric ML features."""
+    findings = record.get("findings") or []
+    if not isinstance(findings, list):
+        findings = []
+    indicators = [_normalise(f.get("indicator", "")) for f in findings if isinstance(f, dict)]
+    categories = [str(f.get("category", "")) for f in findings if isinstance(f, dict)]
+    severities = [str(f.get("severity", "")).upper() for f in findings if isinstance(f, dict)]
+    n_files = max(int(record.get("n_py_files") or 0), 1)
+    out = {}
+    category_counts = Counter(categories)
+    for key, category in CATEGORY_KEYS.items():
+        count = category_counts[category]
+        out[f"behavior_{key}_count"] = count
+        out[f"behavior_{key}_per_file"] = count / n_files
+        out[f"behavior_{key}_present"] = int(count > 0)
+    for key, patterns in INDICATOR_PATTERNS.items():
+        count = sum(1 for indicator in indicators if any(p in indicator for p in patterns))
+        out[f"behavior_{key}_count"] = count
+        out[f"behavior_{key}_per_file"] = count / n_files
+    for severity in ("HIGH", "MEDIUM", "LOW"):
+        count = sum(s == severity for s in severities)
+        out[f"behavior_severity_{severity.lower()}_count"] = count
+        out[f"behavior_severity_{severity.lower()}_per_file"] = count / n_files
+    out["behavior_unique_indicator_count"] = len(set(i for i in indicators if i))
+    out["behavior_unique_indicator_per_file"] = out["behavior_unique_indicator_count"] / n_files
+    # Diagnostic/ablation columns: not included in the behavior-only model.
+    out["n_py_files"] = int(record.get("n_py_files") or 0)
+    out["n_findings"] = int(record.get("n_findings") or len(findings))
+    out["parse_error_count"] = int(record.get("parse_error_count") or 0)
+    out["failed_static_analysis"] = int(record.get("failed_static_analysis") or 0)
+    return out
 
-    # 2. Map Person A's findings
-    for finding in findings:
-        cat = finding.get("category")
-        ind = finding.get("indicator", "")
+BEHAVIOR_FEATURE_COLS = (
+    [f"behavior_{key}_{suffix}" for key in CATEGORY_KEYS for suffix in ("count", "per_file", "present")]
+    + [f"behavior_{key}_{suffix}" for key in INDICATOR_PATTERNS for suffix in ("count", "per_file")]
+    + [f"behavior_severity_{level}_{suffix}" for level in ("high", "medium", "low") for suffix in ("count", "per_file")]
+    + ["behavior_unique_indicator_count", "behavior_unique_indicator_per_file"]
+)
+DIAGNOSTIC_FEATURE_COLS = ["n_py_files", "n_findings", "parse_error_count", "failed_static_analysis"]
 
-        # Handle Person A's parse error flag
-        if cat == "Parse Error" or ind == "SyntaxError":
-            features["feat_parse_failed"] = 1
-            return features  # Stop here if unparsable
-
-        # Tally dangerous indicators
-        if ind == "eval":
-            raw_counts["eval"] += 1
-        elif ind in ["exec", "compile"]:
-            raw_counts["exec"] += 1
-        elif ind == "os.system":
-            raw_counts["system"] += 1
-        elif ind.startswith("subprocess."):
-            raw_counts["subprocess"] += 1
-
-    # 3. Extract our own file-level features (Entropy & Total Calls)
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            source = f.read()
-            
-        # Compute Shannon Entropy per line to find obfuscation blocks
-        lines = source.split('\n')
-        entropies = [compute_shannon_entropy(line) for line in lines if line.strip()]
-        if entropies:
-            features["feat_max_entropy"] = max(entropies)
-            features["feat_avg_entropy"] = sum(entropies) / len(entropies)
-
-        # Count total calls for our ML ratio denominators
-        tree = ast.parse(source)
-        features["feat_total_calls"] = sum(1 for node in ast.walk(tree) if isinstance(node, ast.Call))
-
-    except Exception:
-        # Failsafe if the file is utterly broken
-        features["feat_parse_failed"] = 1
-
-    # 4. Compute Final ML Ratios
-    total = features["feat_total_calls"]
-    if total > 0:
-        features["feat_eval_ratio"] = raw_counts["eval"] / total
-        features["feat_exec_ratio"] = raw_counts["exec"] / total
-        features["feat_system_call_ratio"] = raw_counts["system"] / total
-        features["feat_subprocess_ratio"] = raw_counts["subprocess"] / total
-
-    return features
-
-if __name__ == "__main__":
-    # Quick sanity check on how our adapter handles Person A's output format
-    mock_findings = [
-        {"category": "Command Execution", "indicator": "os.system", "line": 4},
-        {"category": "Dynamic Code Execution", "indicator": "eval", "line": 10}
-    ]
-    
-    # We will test this against a real file once we wire up the full loop
-    print("[+] Feature extraction adapter ready for Person A's output schema.")
+def extract_code_features(file_path=None, findings=None):
+    """Backward-compatible adapter for older callers; package records are preferred."""
+    return extract_record_features({"findings": findings or []})
