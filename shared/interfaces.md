@@ -28,3 +28,33 @@ indicator: os.system
 file: sample.py
 line: 4
 evidence: os.system() call detected
+
+## Parse Errors
+
+`Parse Error` is not a security category.
+
+If the AST analyzer cannot parse a Python file, it produces a `Parse Error`
+finding so the analyzer does not crash.
+
+Person B must not count `Parse Error` as a security-category finding.
+
+Instead, it should be represented separately as:
+
+`failed_static_analysis = 1`
+
+when building ML features.
+
+The normal security categories remain the seven categories defined in the
+security taxonomy.
+
+## Confirmed Package Name
+
+The actual Person A package folder in this repository is:
+
+- `Person_A`
+
+All imports must use:
+
+`Person_A.ast_analyzer.analyzer`
+
+The casing should be preserved exactly.
