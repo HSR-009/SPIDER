@@ -1,0 +1,1168 @@
+{
+  "metadata": {
+    "title": "SPIDER Day 1 Evasion Baseline Evaluation",
+    "eval_date": "2026-11-03",
+    "corpus": "data/toy_samples/malicious (10 files)",
+    "analyzer_version": "v1 (frozen baseline)",
+    "scoring_definition": {
+      "recovered": "Same (category, indicator) as original detected",
+      "different_signal": "Some finding detected, but original behavior missed",
+      "missed": "Zero findings detected (complete evasion)"
+    }
+  },
+  "overall": {
+    "total_tests": 50,
+    "recovered": 26,
+    "different_signal": 16,
+    "missed": 8,
+    "recovery_rate_pct": 52.0,
+    "different_signal_rate_pct": 32.0,
+    "missed_rate_pct": 16.0
+  },
+  "by_technique": {
+    "T01_string_split": {
+      "recovered": 10,
+      "different_signal": 0,
+      "missed": 0,
+      "total": 10
+    },
+    "T02_base64": {
+      "recovered": 2,
+      "different_signal": 8,
+      "missed": 0,
+      "total": 10
+    },
+    "T03_rot13": {
+      "recovered": 2,
+      "different_signal": 8,
+      "missed": 0,
+      "total": 10
+    },
+    "T04_getattr": {
+      "recovered": 2,
+      "different_signal": 0,
+      "missed": 8,
+      "total": 10
+    },
+    "T05_delayed_trigger": {
+      "recovered": 10,
+      "different_signal": 0,
+      "missed": 0,
+      "total": 10
+    }
+  },
+  "details": [
+    {
+      "sample": "compile.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "compile",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "compile",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "compile.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "compile",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "compile.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "compile",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "compile.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "compile",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "compile.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "compile",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "compile",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "encoded_exec.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "eval.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "eval_exec.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "eval",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "exec.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "install_time.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.command.install",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Install-Time / Package Execution",
+          "indicator": "setuptools.setup",
+          "severity": "HIGH"
+        },
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Network Activity",
+          "indicator": "socket",
+          "severity": "MEDIUM"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Network Activity",
+          "indicator": "socket",
+          "severity": "MEDIUM"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Network Activity",
+          "indicator": "socket",
+          "severity": "MEDIUM"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Network Activity",
+          "indicator": "socket",
+          "severity": "MEDIUM"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Network Activity",
+          "indicator": "socket",
+          "severity": "MEDIUM"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "network_activity.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Network Activity",
+          "indicator": "socket",
+          "severity": "MEDIUM"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Network Activity",
+          "indicator": "socket",
+          "severity": "MEDIUM"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.run",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.run",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.run",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.run",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.run",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "subprocess_call.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.run",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.run",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.Popen",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.Popen",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.Popen",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.Popen",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.Popen",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "subprocess_popen.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.Popen",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "subprocess.Popen",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T01_string_split",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T02_base64",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Obfuscation",
+          "indicator": "base64.b64decode",
+          "severity": "MEDIUM"
+        },
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T03_rot13",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Dynamic Code Execution",
+          "indicator": "exec",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "different_signal"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T04_getattr",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [],
+      "outcome": "missed"
+    },
+    {
+      "sample": "system_command.py",
+      "technique": "T05_delayed_trigger",
+      "syntax_valid": true,
+      "baseline_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "transformed_findings": [
+        {
+          "category": "Command Execution",
+          "indicator": "os.system",
+          "severity": "HIGH"
+        }
+      ],
+      "outcome": "recovered"
+    }
+  ]
+}

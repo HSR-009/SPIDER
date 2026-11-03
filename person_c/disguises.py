@@ -51,16 +51,18 @@ def delay_disguise(payload_code, trigger_count=3):
     )
 
 
-def string_split_disguise(sensitive_word):
+def string_split_disguise(sensitive_word, seed=None):
     if not sensitive_word:
         return "''"
+
+    rng = random.Random(seed) if seed is not None else random
 
     parts = []
     index = 0
 
     while index < len(sensitive_word):
         remaining = len(sensitive_word) - index
-        size = random.randint(1, min(3, remaining))
+        size = rng.randint(1, min(3, remaining))
         parts.append(sensitive_word[index:index + size])
         index += size
 
