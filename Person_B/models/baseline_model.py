@@ -1,149 +1,103 @@
-import os
-import sys
+"""Train leakage-safe RF/XGBoost baselines and feature ablations on real data."""
+import json
 from pathlib import Path
+import sys
+
 import joblib
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score, classification_report, confusion_matrix, f1_score,
+    precision_score, recall_score, roc_auc_score,
+)
 from xgboost import XGBClassifier
 
-# Ensure root folder (SPIDER) is available in sys.path
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
+from Person_B.features.extract_features import BEHAVIOR_FEATURE_COLS, DIAGNOSTIC_FEATURE_COLS
 from Person_B.models.splitting import split_dataset_by_package
 
-FEATURE_COLS = [
-    "feat_total_calls",
-    "feat_eval_ratio",
-    "feat_exec_ratio",
-    "feat_system_call_ratio",
-    "feat_subprocess_ratio",
-    "feat_max_entropy",
-    "feat_avg_entropy",
-    "feat_parse_failed",
-    "feat_min_edit_distance",
-    "feat_is_potential_squat",
-    "feat_package_age_days",
-    "feat_total_releases",
-    "feat_pypi_exists"
-]
+SIZE_FEATURE_COLS = ["n_py_files", "n_findings"]
+QUALITY_DIAGNOSTIC_COLS = ["parse_error_count", "failed_static_analysis"]
+EXPERIMENTS = {
+    "behavior_only": BEHAVIOR_FEATURE_COLS,
+    "size_only": SIZE_FEATURE_COLS,
+    "behavior_plus_size": BEHAVIOR_FEATURE_COLS + SIZE_FEATURE_COLS,
+}
 
-def prepare_data(csv_path: str):
-    """Loads CSV, verifies schema, converts types, and applies group splitting."""
-    df = pd.read_csv(csv_path)
-
-    missing = [col for col in FEATURE_COLS if col not in df.columns]
-    if missing:
-        raise ValueError(f"Missing expected feature columns in dataset: {missing}")
-
-    # Ensure label is clean integer 0 and 1
-    df["label"] = df["label"].astype(int)
-
-    train_df, test_df = split_dataset_by_package(df, group_col="package_name", target_col="label")
-
-    # Safety check: if split ended up with only 1 class in train, retry split with a different seed
-    seed = 42
-    while len(train_df["label"].unique()) < 2:
-        seed += 1
-        train_df, test_df = split_dataset_by_package(df, group_col="package_name", target_col="label", random_state=seed)
-
-    X_train = train_df[FEATURE_COLS].astype(float)
-    y_train = train_df["label"].astype(int)
-    X_test = test_df[FEATURE_COLS].astype(float)
-    y_test = test_df["label"].astype(int)
-
-    return X_train, X_test, y_train, y_test
-
-def train_and_evaluate(X_train, X_test, y_train, y_test, output_dir: str = "Person_B/models/saved"):
-    """Trains Random Forest and XGBoost, evaluates metrics, and saves weights."""
-    os.makedirs(output_dir, exist_ok=True)
-
-    neg_count = int((y_train == 0).sum())
-    pos_count = int((y_train == 1).sum())
-    scale_pos_weight = float(neg_count / pos_count) if pos_count > 0 else 1.0
-
-    models = {
-        "RandomForest": RandomForestClassifier(
-            n_estimators=100,
-            class_weight="balanced",
-            random_state=42
+def make_models(y_train):
+    positives = int((y_train == 1).sum())
+    negatives = int((y_train == 0).sum())
+    weight = negatives / positives if positives else 1.0
+    return {
+        "random_forest": RandomForestClassifier(
+            n_estimators=300, min_samples_leaf=2, class_weight="balanced",
+            random_state=42, n_jobs=-1,
         ),
-        "XGBoost": XGBClassifier(
-            n_estimators=100,
-            scale_pos_weight=scale_pos_weight,
-            eval_metric="logloss",
-            random_state=42
-        )
+        "xgboost": XGBClassifier(
+            n_estimators=200, max_depth=4, learning_rate=0.05,
+            subsample=0.8, colsample_bytree=0.8,
+            scale_pos_weight=weight, eval_metric="logloss",
+            random_state=42, n_jobs=4,
+        ),
     }
 
-    trained_models = {}
+def evaluate(model, X_test, y_test):
+    pred = model.predict(X_test)
+    prob = model.predict_proba(X_test)[:, 1]
+    return {
+        "accuracy": accuracy_score(y_test, pred),
+        "precision": precision_score(y_test, pred, zero_division=0),
+        "recall": recall_score(y_test, pred, zero_division=0),
+        "f1": f1_score(y_test, pred, zero_division=0),
+        "roc_auc": roc_auc_score(y_test, prob) if y_test.nunique() == 2 else float("nan"),
+        "confusion_matrix": confusion_matrix(y_test, pred, labels=[0, 1]).tolist(),
+        "classification_report": classification_report(y_test, pred, labels=[0, 1], target_names=["benign", "malicious"], zero_division=0, output_dict=True),
+    }
 
-    for name, model in models.items():
-        print(f"\n==================== Training {name} ====================")
-        model.fit(X_train, y_train)
-        preds = model.predict(X_test)
-        
-        print("\n--- Confusion Matrix ---")
-        print(confusion_matrix(y_test, preds))
+def train_all():
+    data_path = BASE_DIR / "data" / "processed" / "feature_table.csv"
+    if not data_path.exists():
+        raise FileNotFoundError(f"{data_path} not found. First run: python -m Person_B.features.build_feature_table")
+    df = pd.read_csv(data_path)
+    required = set(["package_name", "label"] + BEHAVIOR_FEATURE_COLS + SIZE_FEATURE_COLS)
+    missing = sorted(required - set(df.columns))
+    if missing:
+        raise ValueError(f"Feature table schema is outdated/missing columns: {missing}. Rebuild it first.")
+    train_df, test_df = split_dataset_by_package(df, "normalized_package_name" if "normalized_package_name" in df.columns else "package_name")
+    y_train = train_df["label"].astype(int)
+    y_test = test_df["label"].astype(int)
+    if y_train.nunique() != 2 or y_test.nunique() != 2:
+        raise ValueError("Both train and test partitions must contain benign and malicious packages.")
 
-        print("\n--- Classification Report ---")
-        print(classification_report(y_test, preds, zero_division=0))
+    output_dir = BASE_DIR / "Person_B" / "models" / "saved"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for experiment, columns in EXPERIMENTS.items():
+        X_train = train_df[columns].astype(float).replace([np.inf, -np.inf], 0).fillna(0)
+        X_test = test_df[columns].astype(float).replace([np.inf, -np.inf], 0).fillna(0)
+        for model_name, model in make_models(y_train).items():
+            print(f"Training {model_name} | {experiment} ({len(columns)} features)")
+            model.fit(X_train, y_train)
+            metrics = evaluate(model, X_test, y_test)
+            row = {"model": model_name, "experiment": experiment, **{k: v for k, v in metrics.items() if k not in ("confusion_matrix", "classification_report")}}
+            results.append(row)
+            joblib.dump(model, output_dir / f"{model_name}_{experiment}.joblib")
+            with open(output_dir / f"{model_name}_{experiment}_details.json", "w", encoding="utf-8") as handle:
+                json.dump(metrics, handle, indent=2)
+            print(f"  precision={metrics['precision']:.3f} recall={metrics['recall']:.3f} f1={metrics['f1']:.3f} auc={metrics['roc_auc']:.3f}")
+            print("  confusion matrix [benign, malicious]:", metrics["confusion_matrix"])
 
-        if len(set(y_test)) > 1:
-            probs = model.predict_proba(X_test)[:, 1]
-            auc = roc_auc_score(y_test, probs)
-            print(f"ROC-AUC Score: {auc:.4f}")
-
-        save_path = os.path.join(output_dir, f"{name.lower()}_baseline.joblib")
-        joblib.dump(model, save_path)
-        print(f"[+] Model saved to: {save_path}")
-
-        trained_models[name] = model
-
-    return trained_models
-
-def generate_mock_dataset(csv_path: str):
-    """Generates a balanced mock dataset with multiple packages and versions."""
-    np.random.seed(42)
-    packages = [f"pkg_{i}" for i in range(30)]
-    records = []
-    
-    for i, pkg in enumerate(packages):
-        # Guarantee a balanced spread: first 15 benign, remaining 15 malicious
-        is_malicious = 1 if i >= 15 else 0
-        for ver in ["1.0.0", "1.1.0"]:
-            row = {
-                "package_name": pkg,
-                "package_version": ver,
-                "feat_total_calls": int(np.random.randint(5, 500)),
-                "feat_eval_ratio": float(np.random.uniform(0.1, 0.9) if is_malicious else 0.0),
-                "feat_exec_ratio": float(np.random.uniform(0.1, 0.5) if is_malicious else 0.0),
-                "feat_system_call_ratio": float(np.random.uniform(0.1, 0.8) if is_malicious else 0.0),
-                "feat_subprocess_ratio": float(np.random.uniform(0.1, 0.5) if is_malicious else 0.0),
-                "feat_max_entropy": float(np.random.uniform(3.5, 5.0) if is_malicious else np.random.uniform(1.5, 2.8)),
-                "feat_avg_entropy": float(np.random.uniform(3.0, 4.5) if is_malicious else np.random.uniform(1.2, 2.5)),
-                "feat_parse_failed": 0,
-                "feat_min_edit_distance": int(np.random.choice([1, 2]) if is_malicious else np.random.choice([0, 5, 8])),
-                "feat_is_potential_squat": int(1 if is_malicious else 0),
-                "feat_package_age_days": int(np.random.randint(1, 10) if is_malicious else np.random.randint(100, 2000)),
-                "feat_total_releases": int(np.random.randint(1, 3) if is_malicious else np.random.randint(5, 50)),
-                "feat_pypi_exists": 1,
-                "label": int(is_malicious)
-            }
-            records.append(row)
-
-    os.makedirs(os.path.dirname(csv_path), exist_ok=True)
-    pd.DataFrame(records).to_csv(csv_path, index=False)
-    print(f"[+] Balanced dataset created at {csv_path}")
+    pd.DataFrame(results).to_csv(output_dir / "baseline_metrics.csv", index=False)
+    test_columns = ["package_name", "normalized_package_name", "label"]
+    test_df[[c for c in test_columns if c in test_df.columns]].to_csv(output_dir / "heldout_test_packages.csv", index=False)
+    print(f"Saved models, metrics and held-out package list under {output_dir}")
+    print(f"Train rows: {len(train_df)} | Test rows: {len(test_df)}")
+    print("Train class counts:", y_train.value_counts().sort_index().to_dict())
+    print("Test class counts:", y_test.value_counts().sort_index().to_dict())
 
 if __name__ == "__main__":
-    csv_file = "data/processed/feature_table.csv"
-
-    # Regenerate the table with guaranteed class diversity
-    generate_mock_dataset(csv_file)
-
-    X_tr, X_te, y_tr, y_te = prepare_data(csv_file)
-    train_and_evaluate(X_tr, X_te, y_tr, y_te)
+    train_all()
