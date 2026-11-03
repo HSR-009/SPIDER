@@ -6,6 +6,9 @@ __pycache__/
 .ipynb_checkpoints/
 data/raw_safe/
 data/raw_malicious/
+data/
+*.joblib
+*.png
 # SPIDER generated scan outputs and local backups
 *.bak
 *.bak.*
@@ -24,3 +27,4 @@ data/raw_safe/
 data/raw_malicious/
 data/processed/benign_for_b.jsonl
 data/processed/malicious_scan*.jsonl
+data/raw/
