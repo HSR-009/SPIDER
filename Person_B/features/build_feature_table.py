@@ -1,86 +1,95 @@
-"""Build Person B's feature table from the shared, versioned JSONL exports."""
-import gzip
-import json
+import os
 import sys
-from pathlib import Path
 import pandas as pd
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-from Person_B.features.extract_features import (
-    DIAGNOSTIC_COLUMNS, extract_record_features, normalize_package_name,
-    top_indicator_vocabulary, feature_columns,
-)
+# Ensure root folder (SPIDER) is available in sys.path
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-def read_jsonl(path):
-    opener = gzip.open if str(path).endswith(".gz") else open
-    with opener(path, "rt", encoding="utf-8") as stream:
-        for line_no, line in enumerate(stream, 1):
-            if line.strip():
-                try:
-                    yield json.loads(line)
-                except json.JSONDecodeError as exc:
-                    raise ValueError(f"Invalid JSON at {path}:{line_no}") from exc
+# 1. Import Person A's real AST parser
+from Person_A.ast_analyzer.analyzer import analyze_file
 
-def build_feature_table():
-    processed = ROOT / "data" / "processed"
-    paths = [processed / "malicious_for_b.jsonl", processed / "benign_for_b.jsonl.gz"]
-    missing = [str(path) for path in paths if not path.exists()]
-    if missing:
-        raise FileNotFoundError("Missing dataset export(s): " + ", ".join(missing))
+# 2. Import Person B's feature extractors
+from Person_B.features.extract_features import extract_code_features
+from Person_B.features.metadata_features import fetch_pypi_metadata, compute_typosquat_distance
+from Person_B.models.baseline_model import FEATURE_COLS
+
+# Mock top packages for Typosquatting checks
+TOP_PACKAGES = ["requests", "urllib3", "numpy", "pandas", "tensorflow", "colorama", "setuptools"]
+
+def process_toy_samples(samples_dir: str):
+    """
+    Crawls the toy_samples directory, runs Person A's analyzer, 
+    and builds the final ML-ready feature table.
+    """
     records = []
-    for path, expected_label in zip(paths, (1, 0)):
-        for record in read_jsonl(path):
-            if int(record.get("label", -1)) != expected_label:
-                raise ValueError(f"Wrong label in {path}: {record.get('package_id')}")
-            records.append(record)
-    if not records:
-        raise ValueError("Both JSONL exports are empty.")
-
-    ids = [str(r.get("package_id") or "") for r in records]
-    if any(not value for value in ids):
-        raise ValueError("Every record must have package_id.")
-    if len(ids) != len(set(ids)):
-        raise ValueError("Duplicate package_id detected.")
-
-    vocabulary = top_indicator_vocabulary(records, limit=40)
-    rows = []
-    for record in records:
-        package_name = normalize_package_name(record.get("package_name") or record.get("package"))
-        if not package_name:
-            raise ValueError(f"Missing package_name for {record.get('package_id')}")
-        group_id = package_name
-        row = {
-            "package_id": str(record["package_id"]),
-            "package_name": package_name,
-            "group_id": group_id,
-            "version": str(record.get("version") or ""),
-            "analyzer_version": record.get("analyzer_version"),
-            "label": int(record["label"]),
-        }
-        row.update(extract_record_features(record, vocabulary))
-        rows.append(row)
-
-    df = pd.DataFrame(rows)
-    if df.groupby("group_id")["label"].nunique().gt(1).any():
-        raise ValueError("A normalized group_id has contradictory labels.")
-    overlap = set(df.loc[df.label == 0, "group_id"]) & set(df.loc[df.label == 1, "group_id"])
-    if overlap:
-        raise ValueError(f"Package groups cross labels: {sorted(overlap)[:10]}")
-
-    # Keep provenance/diagnostic fields in the table; training code explicitly excludes them.
-    metadata = ["package_id", "package_name", "group_id", "version", "analyzer_version", "label"]
-    columns = metadata + feature_columns(vocabulary) + DIAGNOSTIC_COLUMNS
-    df = df[columns]\n    numeric_columns = feature_columns(vocabulary) + DIAGNOSTIC_COLUMNS\n    df[numeric_columns] = df[numeric_columns].fillna(0)
-    out = processed / "feature_table.csv"
-    df.to_csv(out, index=False)
-    (processed / "top40_indicators.json").write_text(json.dumps(vocabulary, indent=2), encoding="utf-8")
-    print(f"Feature table: {out} | rows={len(df)} | groups={df.group_id.nunique()}")
-    print("Labels:", df.label.value_counts().sort_index().to_dict())
-    print("Top-indicator vocabulary size:", len(vocabulary))
-    print("NOTE: analyzer_version is null when it is absent from source exports; it is not inferred.")
-    return df
+    
+    # data/toy_samples contains 'clean', 'malicious', 'edge_cases'
+    for label_dir in os.listdir(samples_dir):
+        label_path = os.path.join(samples_dir, label_dir)
+        if not os.path.isdir(label_path):
+            continue
+            
+        # 1 means malicious, 0 means benign (edge cases default to benign for toy testing)
+        is_malicious = 1 if label_dir == "malicious" else 0
+        
+        for file_name in os.listdir(label_path):
+            if not file_name.endswith(".py"):
+                continue
+                
+            file_path = os.path.join(label_path, file_name)
+            # Derive a mock package name from the filename
+            package_name = file_name.replace(".py", "").split("_")[0] 
+            
+            print(f"[*] Processing: {file_path}")
+            
+            # --- PHASE A: Person A's Static Analysis ---
+            findings = analyze_file(file_path)
+            
+            # --- PHASE B: Person B's ML Code Feature Translation ---
+            code_features = extract_code_features(file_path, findings)
+            
+            # --- PHASE C: Person B's Metadata Features ---
+            typosquat_features = compute_typosquat_distance(package_name)
+            metadata = fetch_pypi_metadata(package_name)
+            
+            # --- PHASE D: Merge All Features ---
+            row = {
+                "package_name": package_name,
+                "label": is_malicious
+            }
+            row.update(code_features)
+            row.update(typosquat_features)
+            row.update(metadata)
+            
+            records.append(row)
+            
+    return pd.DataFrame(records)
 
 if __name__ == "__main__":
-    build_feature_table()
+    samples_dir = os.path.join(BASE_DIR, "data", "benchmark_dataset")
+    output_csv = os.path.join(BASE_DIR, "data", "processed", "feature_table.csv")
+    
+    if not os.path.exists(samples_dir):
+        print(f"[!] Cannot find toy samples at {samples_dir}. Did the merge succeed?")
+        sys.exit(1)
+        
+    os.makedirs(os.path.dirname(output_csv), exist_ok=True)
+    
+    print("[*] Starting end-to-end feature extraction pipeline...")
+    df = process_toy_samples(samples_dir)
+    
+    # Ensure all expected columns exist (fill missing with 0)
+    for col in FEATURE_COLS:
+        if col not in df.columns:
+            df[col] = 0
+            
+    # Reorder columns to exactly match our ML model's expected schema
+    final_cols = ["package_name"] + FEATURE_COLS + ["label"]
+    df = df[final_cols]
+    
+    df.to_csv(output_csv, index=False)
+    print(f"\n[+] Successfully built feature table with {len(df)} packages.")
+    print(f"[+] Saved to: {output_csv}")
