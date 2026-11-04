@@ -71,16 +71,23 @@ Validate dataset integrity, PEP 503 `group_id` normalization, and required prove
 python -m spider_contract.dataset_check
 ```
 
-### 4. Run the Static Analyzer on a File
+### 4. Run the Static Analyzer (File & Directory Scanning)
 
-Analyze any Python file using Person A's AST analyzer:
+Analyze a single file or scan an entire package directory using Person A's AST analyzer:
 
 ```python
-from Person_A.ast_analyzer.analyzer import analyze_file
+from Person_A.ast_analyzer.analyzer import analyze_file, scan_directory
 
+# 1. Analyze single file (includes col_offset, end_lineno, snippet, and stable rule_id)
 findings = analyze_file("data/toy_samples/malicious/encoded_exec.py")
 for finding in findings:
-    print(f"[{finding['severity']}] {finding['category']} :: {finding['indicator']} (Line {finding['line']})")
+    print(f"[{finding['severity']}] {finding['category']} :: {finding['indicator']} (Line {finding['line']}:{finding['col_offset']})")
+
+# 2. Scan whole package directory (returns structured verdict and file inventory)
+scan_result = scan_directory("data/toy_samples/clean")
+print(f"Verdict: {scan_result['verdict']} (Review Recommended: {scan_result['review_recommended']})")
+print(f"Inspected files: {len(scan_result['inventory']['inspected_files'])}")
+print(f"Uninspected native files (.so/.dll/.pyd): {len(scan_result['inventory']['uninspected_files'])}")
 ```
 
 ### 5. Launch the Investigation Dashboard
@@ -93,17 +100,18 @@ streamlit run person_c/dashboard/app.py
 
 ---
 
-## 🛡️ Core Security Categories
+## 🛡️ Core Security Categories & Honest V1 Policies
 
-SPIDER detects indicators across six primary behavioral categories (plus an explicit status category for unparsable code):
+SPIDER detects indicators across six primary behavioral categories (plus explicit status categories for unparsable code and uninspected native binaries):
 
 1. **Command Execution** (`HIGH`): `os.system`, `subprocess.run`, `subprocess.Popen`
-2. **Dynamic Code Execution** (`HIGH`): `eval`, `exec`, `compile`
+2. **Dynamic Code Execution** (`HIGH`): `eval`, `exec`, `compile`, dynamic `getattr` resolution
 3. **Credential / Data Access** (`HIGH`): `os.environ`, `.aws/credentials`, `.ssh/`, `.netrc`, `.env`
 4. **Network Activity** (`MEDIUM`): `socket`, `requests.get/post`, `urllib.request.urlopen`
 5. **Obfuscation** (`MEDIUM`): `base64` decoders, dynamic string reconstructions
-6. **Install-Time Execution** (`HIGH`): Custom `setuptools.command.install`, `setup.py` hooks
+6. **Install-Time Execution** (`HIGH` for custom hooks / `LOW` for standard setup): Custom `setuptools.command.install`, `cmdclass` hooks. Standard `setuptools.setup()` calls are calibrated to `LOW` severity to prevent false positives across benign packages.
 7. **Parse Error** (`MEDIUM` status): Tracks `SyntaxError` and unparsable files as explicit coverage gaps, never as malicious behavior.
+8. **Uninspected Native Artifacts**: Non-Python compiled binaries (`.so`, `.dll`, `.dylib`, `.pyd`) cannot be parsed by AST and are honestly logged under `inventory.uninspected_files`. If a package contains only uninspected binaries without Python code, the scan verdict is honestly set to `unable_to_assess`.
 
 ---
 

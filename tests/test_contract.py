@@ -6,6 +6,7 @@ from spider_contract.dataset import (
     assert_group_disjoint,
     BANNED_FEATURE_COLUMNS,
 )
+from spider_contract.models import ScanRecord, Finding
 
 class TestContract(unittest.TestCase):
     def test_make_group_id_pep503(self):
@@ -40,6 +41,35 @@ class TestContract(unittest.TestCase):
         test_df = pd.DataFrame({"group_id": ["pkg-b", "pkg-d"]})
         with self.assertRaises(AssertionError):
             assert_group_disjoint(train_df, test_df)
+
+    def test_scan_record_contract_model(self):
+        finding = Finding(
+            category="Command Execution",
+            indicator="os.system",
+            severity="HIGH",
+            file="sample.py",
+            line=4,
+            col_offset=0,
+            end_lineno=4,
+            snippet="os.system('id')",
+            rule_id="RULE_CMD_OS_SYSTEM",
+            evidence="os.system() call detected"
+        )
+        record = ScanRecord(
+            package_name="test-pkg",
+            version="1.0.0",
+            package_id="test-pkg==1.0.0",
+            group_id="test-pkg",
+            verdict="suspicious",
+            findings=[finding.to_dict()],
+            n_findings=1,
+            n_py_files=1
+        )
+        d = record.to_dict()
+        self.assertEqual(d["package_name"], "test-pkg")
+        self.assertEqual(d["verdict"], "suspicious")
+        self.assertEqual(len(d["findings"]), 1)
+        self.assertEqual(d["findings"][0]["rule_id"], "RULE_CMD_OS_SYSTEM")
 
 if __name__ == "__main__":
     unittest.main()
