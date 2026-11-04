@@ -1,23 +1,23 @@
 {
-  "experiment_warning": "LEAKAGE/DIAGNOSTIC EXPERIMENT \u2014 NOT A PRODUCTION SAFE MODEL. Metadata features (e.g., PyPI release age, total releases, or unindexed status) can leak target distributions, release popularity, or dataset curation artifacts.",
-  "pypi_snapshot_disclosure": "No external PyPI snapshot dataset is committed in the repository. Because live PyPI API querying is prohibited to prevent network leakage and unrepeatable state, feat_package_age_days (-1), feat_total_releases (0), and feat_pypi_exists (0) currently use documented default fallbacks rather than measured PyPI metadata. Only feat_min_edit_distance and feat_is_potential_squat are computed offline from package names. These results do not claim real metadata improvement.",
-  "metadata_features": [
+  "experiment_status": "PARTIALLY COMPLETED",
+  "experiment_warning": "DIAGNOSTIC / LEAKAGE EXPERIMENT \u2014 NOT A PRODUCTION SAFE MODEL. Metadata features (e.g., PyPI release age or unindexed status) can leak target distributions or dataset curation artifacts.",
+  "genuine_metadata_features_evaluated": [
     "feat_min_edit_distance",
-    "feat_is_potential_squat",
-    "feat_package_age_days",
-    "feat_total_releases",
-    "feat_pypi_exists"
+    "feat_is_potential_squat"
   ],
+  "unavailable_metadata_features": {
+    "feat_package_age_days": "Missing offline stored PyPI snapshot in repository. Live network requests are prohibited.",
+    "feat_total_releases": "Missing offline stored PyPI snapshot in repository. Live network requests are prohibited.",
+    "feat_pypi_exists": "Missing offline stored PyPI snapshot in repository. Live network requests are prohibited."
+  },
+  "metadata_limitation_disclosure": "Genuine source data was only available for offline typosquatting edit distance features. A stored offline PyPI snapshot covering the full dataset was not available in the repository. Rather than fabricating missing values with synthetic defaults or making prohibited live API calls, the 3 PyPI API metadata features were omitted from training. This experiment is reported as partially completed to maintain methodological honesty.",
   "experiments": {
     "metadata_only": {
       "random_forest": {
-        "feature_count": 5,
+        "feature_count": 2,
         "features": [
           "feat_min_edit_distance",
-          "feat_is_potential_squat",
-          "feat_package_age_days",
-          "feat_total_releases",
-          "feat_pypi_exists"
+          "feat_is_potential_squat"
         ],
         "frozen_holdout": {
           "threshold": 0.5,
@@ -38,36 +38,33 @@
         }
       },
       "xgboost": {
-        "feature_count": 5,
+        "feature_count": 2,
         "features": [
           "feat_min_edit_distance",
-          "feat_is_potential_squat",
-          "feat_package_age_days",
-          "feat_total_releases",
-          "feat_pypi_exists"
+          "feat_is_potential_squat"
         ],
         "frozen_holdout": {
           "threshold": 0.5,
           "sample_count": 991,
           "malicious_count": 409,
           "benign_count": 582,
-          "accuracy": 0.6014127144298688,
-          "precision": 0.5142857142857142,
-          "recall": 0.6161369193154034,
-          "f1": 0.560622914349277,
-          "pr_auc": 0.5111884517251393,
-          "roc_auc": 0.6411371293658995,
-          "fpr": 0.40893470790378006,
-          "tn": 344,
-          "fp": 238,
-          "fn": 157,
-          "tp": 252
+          "accuracy": 0.5822401614530777,
+          "precision": 0.4955595026642984,
+          "recall": 0.6821515892420538,
+          "f1": 0.5740740740740741,
+          "pr_auc": 0.5093091605886073,
+          "roc_auc": 0.6365622295599861,
+          "fpr": 0.4879725085910653,
+          "tn": 298,
+          "fp": 284,
+          "fn": 130,
+          "tp": 279
         }
       }
     },
     "behavior_with_metadata": {
       "random_forest": {
-        "feature_count": 59,
+        "feature_count": 56,
         "features": [
           "category_count__network_activity",
           "category_present__network_activity",
@@ -124,31 +121,28 @@
           "indicator_present__base64.b32hexencode",
           "indicator_present__base64.decode",
           "feat_min_edit_distance",
-          "feat_is_potential_squat",
-          "feat_package_age_days",
-          "feat_total_releases",
-          "feat_pypi_exists"
+          "feat_is_potential_squat"
         ],
         "frozen_holdout": {
           "threshold": 0.5,
           "sample_count": 991,
           "malicious_count": 409,
           "benign_count": 582,
-          "accuracy": 0.8365287588294652,
-          "precision": 0.8365122615803815,
+          "accuracy": 0.8385469223007064,
+          "precision": 0.8410958904109589,
           "recall": 0.7506112469437652,
-          "f1": 0.7912371134020618,
-          "pr_auc": 0.89420113002575,
-          "roc_auc": 0.9070463539434881,
-          "fpr": 0.10309278350515463,
-          "tn": 522,
-          "fp": 60,
+          "f1": 0.7932816537467701,
+          "pr_auc": 0.8925114255191925,
+          "roc_auc": 0.905147497458389,
+          "fpr": 0.09965635738831616,
+          "tn": 524,
+          "fp": 58,
           "fn": 102,
           "tp": 307
         }
       },
       "xgboost": {
-        "feature_count": 59,
+        "feature_count": 56,
         "features": [
           "category_count__network_activity",
           "category_present__network_activity",
@@ -205,25 +199,22 @@
           "indicator_present__base64.b32hexencode",
           "indicator_present__base64.decode",
           "feat_min_edit_distance",
-          "feat_is_potential_squat",
-          "feat_package_age_days",
-          "feat_total_releases",
-          "feat_pypi_exists"
+          "feat_is_potential_squat"
         ],
         "frozen_holdout": {
           "threshold": 0.5,
           "sample_count": 991,
           "malicious_count": 409,
           "benign_count": 582,
-          "accuracy": 0.8355196770938446,
-          "precision": 0.8993506493506493,
+          "accuracy": 0.8304742684157417,
+          "precision": 0.8849840255591054,
           "recall": 0.6772616136919315,
-          "f1": 0.7726638772663877,
-          "pr_auc": 0.8795572239709561,
-          "roc_auc": 0.8989468068123576,
-          "fpr": 0.05326460481099656,
-          "tn": 551,
-          "fp": 31,
+          "f1": 0.7673130193905817,
+          "pr_auc": 0.8793865397588345,
+          "roc_auc": 0.8988480830791723,
+          "fpr": 0.061855670103092786,
+          "tn": 546,
+          "fp": 36,
           "fn": 132,
           "tp": 277
         }
@@ -231,7 +222,7 @@
     },
     "behavior_with_size_and_metadata": {
       "random_forest": {
-        "feature_count": 60,
+        "feature_count": 57,
         "features": [
           "category_count__network_activity",
           "category_present__network_activity",
@@ -289,31 +280,28 @@
           "indicator_present__base64.decode",
           "n_py_files",
           "feat_min_edit_distance",
-          "feat_is_potential_squat",
-          "feat_package_age_days",
-          "feat_total_releases",
-          "feat_pypi_exists"
+          "feat_is_potential_squat"
         ],
         "frozen_holdout": {
           "threshold": 0.5,
           "sample_count": 991,
           "malicious_count": 409,
           "benign_count": 582,
-          "accuracy": 0.863773965691221,
-          "precision": 0.8663101604278075,
-          "recall": 0.7921760391198044,
-          "f1": 0.8275862068965517,
-          "pr_auc": 0.9240330210103717,
-          "roc_auc": 0.9323973483225367,
-          "fpr": 0.0859106529209622,
-          "tn": 532,
-          "fp": 50,
-          "fn": 85,
-          "tp": 324
+          "accuracy": 0.8557013118062563,
+          "precision": 0.8556149732620321,
+          "recall": 0.78239608801956,
+          "f1": 0.8173690932311622,
+          "pr_auc": 0.9219615362888735,
+          "roc_auc": 0.9304690847679782,
+          "fpr": 0.09278350515463918,
+          "tn": 528,
+          "fp": 54,
+          "fn": 89,
+          "tp": 320
         }
       },
       "xgboost": {
-        "feature_count": 60,
+        "feature_count": 57,
         "features": [
           "category_count__network_activity",
           "category_present__network_activity",
@@ -371,27 +359,24 @@
           "indicator_present__base64.decode",
           "n_py_files",
           "feat_min_edit_distance",
-          "feat_is_potential_squat",
-          "feat_package_age_days",
-          "feat_total_releases",
-          "feat_pypi_exists"
+          "feat_is_potential_squat"
         ],
         "frozen_holdout": {
           "threshold": 0.5,
           "sample_count": 991,
           "malicious_count": 409,
           "benign_count": 582,
-          "accuracy": 0.8446014127144299,
-          "precision": 0.8294573643410853,
-          "recall": 0.784841075794621,
-          "f1": 0.8065326633165829,
-          "pr_auc": 0.900951173416519,
-          "roc_auc": 0.9033494652114369,
-          "fpr": 0.1134020618556701,
-          "tn": 516,
-          "fp": 66,
-          "fn": 88,
-          "tp": 321
+          "accuracy": 0.8375378405650857,
+          "precision": 0.8212435233160622,
+          "recall": 0.7750611246943765,
+          "f1": 0.7974842767295598,
+          "pr_auc": 0.9053721023541162,
+          "roc_auc": 0.911325082549845,
+          "fpr": 0.11855670103092783,
+          "tn": 513,
+          "fp": 69,
+          "fn": 92,
+          "tp": 317
         }
       }
     }

@@ -3,8 +3,8 @@
 Includes:
 1. AST-only vs AST + Size evaluation.
 2. Size-stratified evaluation on frozen holdout (1-5, 6-20, >20 files).
-3. Metadata ablation (explicitly labelled as a LEAKAGE/DIAGNOSTIC EXPERIMENT).
-4. False Positive / False Negative review (up to 30 actual FPs, up to 30 actual FNs).
+3. Metadata ablation (explicitly labelled as a DIAGNOSTIC / LEAKAGE EXPERIMENT, partially completed due to missing PyPI snapshot).
+4. False Positive / False Negative review (strictly true FPs and true FNs).
 """
 
 import gzip
@@ -163,10 +163,18 @@ def run_size_stratified_evaluation(holdout):
 
     md_lines.extend([
         "",
-        "### Key Takeaways from Stratification:",
-        "1. **AST-only without size (`behavior_without_size`)** performs consistently across small (1-5 files) and medium packages, keeping FPR under 8%.",
-        "2. In the `>20 files` bucket, benign packages contain extensive helper/test files; models without size distinguish malicious indicators without penalizing large benign packages.",
-        "3. Models relying purely on `n_py_files` (`size_only`) suffer from high false positive rates (FPR > 20%) because legitimate popular packages have larger codebases.",
+        "### Key Takeaways from Size Stratification:",
+        "1. **AST-Only Baseline (`behavior_without_size`):**",
+        "   - **Random Forest** exhibits robust false positive control across all strata: **3.97%** on small packages (1-5 files), **7.19%** on medium packages (6-20 files), and **7.14%** on large packages (>20 files), yielding an overall holdout FPR of **6.36%** and ROC-AUC of **0.9012**.",
+        "   - **XGBoost** exhibits slightly higher variation across strata: **4.76%** on small packages (1-5 files), **9.35%** on medium packages (6-20 files), and **8.12%** on large packages (>20 files), with an overall holdout FPR of **7.56%** and ROC-AUC of **0.8844**.",
+        "   - Note that while Random Forest keeps FPR under 8% across all strata, XGBoost reaches **9.35% FPR** on medium-sized packages.",
+        "2. **Severe Distortion from Size Feature (`behavior_with_size`):**",
+        "   - Introducing `n_py_files` to tree classifiers induces severe class-confounding: the False Positive Rate on small packages (1-5 files) explodes to **53.17% (RF)** and **51.59% (XGBoost)**.",
+        "   - Because benign training samples are predominantly larger libraries, the models learn an artificial shortcut linking small codebase size directly to malice.",
+        "",
+        "### Limitations of Experiments:",
+        "1. **Limitations of `size_only`:** Codebase file count alone is inherently confounded by dataset curation: legitimate packages ship extensive tests and documentation, while historical malware samples are predominantly compact scripts. Relying on size produces a catastrophic **100% FPR** on 1-5 file packages (classifying all small benign packages as malicious) while failing entirely on large evasion-padded malware.",
+        "2. **Limitations of metadata ablation:** Typosquatting distance features (`feat_min_edit_distance`, `feat_is_potential_squat`) offer limited standalone discriminative power (ROC-AUC ~0.64, PR-AUC ~0.51) because only a minor subset of supply-chain attacks rely on name similarity. Furthermore, PyPI API attributes (`feat_package_age_days`, `feat_total_releases`, `feat_pypi_exists`) are missing from stored repository snapshots; live network querying is prohibited to avoid network dependency and distribution leakage.",
         "",
     ])
 
@@ -178,35 +186,35 @@ def run_size_stratified_evaluation(holdout):
 
 
 # =====================================================================
-# Task 3: Metadata Ablation (Explicit Leakage Experiment)
+# Task 3: Metadata Ablation (Explicit Leakage / Diagnostic Experiment)
 # =====================================================================
 
 def run_metadata_ablation(df, development, holdout):
-    print("\n--- Running Metadata Ablation (LEAKAGE/DIAGNOSTIC EXPERIMENT) ---")
+    print("\n--- Running Metadata Ablation (DIAGNOSTIC / LEAKAGE EXPERIMENT) ---")
 
-    # 1. Compute/extract the 5 metadata features
-    # Typosquat distance features are computed offline deterministically
-    print("[*] Computing offline typosquat distance features...")
+    # 1. Inspect metadata sources:
+    # Compute genuine offline typosquat distance features from package_name
+    print("[*] Extracting genuine offline typosquat distance features...")
     typosquat_data = [compute_typosquat_distance(name) for name in df["package_name"]]
     typosquat_df = pd.DataFrame(typosquat_data)
 
-    metadata_cols = [
+    genuine_metadata_cols = [
         "feat_min_edit_distance",
         "feat_is_potential_squat",
-        "feat_package_age_days",
-        "feat_total_releases",
-        "feat_pypi_exists",
     ]
 
-    # Stored snapshot inspection:
-    # PyPI API features fallback to documented defaults (-1, 0, 0) as no live PyPI call is allowed
-    # and no stored external PyPI snapshot is committed in the repository.
+    unavailable_metadata_features = {
+        "feat_package_age_days": "Missing offline stored PyPI snapshot in repository. Live network requests are prohibited.",
+        "feat_total_releases": "Missing offline stored PyPI snapshot in repository. Live network requests are prohibited.",
+        "feat_pypi_exists": "Missing offline stored PyPI snapshot in repository. Live network requests are prohibited.",
+    }
+
+    print(f"[*] Genuine metadata features available: {genuine_metadata_cols}")
+    print(f"[*] Unavailable PyPI API features: {list(unavailable_metadata_features.keys())}")
+
     meta_augmented_df = df.copy()
     meta_augmented_df["feat_min_edit_distance"] = typosquat_df["feat_min_edit_distance"]
     meta_augmented_df["feat_is_potential_squat"] = typosquat_df["feat_is_potential_squat"]
-    meta_augmented_df["feat_package_age_days"] = -1
-    meta_augmented_df["feat_total_releases"] = 0
-    meta_augmented_df["feat_pypi_exists"] = 0
 
     holdout_ids = set(holdout["package_id"].astype(str))
     dev_meta = meta_augmented_df[~meta_augmented_df["package_id"].astype(str).isin(holdout_ids)].copy()
@@ -216,19 +224,27 @@ def run_metadata_ablation(df, development, holdout):
     excluded = {
         "package_id", "package_name", "group_id", "version", "analyzer_version", "label",
         "n_findings", "parse_error_count", "failed_static_analysis", "n_py_files",
-    } | set(metadata_cols)
+    } | set(genuine_metadata_cols)
     behavior_cols = [c for c in df.columns if c not in excluded]
 
     ablation_experiments = {
-        "metadata_only": metadata_cols,
-        "behavior_with_metadata": behavior_cols + metadata_cols,
-        "behavior_with_size_and_metadata": behavior_cols + ["n_py_files"] + metadata_cols,
+        "metadata_only": genuine_metadata_cols,
+        "behavior_with_metadata": behavior_cols + genuine_metadata_cols,
+        "behavior_with_size_and_metadata": behavior_cols + ["n_py_files"] + genuine_metadata_cols,
     }
 
     results = {
-        "experiment_warning": "LEAKAGE/DIAGNOSTIC EXPERIMENT — NOT A PRODUCTION SAFE MODEL. Metadata features (e.g., PyPI release age, total releases, or unindexed status) can leak target distributions, release popularity, or dataset curation artifacts.",
-        "pypi_snapshot_disclosure": "No external PyPI snapshot dataset is committed in the repository. Because live PyPI API querying is prohibited to prevent network leakage and unrepeatable state, feat_package_age_days (-1), feat_total_releases (0), and feat_pypi_exists (0) currently use documented default fallbacks rather than measured PyPI metadata. Only feat_min_edit_distance and feat_is_potential_squat are computed offline from package names. These results do not claim real metadata improvement.",
-        "metadata_features": metadata_cols,
+        "experiment_status": "PARTIALLY COMPLETED",
+        "experiment_warning": "DIAGNOSTIC / LEAKAGE EXPERIMENT — NOT A PRODUCTION SAFE MODEL. Metadata features (e.g., PyPI release age or unindexed status) can leak target distributions or dataset curation artifacts.",
+        "genuine_metadata_features_evaluated": genuine_metadata_cols,
+        "unavailable_metadata_features": unavailable_metadata_features,
+        "metadata_limitation_disclosure": (
+            "Genuine source data was only available for offline typosquatting edit distance features. "
+            "A stored offline PyPI snapshot covering the full dataset was not available in the repository. "
+            "Rather than fabricating missing values with synthetic defaults or making prohibited live API calls, "
+            "the 3 PyPI API metadata features were omitted from training. This experiment is reported as partially "
+            "completed to maintain methodological honesty."
+        ),
         "experiments": {},
     }
 

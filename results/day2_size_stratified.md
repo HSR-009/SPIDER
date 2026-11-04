@@ -37,7 +37,15 @@ Evaluation performed on the frozen holdout set (991 packages) divided into packa
 | size_only | xgboost | 0_files | 25 | 9 | 16 | 0.6400 | 0.5000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
 | size_only | xgboost | all_packages | 991 | 582 | 409 | 0.6924 | 0.7744 | 0.6827 | 0.6944 | 0.6885 | 0.2268 |
 
-### Key Takeaways from Stratification:
-1. **AST-only without size (`behavior_without_size`)** performs consistently across small (1-5 files) and medium packages, keeping FPR under 8%.
-2. In the `>20 files` bucket, benign packages contain extensive helper/test files; models without size distinguish malicious indicators without penalizing large benign packages.
-3. Models relying purely on `n_py_files` (`size_only`) suffer from high false positive rates (FPR > 20%) because legitimate popular packages have larger codebases.
+### Key Takeaways from Size Stratification:
+1. **AST-Only Baseline (`behavior_without_size`):**
+   - **Random Forest** exhibits robust false positive control across all strata: **3.97%** on small packages (1-5 files), **7.19%** on medium packages (6-20 files), and **7.14%** on large packages (>20 files), yielding an overall holdout FPR of **6.36%** and ROC-AUC of **0.9012**.
+   - **XGBoost** exhibits slightly higher variation across strata: **4.76%** on small packages (1-5 files), **9.35%** on medium packages (6-20 files), and **8.12%** on large packages (>20 files), with an overall holdout FPR of **7.56%** and ROC-AUC of **0.8844**.
+   - Note that while Random Forest keeps FPR under 8% across all strata, XGBoost reaches **9.35% FPR** on medium-sized packages.
+2. **Severe Distortion from Size Feature (`behavior_with_size`):**
+   - Introducing `n_py_files` to tree classifiers induces severe class-confounding: the False Positive Rate on small packages (1-5 files) explodes to **53.17% (RF)** and **51.59% (XGBoost)**.
+   - Because benign training samples are predominantly larger libraries, the models learn an artificial shortcut linking small codebase size directly to malice.
+
+### Limitations of Experiments:
+1. **Limitations of `size_only`:** Codebase file count alone is inherently confounded by dataset curation: legitimate packages ship extensive tests and documentation, while historical malware samples are predominantly compact scripts. Relying on size produces a catastrophic **100% FPR** on 1-5 file packages (classifying all small benign packages as malicious) while failing entirely on large evasion-padded malware.
+2. **Limitations of metadata ablation:** Typosquatting distance features (`feat_min_edit_distance`, `feat_is_potential_squat`) offer limited standalone discriminative power (ROC-AUC ~0.64, PR-AUC ~0.51) because only a minor subset of supply-chain attacks rely on name similarity. Furthermore, PyPI API attributes (`feat_package_age_days`, `feat_total_releases`, `feat_pypi_exists`) are missing from stored repository snapshots; live network querying is prohibited to avoid network dependency and distribution leakage.
