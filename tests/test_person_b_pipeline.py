@@ -52,6 +52,18 @@ class PersonBPipelineTests(unittest.TestCase):
             valid_groups = set(development.iloc[valid_idx].group_id)
             self.assertTrue(train_groups.isdisjoint(valid_groups))
 
+    def test_score_predictions_handles_edge_cases(self):
+        from Person_B.evaluation.day2_ablation import score_predictions
+        scores = score_predictions([0, 1, 0, 1], [0.1, 0.9, 0.2, 0.8])
+        self.assertEqual(scores["accuracy"], 1.0)
+        self.assertEqual(scores["roc_auc"], 1.0)
+        self.assertEqual(scores["fpr"], 0.0)
+
+        scores_single = score_predictions([0, 0, 0], [0.1, 0.2, 0.3])
+        self.assertIsNone(scores_single["roc_auc"])
+        self.assertIsNone(scores_single["pr_auc"])
+        self.assertEqual(scores_single["sample_count"], 3)
+
 
 if __name__ == "__main__":
     unittest.main()

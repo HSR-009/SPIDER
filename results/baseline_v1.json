@@ -1,0 +1,610 @@
+{
+  "protocol": "5-fold StratifiedGroupKFold on development set plus frozen grouped holdout",
+  "positive_label": 1,
+  "group_column": "group_id",
+  "rows_total": 4953,
+  "groups_total": 2654,
+  "rows_development": 3962,
+  "rows_frozen_holdout": 991,
+  "analyzer_version_note": "Not present in current source JSONL; kept null, not inferred.",
+  "experiments": {
+    "behavior_without_size": {
+      "random_forest": {
+        "feature_count": 54,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64encode",
+          "indicator_present__base64.b64decode",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__.env",
+          "indicator_present__requests.post",
+          "indicator_present__socket",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__eval",
+          "indicator_present__compile",
+          "indicator_present__os.system",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__requests.request",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__base64.encodestring",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.decodestring",
+          "indicator_present__base64.b32decode",
+          "indicator_present__base64.b16decode",
+          "indicator_present__base64.b16encode",
+          "indicator_present__base64.b85decode",
+          "indicator_present__base64.a85encode",
+          "indicator_present__base64.b85encode",
+          "indicator_present__base64.a85decode",
+          "indicator_present__base64.encode",
+          "indicator_present__base64.b32hexdecode",
+          "indicator_present__base64.b32hexencode",
+          "indicator_present__base64.decode"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "threshold": {
+              "mean": 0.5,
+              "std": 0.0
+            },
+            "accuracy": {
+              "mean": 0.8185174570420474,
+              "std": 0.02261762975586663
+            },
+            "precision": {
+              "mean": 0.8651452388406072,
+              "std": 0.02469507215349426
+            },
+            "recall": {
+              "mean": 0.6638024912359215,
+              "std": 0.04878335604735954
+            },
+            "f1": {
+              "mean": 0.750586349136734,
+              "std": 0.0377090385983545
+            },
+            "pr_auc": {
+              "mean": 0.8535491940778439,
+              "std": 0.022578849106744667
+            },
+            "roc_auc": {
+              "mean": 0.8774754361789079,
+              "std": 0.022458237388843387
+            },
+            "fpr": {
+              "mean": 0.07266509760487332,
+              "std": 0.013590415631651842
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2157,
+            "fp": 169,
+            "fn": 550,
+            "tp": 1086
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "accuracy": 0.8244197780020182,
+          "precision": 0.8802588996763754,
+          "recall": 0.6650366748166259,
+          "f1": 0.7576601671309192,
+          "pr_auc": 0.8713012432415791,
+          "roc_auc": 0.9012195531805846,
+          "tn": 545,
+          "fp": 37,
+          "fn": 137,
+          "tp": 272,
+          "fpr": 0.06357388316151202
+        },
+        "model_path": "Person_B\\models\\saved\\random_forest_behavior_without_size.joblib"
+      },
+      "xgboost": {
+        "feature_count": 54,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64encode",
+          "indicator_present__base64.b64decode",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__.env",
+          "indicator_present__requests.post",
+          "indicator_present__socket",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__eval",
+          "indicator_present__compile",
+          "indicator_present__os.system",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__requests.request",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__base64.encodestring",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.decodestring",
+          "indicator_present__base64.b32decode",
+          "indicator_present__base64.b16decode",
+          "indicator_present__base64.b16encode",
+          "indicator_present__base64.b85decode",
+          "indicator_present__base64.a85encode",
+          "indicator_present__base64.b85encode",
+          "indicator_present__base64.a85decode",
+          "indicator_present__base64.encode",
+          "indicator_present__base64.b32hexdecode",
+          "indicator_present__base64.b32hexencode",
+          "indicator_present__base64.decode"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "threshold": {
+              "mean": 0.5,
+              "std": 0.0
+            },
+            "accuracy": {
+              "mean": 0.8111961353764633,
+              "std": 0.0309917726971258
+            },
+            "precision": {
+              "mean": 0.8536437840859726,
+              "std": 0.045261462039495805
+            },
+            "recall": {
+              "mean": 0.6552379354068769,
+              "std": 0.05694633369711818
+            },
+            "f1": {
+              "mean": 0.740591236516492,
+              "std": 0.048013540721244106
+            },
+            "pr_auc": {
+              "mean": 0.855321808752886,
+              "std": 0.025279444106553323
+            },
+            "roc_auc": {
+              "mean": 0.8777232049330606,
+              "std": 0.025983901530736292
+            },
+            "fpr": {
+              "mean": 0.07911763348562462,
+              "std": 0.024804020298198896
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2142,
+            "fp": 184,
+            "fn": 564,
+            "tp": 1072
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "accuracy": 0.8022199798183652,
+          "precision": 0.8538205980066446,
+          "recall": 0.628361858190709,
+          "f1": 0.723943661971831,
+          "pr_auc": 0.85353955399678,
+          "roc_auc": 0.8844260160142497,
+          "tn": 538,
+          "fp": 44,
+          "fn": 152,
+          "tp": 257,
+          "fpr": 0.07560137457044673
+        },
+        "model_path": "Person_B\\models\\saved\\xgboost_behavior_without_size.joblib"
+      }
+    },
+    "behavior_with_size": {
+      "random_forest": {
+        "feature_count": 55,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64encode",
+          "indicator_present__base64.b64decode",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__.env",
+          "indicator_present__requests.post",
+          "indicator_present__socket",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__eval",
+          "indicator_present__compile",
+          "indicator_present__os.system",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__requests.request",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__base64.encodestring",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.decodestring",
+          "indicator_present__base64.b32decode",
+          "indicator_present__base64.b16decode",
+          "indicator_present__base64.b16encode",
+          "indicator_present__base64.b85decode",
+          "indicator_present__base64.a85encode",
+          "indicator_present__base64.b85encode",
+          "indicator_present__base64.a85decode",
+          "indicator_present__base64.encode",
+          "indicator_present__base64.b32hexdecode",
+          "indicator_present__base64.b32hexencode",
+          "indicator_present__base64.decode",
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "threshold": {
+              "mean": 0.5,
+              "std": 0.0
+            },
+            "accuracy": {
+              "mean": 0.8558778198122461,
+              "std": 0.00868222645309955
+            },
+            "precision": {
+              "mean": 0.8417510341312227,
+              "std": 0.03316053986888374
+            },
+            "recall": {
+              "mean": 0.805012307003804,
+              "std": 0.0448080697735908
+            },
+            "f1": {
+              "mean": 0.8216128100965113,
+              "std": 0.012379615038145057
+            },
+            "pr_auc": {
+              "mean": 0.9122256942678243,
+              "std": 0.0124537692548944
+            },
+            "roc_auc": {
+              "mean": 0.9174057931892238,
+              "std": 0.01743913351763404
+            },
+            "fpr": {
+              "mean": 0.10834187087544418,
+              "std": 0.034433849370775566
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2074,
+            "fp": 252,
+            "fn": 319,
+            "tp": 1317
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "accuracy": 0.8496468213925328,
+          "precision": 0.8217821782178217,
+          "recall": 0.8117359413202934,
+          "f1": 0.8167281672816729,
+          "pr_auc": 0.907716600216845,
+          "roc_auc": 0.91780303985078,
+          "tn": 510,
+          "fp": 72,
+          "fn": 77,
+          "tp": 332,
+          "fpr": 0.12371134020618557
+        },
+        "model_path": "Person_B\\models\\saved\\random_forest_behavior_with_size.joblib"
+      },
+      "xgboost": {
+        "feature_count": 55,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64encode",
+          "indicator_present__base64.b64decode",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__.env",
+          "indicator_present__requests.post",
+          "indicator_present__socket",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__eval",
+          "indicator_present__compile",
+          "indicator_present__os.system",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__requests.request",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__base64.encodestring",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.decodestring",
+          "indicator_present__base64.b32decode",
+          "indicator_present__base64.b16decode",
+          "indicator_present__base64.b16encode",
+          "indicator_present__base64.b85decode",
+          "indicator_present__base64.a85encode",
+          "indicator_present__base64.b85encode",
+          "indicator_present__base64.a85decode",
+          "indicator_present__base64.encode",
+          "indicator_present__base64.b32hexdecode",
+          "indicator_present__base64.b32hexencode",
+          "indicator_present__base64.decode",
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "threshold": {
+              "mean": 0.5,
+              "std": 0.0
+            },
+            "accuracy": {
+              "mean": 0.8604197714853452,
+              "std": 0.010907319951866782
+            },
+            "precision": {
+              "mean": 0.8470752451765637,
+              "std": 0.02981440057445876
+            },
+            "recall": {
+              "mean": 0.8098903557842917,
+              "std": 0.03054050802609245
+            },
+            "f1": {
+              "mean": 0.8273221164794833,
+              "std": 0.012495149376139684
+            },
+            "pr_auc": {
+              "mean": 0.9119551363097822,
+              "std": 0.014235896300396154
+            },
+            "roc_auc": {
+              "mean": 0.9157124876456579,
+              "std": 0.017168126419602626
+            },
+            "fpr": {
+              "mean": 0.10404817942683095,
+              "std": 0.028580886644808925
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2084,
+            "fp": 242,
+            "fn": 311,
+            "tp": 1325
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "accuracy": 0.8365287588294652,
+          "precision": 0.8224543080939948,
+          "recall": 0.7701711491442543,
+          "f1": 0.7954545454545454,
+          "pr_auc": 0.887044406348603,
+          "roc_auc": 0.8905006763625976,
+          "tn": 514,
+          "fp": 68,
+          "fn": 94,
+          "tp": 315,
+          "fpr": 0.11683848797250859
+        },
+        "model_path": "Person_B\\models\\saved\\xgboost_behavior_with_size.joblib"
+      }
+    },
+    "size_only": {
+      "random_forest": {
+        "feature_count": 1,
+        "features": [
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "threshold": {
+              "mean": 0.5,
+              "std": 0.0
+            },
+            "accuracy": {
+              "mean": 0.7513779026074108,
+              "std": 0.02544452990354414
+            },
+            "precision": {
+              "mean": 0.6809074787408774,
+              "std": 0.03140181469887628
+            },
+            "recall": {
+              "mean": 0.751219512195122,
+              "std": 0.0407982050673041
+            },
+            "f1": {
+              "mean": 0.7138187636073031,
+              "std": 0.029170007258328426
+            },
+            "pr_auc": {
+              "mean": 0.7369302699595509,
+              "std": 0.022027644073826624
+            },
+            "roc_auc": {
+              "mean": 0.8117067881097046,
+              "std": 0.02032518495966506
+            },
+            "fpr": {
+              "mean": 0.24850800683003368,
+              "std": 0.036164728529808975
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 1748,
+            "fp": 578,
+            "fn": 407,
+            "tp": 1229
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "accuracy": 0.7416750756811302,
+          "precision": 0.6617336152219874,
+          "recall": 0.7652811735941321,
+          "f1": 0.7097505668934241,
+          "pr_auc": 0.689742510194993,
+          "roc_auc": 0.7797893613624715,
+          "tn": 422,
+          "fp": 160,
+          "fn": 96,
+          "tp": 313,
+          "fpr": 0.27491408934707906
+        },
+        "model_path": "Person_B\\models\\saved\\random_forest_size_only.joblib"
+      },
+      "xgboost": {
+        "feature_count": 1,
+        "features": [
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "threshold": {
+              "mean": 0.5,
+              "std": 0.0
+            },
+            "accuracy": {
+              "mean": 0.7665243226718637,
+              "std": 0.017039000875670528
+            },
+            "precision": {
+              "mean": 0.7070326538326216,
+              "std": 0.027421714395643833
+            },
+            "recall": {
+              "mean": 0.7457149250391587,
+              "std": 0.0411541882987526
+            },
+            "f1": {
+              "mean": 0.7249179653538291,
+              "std": 0.01980495990850942
+            },
+            "pr_auc": {
+              "mean": 0.7434285331139406,
+              "std": 0.021636510832884405
+            },
+            "roc_auc": {
+              "mean": 0.8194962256470146,
+              "std": 0.014734744112817246
+            },
+            "fpr": {
+              "mean": 0.21883612534034796,
+              "std": 0.037791127627012484
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 1817,
+            "fp": 509,
+            "fn": 416,
+            "tp": 1220
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "accuracy": 0.7406659939455096,
+          "precision": 0.6826923076923077,
+          "recall": 0.6943765281173594,
+          "f1": 0.6884848484848485,
+          "pr_auc": 0.6924093913095762,
+          "roc_auc": 0.7743910636116924,
+          "tn": 450,
+          "fp": 132,
+          "fn": 125,
+          "tp": 284,
+          "fpr": 0.2268041237113402
+        },
+        "model_path": "Person_B\\models\\saved\\xgboost_size_only.joblib"
+      }
+    }
+  }
+}
