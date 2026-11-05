@@ -191,7 +191,7 @@ class TestAnalyzer(unittest.TestCase):
         clean_dir = "data/toy_samples/clean"
         if os.path.exists(clean_dir):
             record = scan_directory(clean_dir)
-            self.assertEqual(record["verdict"], "none_detected_in_scan")
+            self.assertEqual(record["verdict"], "none_detected_in_this_scan")
             self.assertGreater(record["n_py_files"], 0)
             self.assertEqual(record["parse_error_count"], 0)
             self.assertGreater(len(record["inventory"]["inspected_files"]), 0)
@@ -229,6 +229,43 @@ class TestAnalyzer(unittest.TestCase):
             # Verify pth file startup hook was detected
             pth_findings = [f for f in record["findings"] if f["indicator"] == "startup_hook.pth"]
             self.assertGreaterEqual(len(pth_findings), 1)
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_non_constant_getattr_alone_not_suspicious(self):
+        temp_dir = tempfile.mkdtemp()
+        try:
+            py_file = os.path.join(temp_dir, "sample.py")
+            with open(py_file, "w", encoding="utf-8") as f:
+                f.write("import os\nfn = 'sys' + 'tem'\ngetattr(os, fn)\n")
+            record = scan_directory(temp_dir)
+            self.assertNotEqual(record["verdict"], "suspicious")
+            indicators = [f["indicator"] for f in record["findings"]]
+            self.assertIn("getattr.dynamic", indicators)
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_non_constant_getattr_plus_network_not_suspicious(self):
+        temp_dir = tempfile.mkdtemp()
+        try:
+            py_file = os.path.join(temp_dir, "sample.py")
+            with open(py_file, "w", encoding="utf-8") as f:
+                f.write("import os\nimport requests\nfn = 'sys' + 'tem'\ngetattr(os, fn)\nrequests.get('https://example.com')\n")
+            record = scan_directory(temp_dir)
+            self.assertNotEqual(record["verdict"], "suspicious")
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_constant_getattr_os_system_flagged_and_suspicious(self):
+        temp_dir = tempfile.mkdtemp()
+        try:
+            py_file = os.path.join(temp_dir, "sample.py")
+            with open(py_file, "w", encoding="utf-8") as f:
+                f.write("import os\ngetattr(os, 'system')('id')\n")
+            record = scan_directory(temp_dir)
+            self.assertEqual(record["verdict"], "suspicious")
+            indicators = [f["indicator"] for f in record["findings"]]
+            self.assertIn("os.system", indicators)
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 

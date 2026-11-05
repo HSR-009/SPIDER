@@ -3,18 +3,20 @@
  1) size strata + size-only AUC  (needs only the two *_for_b.jsonl files)
  2) rule parity: re-scan a random sample of benign packages with the real analyzer path and compare
     (needs data/raw/benign and Person_A/pipeline/run_malicious_scan.py)"""
-import json, random, re, sys
+import gzip, json, random, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MAL = ROOT / "data/processed/malicious_for_b.jsonl"
-BEN = ROOT / "data/processed/benign_for_b.jsonl"
+BEN = ROOT / "data/processed/benign_for_b.jsonl.gz"
 ARCH = (".tar.gz", ".tgz", ".tar.bz2", ".tar.xz", ".tar", ".zip", ".whl")
 CATS = ["Install-Time / Package Execution", "Network Activity", "Command Execution",
         "Credential / Data Access", "Obfuscation", "Dynamic Code Execution"]
 
 def norm(n): return re.sub(r"[-_.]+", "-", str(n).strip()).lower()
-def load(p): return [json.loads(l) for l in open(p, encoding="utf-8") if l.strip()]
+def load(p):
+    opener = gzip.open if str(p).endswith(".gz") else open
+    return [json.loads(l) for l in opener(p, "rt", encoding="utf-8") if l.strip()]
 def pct(a, b): return f"{100 * a / b:5.1f}%" if b else "   n/a"
 
 def auc(pos, neg):

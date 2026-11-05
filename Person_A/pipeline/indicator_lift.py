@@ -1,9 +1,10 @@
-﻿
+
+import gzip
 import json
 from pathlib import Path
 
 MAL = Path("data/processed/malicious_for_b.jsonl")
-BEN = Path("data/processed/benign_for_b.jsonl")
+BEN = Path("data/processed/benign_for_b.jsonl.gz")
 OUT = Path("Person_A/analysis/indicator_discrimination.md")
 PIPE = Path("Person_A/pipeline")
 
@@ -12,9 +13,10 @@ OUT.parent.mkdir(parents=True, exist_ok=True)
 
 
 def load(path, expected_label):
+    opener = gzip.open if str(path).endswith(".gz") else open
     rows = [
         json.loads(line)
-        for line in path.open(encoding="utf-8")
+        for line in opener(path, "rt", encoding="utf-8")
         if line.strip()
     ]
 
