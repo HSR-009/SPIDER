@@ -215,7 +215,10 @@ def build_record(
     if derived["outcome"] == "none_detected_in_this_scan":
         limitations.append(NONE_DETECTED_NOTE)
     limitations.extend(extra_limitations or [])
-    record["verdict"] = {"outcome": derived["outcome"], "reasons": derived["reasons"], "limitations": limitations}
+    verdict_dict = {"outcome": derived["outcome"], "reasons": derived["reasons"], "limitations": limitations}
+    if "review_recommended" in derived:
+        verdict_dict["review_recommended"] = derived["review_recommended"]
+    record["verdict"] = verdict_dict
     return record
 
 
@@ -420,11 +423,23 @@ def fx_vendored() -> Dict[str, Any]:
     )
 
 
+def clean_dir(d: Path) -> None:
+    if not d.exists():
+        d.mkdir(parents=True)
+        return
+    for item in d.iterdir():
+        if item.is_file():
+            try:
+                item.unlink()
+            except Exception:
+                pass
+        elif item.is_dir():
+            shutil.rmtree(item, ignore_errors=True)
+
+
 def main() -> None:
     for d in (SRC_DIR, REC_DIR):
-        if d.exists():
-            shutil.rmtree(d)
-        d.mkdir(parents=True)
+        clean_dir(d)
     records = [
         ("01_clean_network_in_function", fx_clean()),
         ("02_install_hook", fx_install_hook()),
