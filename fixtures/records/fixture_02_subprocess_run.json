@@ -1,0 +1,29 @@
+{
+  "fixture_id": "fixture_02_subprocess_run",
+  "package_name": "toy-subproc",
+  "version": "1.0.0",
+  "record_origin": "fixture",
+  "verdict": "Malicious",
+  "findings": [
+    {
+      "category": "Command Execution",
+      "indicator": "subprocess.run",
+      "severity": "HIGH",
+      "file": "subprocess_call.py",
+      "line": 3,
+      "evidence": "subprocess.run() call detected"
+    }
+  ],
+  "files": [
+    {
+      "filename": "subprocess_call.py",
+      "path": "fixture_02_subprocess_run\\subprocess_call.py",
+      "content": "import subprocess\n\nsubprocess.run([\"whoami\"])\n"
+    }
+  ],
+  "model_assessment": {
+    "risk_score": 0.88,
+    "model_status": "illustrative",
+    "label": "Illustrative (pre-training placeholder)"
+  }
+}

@@ -1,0 +1,109 @@
+version: "1.0"
+title: "SPIDER Roadmap"
+description: "Supply Chain Packages Intelligence for Detection, Evasion and Resilience"
+
+levels:
+  - level: 0
+    id: "level-0-contract"
+    title: "Evidence Contract & Research Checks"
+    group: "v1"
+    status: "built"
+    description: "Shared schema contract, leakage guards, group-safe splits, size-bias evaluation."
+    deliverables:
+      - "Versioned scan_record JSON schema"
+      - "Grouped evaluation (package-name group_id)"
+      - "Size-only baseline comparison"
+
+  - level: 1
+    id: "level-1-scanner"
+    title: "Core Scanner and CLI"
+    group: "v1"
+    status: "in_progress"
+    description: "Static AST analyzer engine (v1 frozen, v1.1 hardened), safe acquisition, scan_directory, and spider scan CLI."
+    deliverables:
+      - "AST analyzer with span, snippet, and rule IDs"
+      - "Directory-level scan engine with build hook inspection"
+      - "spider scan CLI with 3-way verdicts"
+
+  - level: 2
+    id: "level-2-ui"
+    title: "Investigation UI"
+    group: "v1"
+    status: "coming_soon"
+    description: "Interactive dashboard displaying package tree, evidence viewer, findings table, and Capability Web radar."
+    deliverables:
+      - "Interactive Streamlit / web interface"
+      - "Finding code-viewer with exact line/span highlighting"
+      - "Capability Web 6-category radar"
+
+  - level: 3
+    id: "level-3-resilience"
+    title: "Resilience Lab"
+    group: "v1"
+    status: "coming_soon"
+    description: "Automated evasion testing using synthetic disguise transforms and defense normalization."
+    deliverables:
+      - "Harmless synthetic seeds covering 6 categories"
+      - "Transforms T01-T05 (string split, base64, rot13, getattr, delay)"
+      - "Baseline vs normalized vs hardened resilience table"
+
+  - level: 4a
+    id: "level-4a-hunter-env"
+    title: "Hunter: Environment Scan"
+    group: "v1"
+    status: "coming_soon"
+    description: "Post-install scan of local virtual environment and startup persistence artifacts (.pth, sitecustomize, console scripts)."
+    deliverables:
+      - "importlib.metadata environment inventory"
+      - "Startup artifact inspection"
+      - "Planted-artifact verification test"
+
+  - level: 4b
+    id: "level-4b-hunter-tamper"
+    title: "Hunter: Wheel Tamper Check"
+    group: "v1_stretch"
+    status: "coming_soon"
+    description: "Compares installed files against published PyPI wheel contents to catch post-install file modifications."
+    deliverables:
+      - "Wheel manifest hash verification"
+      - "Modified file mismatch alerts"
+
+  - level: 5
+    id: "level-5-guardian"
+    title: "Pre-install Guardian & Browser Extension"
+    group: "next"
+    status: "coming_soon"
+    description: "Intercepts pip install requests and checks packages directly in the browser when viewing PyPI."
+    deliverables:
+      - "Pip pre-install proxy/hook"
+      - "PyPI package page browser extension"
+
+  - level: 6
+    id: "level-6-range"
+    title: "Range-lite & ATT&CK Heatmap"
+    group: "next"
+    status: "coming_soon"
+    description: "Synthetic attack scenarios mapped to the MITRE ATT&CK matrix for supply chain techniques."
+    deliverables:
+      - "ATT&CK matrix mapping for supply chain techniques"
+      - "Threat scenario simulation engine"
+
+  - level: 7
+    id: "level-7-intelligence"
+    title: "Package Intelligence & Typosquat Radar"
+    group: "later"
+    status: "coming_soon"
+    description: "Version-to-version semantic diffs, dependency tree expansion, and proactive typosquat detection."
+    deliverables:
+      - "AST version-diff analyzer"
+      - "Levenshtein typosquat search against PyPI top 5,000"
+
+  - level: 8
+    id: "level-8-ci-sarif"
+    title: "Reports, SARIF & GitHub Action"
+    group: "later"
+    status: "coming_soon"
+    description: "Exportable audit reports, standardized SARIF format output, and automated GitHub Actions CI step."
+    deliverables:
+      - "SARIF 2.1.0 exporter"
+      - "Official GitHub Action runner"

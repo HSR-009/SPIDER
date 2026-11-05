@@ -1,16 +1,23 @@
+# Environments
 env/
 venv/
 .venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-data/raw_safe/
-data/raw_malicious/
-data/
-*.joblib
-*.png
-# SPIDER generated scan outputs and local backups
+
+# Operating system and editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
 *.bak
 *.bak.*
-data/processed/malicious_scan*.jsonl
+
+# Local datasets and raw archives
 data/raw/
+!data/raw/benign/manifest.jsonl
+data/raw_safe/
+data/raw_malicious/
+
+# Intermediary scan outputs
+data/processed/malicious_scan*.jsonl

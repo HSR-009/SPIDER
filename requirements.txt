@@ -4,3 +4,8 @@ scikit-learn
 xgboost
 shap
 streamlit
+jsonschema
+requests
+python-Levenshtein
+matplotlib
+pyyaml

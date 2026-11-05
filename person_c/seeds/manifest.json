@@ -1,0 +1,142 @@
+[
+  {
+    "seed_id": "seed_01",
+    "filename": "seed_01.py",
+    "category": "Command Execution",
+    "intended_indicator": "os.system",
+    "expected_marker": "MARKER_001"
+  },
+  {
+    "seed_id": "seed_02",
+    "filename": "seed_02.py",
+    "category": "Command Execution",
+    "intended_indicator": "subprocess.run",
+    "expected_marker": "MARKER_002"
+  },
+  {
+    "seed_id": "seed_03",
+    "filename": "seed_03.py",
+    "category": "Command Execution",
+    "intended_indicator": "subprocess.Popen",
+    "expected_marker": "MARKER_003"
+  },
+  {
+    "seed_id": "seed_04",
+    "filename": "seed_04.py",
+    "category": "Command Execution",
+    "intended_indicator": "os.popen",
+    "expected_marker": "MARKER_004"
+  },
+  {
+    "seed_id": "seed_05",
+    "filename": "seed_05.py",
+    "category": "Dynamic Code Execution",
+    "intended_indicator": "eval",
+    "expected_marker": "MARKER_005"
+  },
+  {
+    "seed_id": "seed_06",
+    "filename": "seed_06.py",
+    "category": "Dynamic Code Execution",
+    "intended_indicator": "exec",
+    "expected_marker": "MARKER_006"
+  },
+  {
+    "seed_id": "seed_07",
+    "filename": "seed_07.py",
+    "category": "Dynamic Code Execution",
+    "intended_indicator": "compile+exec",
+    "expected_marker": "MARKER_007"
+  },
+  {
+    "seed_id": "seed_08",
+    "filename": "seed_08.py",
+    "category": "Dynamic Code Execution",
+    "intended_indicator": "__import__",
+    "expected_marker": "MARKER_008"
+  },
+  {
+    "seed_id": "seed_09",
+    "filename": "seed_09.py",
+    "category": "Credential / Data Access",
+    "intended_indicator": ".ssh/ path access",
+    "expected_marker": "MARKER_009"
+  },
+  {
+    "seed_id": "seed_10",
+    "filename": "seed_10.py",
+    "category": "Credential / Data Access",
+    "intended_indicator": ".aws/credentials path access",
+    "expected_marker": "MARKER_010"
+  },
+  {
+    "seed_id": "seed_11",
+    "filename": "seed_11.py",
+    "category": "Credential / Data Access",
+    "intended_indicator": "os.environ secret read",
+    "expected_marker": "MARKER_011"
+  },
+  {
+    "seed_id": "seed_12",
+    "filename": "seed_12.py",
+    "category": "Network Activity",
+    "intended_indicator": "requests.get",
+    "expected_marker": "MARKER_012"
+  },
+  {
+    "seed_id": "seed_13",
+    "filename": "seed_13.py",
+    "category": "Network Activity",
+    "intended_indicator": "requests.post",
+    "expected_marker": "MARKER_013"
+  },
+  {
+    "seed_id": "seed_14",
+    "filename": "seed_14.py",
+    "category": "Network Activity",
+    "intended_indicator": "urllib.request.urlopen",
+    "expected_marker": "MARKER_014"
+  },
+  {
+    "seed_id": "seed_15",
+    "filename": "seed_15.py",
+    "category": "Obfuscation",
+    "intended_indicator": "base64.b64decode+exec",
+    "expected_marker": "MARKER_015"
+  },
+  {
+    "seed_id": "seed_16",
+    "filename": "seed_16.py",
+    "category": "Obfuscation",
+    "intended_indicator": "bytes.fromhex+decode",
+    "expected_marker": "MARKER_016"
+  },
+  {
+    "seed_id": "seed_17",
+    "filename": "seed_17.py",
+    "category": "Obfuscation",
+    "intended_indicator": "ROT13 decode",
+    "expected_marker": "MARKER_017"
+  },
+  {
+    "seed_id": "seed_18",
+    "filename": "seed_18.py",
+    "category": "Install-Time / Package Execution",
+    "intended_indicator": "custom install cmdclass",
+    "expected_marker": "MARKER_018"
+  },
+  {
+    "seed_id": "seed_19",
+    "filename": "seed_19.py",
+    "category": "Install-Time / Package Execution",
+    "intended_indicator": "setup.py top-level side effect",
+    "expected_marker": "MARKER_019"
+  },
+  {
+    "seed_id": "seed_20",
+    "filename": "seed_20.py",
+    "category": "Install-Time / Package Execution",
+    "intended_indicator": "custom build-backend reference",
+    "expected_marker": "MARKER_020"
+  }
+]

@@ -1,0 +1,1559 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "0f088bcc-a2f8-5763-8ffc-274ab93edb43",
+  "created_at": "2026-11-01T00:00:00Z",
+  "record_origin": "hand_written_fixture",
+  "tool": {
+    "spider_version": "fixture",
+    "analyzer_version": "fixture",
+    "ruleset_version": "fixture"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "demo-vendored",
+    "version": "3.1.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "f89dbb9f87cb7cfc8fa8708cbf5ec62953e0bc81abc85e45f3edfa2d883362ed",
+      "size_bytes": 9694,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 136,
+    "python_files": 135,
+    "files_inspected": 135,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [
+      "demo_vendored/_vendor"
+    ],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "kind": "doc",
+      "sha256": "1a7e6b42a9cc91608fe12a51d74f476ee19cb72c736ab5b17e90ffcaa9376664",
+      "lines": 3,
+      "inspected": false,
+      "roles": []
+    },
+    {
+      "path": "demo_vendored/__init__.py",
+      "kind": "python",
+      "sha256": "eaeba9b4f3b069538f1248d4fc1edfba840f35b3b26058a206a1e4a57c04f3d0",
+      "lines": 7,
+      "inspected": true,
+      "roles": [
+        "package_init"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod00.py",
+      "kind": "python",
+      "sha256": "b3ecf429a7996691a9d22dccdd1ab8634b7be0bd48e7f9ee6159f7dd32e55ec2",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod01.py",
+      "kind": "python",
+      "sha256": "322bf54b793044098391d76edca0a53e8868a60570077a459585be83c1bc31e7",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod02.py",
+      "kind": "python",
+      "sha256": "0dbc08b10ff520c3b79170bf3d2328b5ac4f7c2fcea304cadffd6fd067ac631c",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod03.py",
+      "kind": "python",
+      "sha256": "1da10837f4438320a2dcebf3560e063f6782e9c9ecd960961d7d2c8f38cb3d36",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod04.py",
+      "kind": "python",
+      "sha256": "fa04d3076fc92b3a5b25411ca951d82a83e0bdf84663c54a11c4c7468a6a9faf",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod05.py",
+      "kind": "python",
+      "sha256": "6dda7b28c815537ba8b583128eb60e31e35e06a555a2818145209352f198bde9",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod06.py",
+      "kind": "python",
+      "sha256": "a0368d0ca2a5ff8f7dab8671e0e0e4f845ec9495a64dd764887520ad67a24c8b",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod07.py",
+      "kind": "python",
+      "sha256": "6a025235fcbd3e8d1f23ba289b8dcdabbfd7ee35f9a4b30f14dfd387f64e1547",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod08.py",
+      "kind": "python",
+      "sha256": "78f77f1d01adc9e55174c23b4de67c5c63aed48e60d127816f678de77965b6d9",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib00/mod09.py",
+      "kind": "python",
+      "sha256": "04278e5a36b4cbfbf135cfac313fa65dfd2ac46a2497da95d8d2d3325c60300a",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod00.py",
+      "kind": "python",
+      "sha256": "f3e588b064c4084f454ea52fcb309bc36e93de001cd7d9cf090c22bb056f619e",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod01.py",
+      "kind": "python",
+      "sha256": "4dddef92f3f17e89574289d537ddf9a3d517f4001a8e78b05394f1c761b25050",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod02.py",
+      "kind": "python",
+      "sha256": "007392173d5ea3d46136ddbedaa6f96cab0eb0271cbed6ce6b19ee468eed03ce",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod03.py",
+      "kind": "python",
+      "sha256": "afc66746b1733568aebc1af29ffc4b303b6de36e86f4bd088206918f3a2467ec",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod04.py",
+      "kind": "python",
+      "sha256": "da280e0d248889116eadb1ab56e359f3355ccaaffe0e8edb9cccfacd0d158c52",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod05.py",
+      "kind": "python",
+      "sha256": "4fc79b43e208b2ddc1189be961e69bd3e0690b5213b32130ffb39f1ef0056db1",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod06.py",
+      "kind": "python",
+      "sha256": "6d19a0fceac3f4653cad52ef635b267b53485cefd66a6e8e290b7b5d5c875ec6",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod07.py",
+      "kind": "python",
+      "sha256": "5a9b849f2cc80b3bd0be47cb2610a729395c1c65b2fad65351834d27e33edf78",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod08.py",
+      "kind": "python",
+      "sha256": "16af664094a618584ae796094c256aa24c97279a899f6cff828c82e6a711ce46",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib01/mod09.py",
+      "kind": "python",
+      "sha256": "e1a0f03185d5a80faecc2b64c328154352e1cb84464fc055975a1de366c6027b",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod00.py",
+      "kind": "python",
+      "sha256": "7ef137e3087a3a26ebc0ae5573b23ba85c613c8a717693f0b035755446a12318",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod01.py",
+      "kind": "python",
+      "sha256": "6c9853c03c30a8c6110602a7d6a5e9067707e1e173ca0c2b58aaa749cab18e10",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod02.py",
+      "kind": "python",
+      "sha256": "ef1d4c55e4c5e56396bcfcb3a5347babfe358fe9cc50402ae41ef91f87126c2c",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod03.py",
+      "kind": "python",
+      "sha256": "6507a39d13b1967e7d279fce083675b4d240c8c0f8375e94df98bd9872786d61",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod04.py",
+      "kind": "python",
+      "sha256": "fb640752f63e6f50be9a09111cbff56adfedbf1995b68ab8c2596f4a5514193d",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod05.py",
+      "kind": "python",
+      "sha256": "89d126f8dde57444a02323b039ec4af5053097d5143a546c7d496197f603c58c",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod06.py",
+      "kind": "python",
+      "sha256": "0420389d7243147766fd1fc6287544b862fbbd28f480c12239f6a7b85687a955",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod07.py",
+      "kind": "python",
+      "sha256": "c32f51cd76994f4946e4146a8ba15d2e4cea82447281009341f504434d23a3e5",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod08.py",
+      "kind": "python",
+      "sha256": "ad612080780bb4c0aef823f76ce1c9c7036bec35b3eebe05d35007d402400a0b",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib02/mod09.py",
+      "kind": "python",
+      "sha256": "bda9cce31d6d2ff9d8c9dedc80f7cbcec6ed75f0760f59b577845b627ecf65b8",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod00.py",
+      "kind": "python",
+      "sha256": "7c69091a0606e55777ef00a8ca57aa4e1a3e34dab91b7d345b35357d400ba5de",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod01.py",
+      "kind": "python",
+      "sha256": "196887ce25860c0059e7eadc45e7357a6168de32e770cb3fdac820207431517f",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod02.py",
+      "kind": "python",
+      "sha256": "f55fd3d4ade0331aa9088385f055c9256d562f618c382201a7fa2bbf7d469375",
+      "lines": 12,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod03.py",
+      "kind": "python",
+      "sha256": "864c40e5f5f2d88c0f55052ed3f0ccc21db726d266a1576b60aee2b2b535291d",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod04.py",
+      "kind": "python",
+      "sha256": "0ece303dc7d3a5db1a331017f978cdba97e2e529d62af0501ad491030e727db6",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod05.py",
+      "kind": "python",
+      "sha256": "d1b8f29a8dc4e7c319b43c92b04b6289c6dbba14943a199ef3b9c5606482f137",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod06.py",
+      "kind": "python",
+      "sha256": "52630f9774b0155170c0d71d0f99da68486decb719ffaf33a5b0c419efd3ffe2",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod07.py",
+      "kind": "python",
+      "sha256": "0227757267470955ca272f36a6ea13678ef104f9aa3f61597d8d34a0fdda89b0",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod08.py",
+      "kind": "python",
+      "sha256": "a1e8e382993b745770bcfcfe99d0456ae7b7ea3dc7762785ca005e1b16263c39",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib03/mod09.py",
+      "kind": "python",
+      "sha256": "237e9aede6c539232d96a4d7afb0680e2d91f5854322ab21c4439bdc32dde6e2",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod00.py",
+      "kind": "python",
+      "sha256": "12bcd36ba283708f8344650bf2873b490f6f9810b264b97aea5c446fe0bb15ff",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod01.py",
+      "kind": "python",
+      "sha256": "dfb99a8b3cf85192a5cf9f6469f9266dcc75a6834b18c0acc9a393539d8d7eb3",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod02.py",
+      "kind": "python",
+      "sha256": "ca51d6fa41c42685b29946e43497cf560dab9b007bb70dcfc23114c064cea7ea",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod03.py",
+      "kind": "python",
+      "sha256": "87a3953f2a5ca9291cdd4bbe18ef37d195cd42d6fb896a4609e53d0b8daf6201",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod04.py",
+      "kind": "python",
+      "sha256": "19be79e9f8cba06a021d1e98026d014ff01de2c99e17bdc4cdde35b9190e7a65",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod05.py",
+      "kind": "python",
+      "sha256": "47748989728626b260b3c637de61015004405037c5ab36d0e9abb8d44459cbf9",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod06.py",
+      "kind": "python",
+      "sha256": "669a03deab33c74766b45243b0290fd7369be18179232b7cfd2cbebe074ea9cb",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod07.py",
+      "kind": "python",
+      "sha256": "cdec62fdaea6b563768f7370254a7097f33c376bbe7b095fe416e8bf560085b4",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod08.py",
+      "kind": "python",
+      "sha256": "bad1415d77588359ccf1d60b2b80c2b3a0cecf7d9794e17103dd899f427b26e4",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib04/mod09.py",
+      "kind": "python",
+      "sha256": "be87d711def03821786b13faffeddaafa00a4dd9f323b64447f2ca63e87fd3fe",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod00.py",
+      "kind": "python",
+      "sha256": "239a32b5563175424b1b716bf0afd6ecd59f2c41dfbe0d49c96394e51fb986c3",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod01.py",
+      "kind": "python",
+      "sha256": "0c5a492f6ac22e5029819d5274f964d0bf10aeb0f20f4f90e4484085383e2a1a",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod02.py",
+      "kind": "python",
+      "sha256": "d922a5859e1b935f8126e12fa365c699997200d70bd779eb910494f7e557a81d",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod03.py",
+      "kind": "python",
+      "sha256": "cc46113cc92df24d9faa98ecc4d0e0b06f5779ec7cabda573241894de12316fe",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod04.py",
+      "kind": "python",
+      "sha256": "7cde476acc1358f3c54ca595c2ec383df997ee4d60bf9a157b12a1dc3f806ebb",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod05.py",
+      "kind": "python",
+      "sha256": "ed701780572b251e2e9c35633d9ab97575bb61bb18ac9449da8cf5e15e54a68e",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod06.py",
+      "kind": "python",
+      "sha256": "a35307a8880ba935a46e7ab9e32b379a1339028b4400d0b2edb3a30e872c259d",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod07.py",
+      "kind": "python",
+      "sha256": "79bec0f50d6eb62ddb98d89121e5bbd851ccb8513b0d98e6211ea20a5d11f610",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod08.py",
+      "kind": "python",
+      "sha256": "3dd17abf3ceca43cec50674307049d97b338dbd4bad797c1df193f78362b27fd",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib05/mod09.py",
+      "kind": "python",
+      "sha256": "b3eda67e0e74f34ec9ec5c4a3d5b118dfd53bcbd7850c9521f32105977938443",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod00.py",
+      "kind": "python",
+      "sha256": "f39272dbaddb24d7833d5d540173e91a9bdd57d7671d5dc88dda269e15803a28",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod01.py",
+      "kind": "python",
+      "sha256": "ccb42d61463ae74ac22e1b06bed39ced896422426cddfab736184d45b8ba6922",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod02.py",
+      "kind": "python",
+      "sha256": "726be56d90b40b80281b1aa0a8ecc18a8e2a0feec2a5e1cf7f8764cc67aef89d",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod03.py",
+      "kind": "python",
+      "sha256": "ec4bb0ef5115524a2d82bb72a6fb39c5bb80ed0aa77cafdf4319cf41a14439dd",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod04.py",
+      "kind": "python",
+      "sha256": "d461655bfde1e7b606fff2f5eeed56a858e6e599cfe16aa4e5c3ea306c6b02c9",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod05.py",
+      "kind": "python",
+      "sha256": "d36fdc503d039d98b4a1d1519897bee4c8292ffa98b67b8fa48c4f4fed89c4aa",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod06.py",
+      "kind": "python",
+      "sha256": "183faf43fde080760c1c91d5dd7a73544a94a1d330e826086041d4bb2e590bb7",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod07.py",
+      "kind": "python",
+      "sha256": "d6dc043d3724a73558f5559e673a1757dae8a21988f8edb75f624ca7422f927b",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod08.py",
+      "kind": "python",
+      "sha256": "d970b0ba5067b316f14b225b3063939cca37666a421f6a3bb1f35b1f577d4002",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib06/mod09.py",
+      "kind": "python",
+      "sha256": "61b3f554b319d379f9bfcadbc16bea85cdf6ad2faf50145402fa3ff55ec1eae0",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod00.py",
+      "kind": "python",
+      "sha256": "7d017517b72e1a580e0070f86161b12ee1438ae5d0fa48648d7fdc78bc85e302",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod01.py",
+      "kind": "python",
+      "sha256": "3ab43612d174846064ecd8e1046fedd9dbd81ed9025350f98601fee35639b6d1",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod02.py",
+      "kind": "python",
+      "sha256": "43f6e81e6517dbd6cc90f3ad438d78050e65a754af4f7b3f35dd6475d1c0898e",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod03.py",
+      "kind": "python",
+      "sha256": "3be9a5c9410ae51bc6c27bbc5ab38f40d75fd77bf215f8f4a6b7502284d8c174",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod04.py",
+      "kind": "python",
+      "sha256": "b2108fc9c2a730b5ab1b98d74157ad770645f21b750224531d6157d7f43ab508",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod05.py",
+      "kind": "python",
+      "sha256": "388db2791c5b7e7527fa15390a28315f559e3fe57aca39977710f0a14682b991",
+      "lines": 12,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod06.py",
+      "kind": "python",
+      "sha256": "39073f166ebc405b5245defd73b89c0b553388271e0cf5abd1cec546483f86b0",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod07.py",
+      "kind": "python",
+      "sha256": "674d3b36a3bd9b430cdeb37a5971ee8f0db76cf311368b69b2f1a6f7e4031b7e",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod08.py",
+      "kind": "python",
+      "sha256": "16b0ced563e4f5e01f1d31ca8e61e465e844826b573909dbe5062e48a40f3eae",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib07/mod09.py",
+      "kind": "python",
+      "sha256": "9c05cb06875bea74923661311d4c11a487a618719b3e3cbe71d95432c7b9589b",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod00.py",
+      "kind": "python",
+      "sha256": "c329643248fbfd91f2e727f17e33e9dc153af0d7766523dbdd2c5b0c27361567",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod01.py",
+      "kind": "python",
+      "sha256": "2b034232e48e653d8de719e6015645d4317cd661c3f7b2b1b8f8416b2b93c731",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod02.py",
+      "kind": "python",
+      "sha256": "a26dc2d41f1097958b607935c44f31558fbf02c0bb7a6b3b0c338d1fb68aee23",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod03.py",
+      "kind": "python",
+      "sha256": "39809324fad052ad2042de2a0ab01a0d104599e738bd7e8c6e22c8a74f14263c",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod04.py",
+      "kind": "python",
+      "sha256": "10cf5193e0997f9f87564b77346a06aa9254f3af845d948983528fff53744e87",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod05.py",
+      "kind": "python",
+      "sha256": "a57e320306cf6fba34615bb259a36ac70a3d8f3de06b1bda81f851bd15d287fe",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod06.py",
+      "kind": "python",
+      "sha256": "085c9e7b401d208f2926dfbb689fef50cef6611337ac43552433100fbc95a240",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod07.py",
+      "kind": "python",
+      "sha256": "2545737c6cb9c345329219022b72254ed30ef5b12a902965662192bb86f48d21",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod08.py",
+      "kind": "python",
+      "sha256": "bf2f840fd25dedc8676a5de16ce5a44150760749e126958cef879b1c9f761644",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib08/mod09.py",
+      "kind": "python",
+      "sha256": "1ebd128480c66ffc3df7b03cd9f028634cb494c42234b796c32101423d47f03f",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod00.py",
+      "kind": "python",
+      "sha256": "54cd245061c7cb0c83b3c993609c68f38ead174c0f1c844088f4e99d119b432b",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod01.py",
+      "kind": "python",
+      "sha256": "ab6ae631250fa8791cbebed9a7b6bba1c823a6430e508f78563368345acfbb75",
+      "lines": 12,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod02.py",
+      "kind": "python",
+      "sha256": "a8aa5fec48b9bbb44f840339bc6fb5ed80ad6a8b9ccd681e02a0a233ac5a40d7",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod03.py",
+      "kind": "python",
+      "sha256": "5cd3489609951807dff2f88b0b85e1ef7f42096d6db466c883828b53bba9db50",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod04.py",
+      "kind": "python",
+      "sha256": "fded4e529ee1e5fb6758828186d2e2f7872998f753fc2eec7b723d03b49149fd",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod05.py",
+      "kind": "python",
+      "sha256": "c19794eaff9cb42b648c4ef7a107c926c4fd1a34a25186d6dd755715d7404513",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod06.py",
+      "kind": "python",
+      "sha256": "874ce32c219159b86f1e07ab97fd48bf412b3e22a32bf3b73def82b9636fbfd6",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod07.py",
+      "kind": "python",
+      "sha256": "4b04a7a2a39031e13a63419d12730091d0c64ea4ffded2dde97b8f9b0958435e",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod08.py",
+      "kind": "python",
+      "sha256": "815cdcecdbc1caf03cbc364a3b4ed1c84a3268eaa947fee5f6b6f03e3ed02f27",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib09/mod09.py",
+      "kind": "python",
+      "sha256": "108d79b3b6b1e8b2cb667fd90f2f02dccd721878454eca4c81c6730be6258249",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod00.py",
+      "kind": "python",
+      "sha256": "de19cd83c219fa273658f29d861217075de6ce00e14bc259a857c6f2b8a18ca2",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod01.py",
+      "kind": "python",
+      "sha256": "b1fcad6252e6abb3ce8d581202993d34600ef610ec5d8946f5bf326a9bed28a2",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod02.py",
+      "kind": "python",
+      "sha256": "fafd80f85b82e17dbcc2f55dadceb7b3664695c2643114aefda4ec4f74047440",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod03.py",
+      "kind": "python",
+      "sha256": "cadcb157f5895e88533a02b3d8aef305858045f3b065a58edd67707a2e712510",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod04.py",
+      "kind": "python",
+      "sha256": "8d8910c58ca4e6967dfbbdcbc0b0c811095e20e2832d7acdfb5762d169cc9089",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod05.py",
+      "kind": "python",
+      "sha256": "741fe9d38fe22bbc8be5269e13613f83c84203939df4fa7f6df81fab4a9781f1",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod06.py",
+      "kind": "python",
+      "sha256": "fdaf50c3a666987185f2785fe6f38bfa8dd88f7872056964486193d19973e957",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod07.py",
+      "kind": "python",
+      "sha256": "b257a4fc5f557454f396a74de5936d2b79d4a9bc4f36fb4cd2d8cf8448ce0406",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod08.py",
+      "kind": "python",
+      "sha256": "d89e79477d55f57a5aa9b83429eb38c93dea32c0cf00c03948dd3ffa6a4eec89",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib10/mod09.py",
+      "kind": "python",
+      "sha256": "a16c8c15779f2b130b76d95150e3a89529a5152392e307518ef100b783781a70",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/__init__.py",
+      "kind": "python",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod00.py",
+      "kind": "python",
+      "sha256": "04b684b1cd2336b47ce02daf9e86f1cc8923731d4f4043d43c63263664c03c09",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod01.py",
+      "kind": "python",
+      "sha256": "a398f4cbb049e18e5bc3a460281156d88886c027c7a7f1f8296aeda68ae004a6",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod02.py",
+      "kind": "python",
+      "sha256": "ce3e0482d73eadaed007e5ce0bb4d98bedef4c44171e123d9aa6652629351ccd",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod03.py",
+      "kind": "python",
+      "sha256": "538258c807efdf3064c101feb5ac905f2ca462c33f9357ef2c87b8bdf3967f1f",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod04.py",
+      "kind": "python",
+      "sha256": "7836164d8efb12355dd876cfa171f372c527f0623eb862bec550273eb63998cc",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod05.py",
+      "kind": "python",
+      "sha256": "b0436dcbc6091001a780b9f6b717f28e96ef9a3f69146811de73ea6b2606d942",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod06.py",
+      "kind": "python",
+      "sha256": "02309cdbb6b214fa3640ab7918dd61ffe31c755172c56f4da257fab4c93af935",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod07.py",
+      "kind": "python",
+      "sha256": "6e3bce7d3db8286908cebf00dedd454e846eea595f39f7f6dbfe8f0c5ccbecd1",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod08.py",
+      "kind": "python",
+      "sha256": "4f764411e90d6f3672ebc5134df8d6fdfcf695b51918e01e3a41e50f7ed42c6f",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "demo_vendored/_vendor/lib11/mod09.py",
+      "kind": "python",
+      "sha256": "c39c1637c8e9e369f3c9dd256d520dce2f9d52717cb46b1ed0d6991241be02fa",
+      "lines": 5,
+      "inspected": true,
+      "roles": [
+        "vendored"
+      ]
+    },
+    {
+      "path": "setup.py",
+      "kind": "python",
+      "sha256": "03b017dbfb9de5a3cd867ec9641464d84140b70616bb33d8cff834885d348f08",
+      "lines": 4,
+      "inspected": true,
+      "roles": [
+        "install_hook"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "SPD-INS-001",
+      "category": "install_time",
+      "indicator": "setuptools.setup",
+      "severity": "low",
+      "confidence": "high",
+      "file": "setup.py",
+      "span": {
+        "start_line": 4,
+        "start_col": 0,
+        "end_line": 4,
+        "end_col": 70
+      },
+      "snippet": "setup(name=\"demo-vendored\", version=\"3.1.0\", packages=find_packages())",
+      "explanation": "Standard setup() call. Common in benign packages; not a discriminative signal on its own.",
+      "trigger_phase": "install",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Plain setup() is expected in most packages (see Day 7 analysis); shown for completeness."
+      ]
+    },
+    {
+      "id": "F002",
+      "rule_id": "SPD-NET-002",
+      "category": "network_activity",
+      "indicator": "urllib.request.urlopen",
+      "severity": "medium",
+      "confidence": "medium",
+      "file": "demo_vendored/__init__.py",
+      "span": {
+        "start_line": 6,
+        "start_col": 9,
+        "end_line": 6,
+        "end_col": 47
+      },
+      "snippet": "urllib.request.urlopen(url, timeout=2)",
+      "explanation": "Opens a URL inside a function; runs only when fetch_status() is called.",
+      "trigger_phase": "call",
+      "context": {
+        "enclosing_function": "fetch_status",
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    },
+    {
+      "id": "F003",
+      "rule_id": "SPD-NET-001",
+      "category": "network_activity",
+      "indicator": "socket.socket",
+      "severity": "low",
+      "confidence": "medium",
+      "file": "demo_vendored/_vendor/lib03/mod02.py",
+      "span": {
+        "start_line": 12,
+        "start_col": 11,
+        "end_line": 12,
+        "end_col": 26
+      },
+      "snippet": "socket.socket()",
+      "explanation": "Creates a socket inside a vendored function.",
+      "trigger_phase": "call",
+      "context": {
+        "enclosing_function": "ping",
+        "after_normalization": false,
+        "in_vendored_path": true
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    },
+    {
+      "id": "F004",
+      "rule_id": "SPD-CMD-002",
+      "category": "command_execution",
+      "indicator": "subprocess.run",
+      "severity": "low",
+      "confidence": "medium",
+      "file": "demo_vendored/_vendor/lib07/mod05.py",
+      "span": {
+        "start_line": 12,
+        "start_col": 11,
+        "end_line": 12,
+        "end_col": 68
+      },
+      "snippet": "subprocess.run([\"echo\", \"vendored\"], capture_output=True)",
+      "explanation": "Runs a subprocess inside a vendored function.",
+      "trigger_phase": "call",
+      "context": {
+        "enclosing_function": "version",
+        "after_normalization": false,
+        "in_vendored_path": true
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    },
+    {
+      "id": "F005",
+      "rule_id": "SPD-NET-003",
+      "category": "network_activity",
+      "indicator": "socket.gethostname",
+      "severity": "low",
+      "confidence": "medium",
+      "file": "demo_vendored/_vendor/lib09/mod01.py",
+      "span": {
+        "start_line": 12,
+        "start_col": 11,
+        "end_line": 12,
+        "end_col": 31
+      },
+      "snippet": "socket.gethostname()",
+      "explanation": "Reads the local hostname inside a vendored function.",
+      "trigger_phase": "call",
+      "context": {
+        "enclosing_function": "host",
+        "after_normalization": false,
+        "in_vendored_path": true
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    }
+  ],
+  "relations": [],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": "Model not run."
+  },
+  "verdict": {
+    "outcome": "none_detected_in_this_scan",
+    "reasons": [],
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe.",
+      "Findings under demo_vendored/_vendor are listed but not suppressed: bundled code is a known hiding place."
+    ]
+  },
+  "timings_ms": {
+    "acquire": 0,
+    "extract": 5,
+    "analyze": 88,
+    "features": 12,
+    "model": null
+  }
+}

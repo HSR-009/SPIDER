@@ -1,0 +1,123 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "53a26c21-c1e1-5f18-b540-7ca5c0f42b38",
+  "created_at": "2026-11-01T00:00:00Z",
+  "record_origin": "hand_written_fixture",
+  "tool": {
+    "spider_version": "fixture",
+    "analyzer_version": "fixture",
+    "ruleset_version": "fixture"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "demo-nativeonly",
+    "version": "2.0.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "bc1ca733543bc6573f4b0edcd1c334bf6daeda9bfaf395f2c15c8905590e5be0",
+      "size_bytes": 222,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 5,
+    "python_files": 2,
+    "files_inspected": 2,
+    "uninspected": [
+      {
+        "path": "demo_nativeonly/_core.so",
+        "reason": "binary file: not analysed"
+      },
+      {
+        "path": "demo_nativeonly/_helper.pyd",
+        "reason": "binary file: not analysed"
+      }
+    ],
+    "parse_failures": [
+      {
+        "path": "demo_nativeonly/broken.py",
+        "error": "SyntaxError: invalid syntax (line 1)"
+      }
+    ],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "demo_nativeonly/__init__.py",
+      "kind": "python",
+      "sha256": "ee20f9821fa9ad48ce02a6efec4816aabc5a9fef7adc69a111eec84be02b7c3f",
+      "lines": 2,
+      "inspected": true,
+      "roles": [
+        "package_init"
+      ]
+    },
+    {
+      "path": "demo_nativeonly/_core.so",
+      "kind": "binary",
+      "sha256": "04a2dc70450ac66cc0ac6511fe2dc517262a0ed2bc0cbd936ea50b3648fe4639",
+      "lines": null,
+      "inspected": false,
+      "roles": []
+    },
+    {
+      "path": "demo_nativeonly/_helper.pyd",
+      "kind": "binary",
+      "sha256": "5f5a04a2bd69e645834015d7432987a3d36a25fd0f96996fb4d6f2c2219a660b",
+      "lines": null,
+      "inspected": false,
+      "roles": []
+    },
+    {
+      "path": "demo_nativeonly/broken.py",
+      "kind": "python",
+      "sha256": "6b8c8a725c23dc076d9a2c185ce4e02435746bc3b4f99906d13de360e56898c7",
+      "lines": 2,
+      "inspected": false,
+      "roles": []
+    },
+    {
+      "path": "pyproject.toml",
+      "kind": "build_config",
+      "sha256": "30f4a45624656b7b8e55560bbc67789bcf59a33d5b589ce415c9a5ac32e1a64b",
+      "lines": 3,
+      "inspected": true,
+      "roles": [
+        "build_config"
+      ]
+    }
+  ],
+  "findings": [],
+  "relations": [],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": "Model not run."
+  },
+  "verdict": {
+    "outcome": "unable_to_assess",
+    "reasons": [
+      "parse_failure_ratio:0.50"
+    ],
+    "limitations": [
+      "More than 20% of Python files could not be parsed (ratio 0.50).",
+      "Binary extension modules (.so/.pyd) are not analysed by SPIDER v0.1."
+    ]
+  },
+  "timings_ms": {
+    "acquire": 0,
+    "extract": 1,
+    "analyze": 6,
+    "features": 1,
+    "model": null
+  }
+}
