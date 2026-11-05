@@ -1,12 +1,21 @@
-# SPIDER Person C — Baseline Evasion Results
+# SPIDER Person C â€” Baseline Evasion Results (Historical / Superseded)
 
-## Experiment
+> [!NOTE]
+> **SUPERSEDED BY OFFICIAL SPRINT BASELINE:**  
+> The preliminary 9.09% (1/11) and 23.08% (3/13) exploratory numbers are obsolete.  
+> The official, verified baseline evaluation across all 10 malicious samples using the team's three-outcome scoring system (`recovered`, `different_signal`, `missed`) is documented in:
+> - [`results/evasion_baseline_v1.md`](../results/evasion_baseline_v1.md)
+> - [`results/evasion_baseline_v1.json`](../results/evasion_baseline_v1.json)
+
+---
+
+## Historical Experiment (Exploratory / Week 1)
 
 Static source transformations were applied to selected malicious toy samples and the transformed source was analyzed using Person A's AST analyzer.
 
 No malicious sample was executed.
 
-## Results
+## Results (Preliminary 11-Test Matrix)
 
 | Sample | Technique | Result |
 |---|---|---|
@@ -24,15 +33,13 @@ No malicious sample was executed.
 
 ## Summary
 
-Applicable experiments: 11
-
-Evasion successes: 1
-
-Baseline evasion rate: 9.09%
+- Applicable experiments: 11
+- Evasion successes: 1
+- Preliminary evasion rate: 9.09% (Superseded by `results/evasion_baseline_v1.md`)
 
 ## Key Finding
 
-The getattr-based transformation bypassed the current AST detection rules in the tested case, while the other tested transformations remained detectable.
+The `getattr`-based transformation bypassed the baseline AST detection rules in the tested case, while the other tested transformations remained detectable.
 
 ## Research Note
 
