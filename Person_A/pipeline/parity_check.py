@@ -2,11 +2,11 @@
 """Rule-parity check: re-scan a random sample of benign archives through the REAL scanner path
 (run_malicious_scan.scan_version -> analyze_file) and compare with benign_for_b.jsonl. Read-only.
 Works with a flat folder of archives (data/raw/benign/archives/*.tar.gz|*.whl|...) or name/version folders."""
-import json, random, re, shutil, sys, tempfile
+import gzip, json, random, re, shutil, sys, tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-BEN = ROOT / "data/processed/benign_for_b.jsonl"
+BEN = ROOT / "data/processed/benign_for_b.jsonl.gz"
 RAW = ROOT / "data/raw/benign"
 EXTS = (".tar.gz", ".tar.bz2", ".tar.xz", ".tgz", ".tar", ".zip", ".whl")
 N = 60
@@ -33,7 +33,7 @@ for p in RAW.rglob("*"):
     if p.is_file():
         k = parse(p.name)
         if k: files.setdefault(k, []).append(p)
-ben = [json.loads(l) for l in open(BEN, encoding="utf-8") if l.strip()]
+ben = [json.loads(l) for l in (gzip.open(BEN, "rt", encoding="utf-8") if str(BEN).endswith(".gz") else open(BEN, encoding="utf-8")) if l.strip()]
 rows = [r for r in ben if (norm(r["package_name"]), r["version"]) in files]
 print(f"archives indexed: {sum(len(v) for v in files.values())} | benign rows matched to an archive: {len(rows)} of {len(ben)}")
 if len(rows) < 0.5 * len(ben):

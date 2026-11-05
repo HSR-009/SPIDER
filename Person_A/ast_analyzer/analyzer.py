@@ -5,7 +5,7 @@ Provides static AST analysis of Python source files and directories:
   and attaches exact source location metadata (lineno, col_offset, end_lineno, snippet, rule_id).
 - scan_directory: recursively inventories and analyzes a package folder, inspecting setup/build hooks,
   recording uninspected native artifacts (.so, .dll, .pth), tracking coverage, and emitting
-  honest 3-way verdicts (suspicious, none_detected_in_scan, unable_to_assess).
+  honest 3-way verdicts (suspicious, none_detected_in_this_scan, unable_to_assess).
 """
 
 import ast
@@ -242,6 +242,12 @@ def analyze_file(file_path: str) -> List[Dict[str, Any]]:
                         SECURITY_CATEGORIES["Dynamic Code Execution"],
                         "RULE_DYN_GETATTR_EXEC", f"{attr_name}() call detected via getattr() dynamic dispatch", node
                     ))
+                elif attr_name is None:
+                    findings.append(make_finding(
+                        "Dynamic Code Execution", "getattr.dynamic",
+                        "LOW",
+                        "RULE_DYN_GETATTR_NON_CONST", "getattr() invocation with non-constant attribute name", node
+                    ))
 
             # Standalone getattr(os, "system") or getattr(subprocess, "run")
             if isinstance(node.func, ast.Name) and node.func.id == "getattr" and len(node.args) >= 2:
@@ -259,6 +265,13 @@ def analyze_file(file_path: str) -> List[Dict[str, Any]]:
                         "Command Execution", f"subprocess.{attr_name}",
                         SECURITY_CATEGORIES["Command Execution"],
                         "RULE_CMD_GETATTR_SUBPROCESS", f"subprocess.{attr_name} resolved via getattr()", node
+                    ))
+                elif attr_name is None:
+                    # Non-constant attribute name
+                    findings.append(make_finding(
+                        "Dynamic Code Execution", "getattr.dynamic",
+                        "LOW",
+                        "RULE_DYN_GETATTR_NON_CONST", "getattr() with non-constant attribute name", node
                     ))
 
         # --- 2. Dynamic Code Execution ---
@@ -409,7 +422,7 @@ def scan_directory(dir_path: str, max_file_size: int = 2 * 1024 * 1024) -> Dict[
     """
     Recursively scans a package directory, inventories files and uninspected native artifacts,
     inspects build hooks (setup.py, pyproject.toml, setup.cfg), runs AST analysis on Python code,
-    and derives a calibrated 3-way verdict (suspicious, none_detected_in_scan, unable_to_assess).
+    and derives a calibrated 3-way verdict (suspicious, none_detected_in_this_scan, unable_to_assess).
     """
     path_obj = Path(dir_path).resolve()
 
@@ -614,7 +627,10 @@ def scan_directory(dir_path: str, max_file_size: int = 2 * 1024 * 1024) -> Dict[
             f["indicator"] in ("setuptools.command.install", "setuptools.setup.cmdclass", "setup_cfg_cmdclass", "startup_hook.pth")
             for f in record["findings"]
         )
-        has_dyn_exec = ("Dynamic Code Execution" in categories)
+        has_dyn_exec = any(
+            f["category"] == "Dynamic Code Execution" and f.get("indicator") != "getattr.dynamic"
+            for f in record["findings"]
+        )
         has_obf = ("Obfuscation" in categories)
         has_net = ("Network Activity" in categories)
 
@@ -629,7 +645,11 @@ def scan_directory(dir_path: str, max_file_size: int = 2 * 1024 * 1024) -> Dict[
         has_cred_with_net = (has_cred_path and has_net) or ("os.environ" in indicators and "requests.post" in indicators)
 
         has_dyn_with_obf_or_net = has_dyn_exec and (has_obf or has_net)
-        has_getattr_evasion = any("getattr" in f.get("rule_id", "") for f in record["findings"])
+        has_getattr_evasion = any(
+            f.get("rule_id") in ("RULE_CMD_GETATTR_SYSTEM", "RULE_CMD_GETATTR_SUBPROCESS", "RULE_DYN_GETATTR_EXEC")
+            and f.get("indicator") != "getattr.dynamic"
+            for f in record["findings"]
+        )
 
         strong_suspicious = (
             has_custom_install
@@ -642,7 +662,7 @@ def scan_directory(dir_path: str, max_file_size: int = 2 * 1024 * 1024) -> Dict[
         if strong_suspicious:
             record["verdict"] = "suspicious"
         else:
-            record["verdict"] = "none_detected_in_scan"
+            record["verdict"] = "none_detected_in_this_scan"
             if record["n_findings"] > 0:
                 record["review_recommended"] = True
 
