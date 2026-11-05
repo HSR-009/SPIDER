@@ -1,94 +1,58 @@
-import ast
-import math
+"""Feature extraction for SPIDER's package-version records (static findings only)."""
+import re
 from collections import Counter
 
-def compute_shannon_entropy(text: str) -> float:
-    """Calculates Shannon entropy to detect packed/obfuscated strings."""
-    if not text:
-        return 0.0
-    entropy = 0.0
-    length = len(text)
-    counts = Counter(text)
-    for count in counts.values():
-        p = count / length
-        entropy -= p * math.log2(p)
-    return entropy
+SECURITY_CATEGORIES = (
+    "Network Activity",
+    "Credential / Data Access",
+    "Command Execution",
+    "Obfuscation",
+    "Install-Time / Package Execution",
+    "Dynamic Code Execution",
+    "Supply-Chain Abuse",
+)
 
-def extract_code_features(file_path: str, findings: list) -> dict:
-    """
-    Translates Person A's security findings into ML numerical features.
-    Also calculates file-level metrics (entropy, total calls) for normalization.
-    """
-    # 1. Initialize base metrics
-    features = {
-        "feat_total_calls": 0,
-        "feat_eval_ratio": 0.0,
-        "feat_exec_ratio": 0.0,
-        "feat_system_call_ratio": 0.0,
-        "feat_subprocess_ratio": 0.0,
-        "feat_max_entropy": 0.0,
-        "feat_avg_entropy": 0.0,
-        "feat_parse_failed": 0
-    }
+def normalize_package_name(name):
+    return re.sub(r"[-_.]+", "-", str(name or "").strip().lower())
 
-    raw_counts = {"eval": 0, "exec": 0, "system": 0, "subprocess": 0}
+def clean_indicator(value):
+    return str(value or "").strip()
 
-    # 2. Map Person A's findings
-    for finding in findings:
-        cat = finding.get("category")
-        ind = finding.get("indicator", "")
+def extract_record_features(record, indicator_vocabulary=()):
+    findings = record.get("findings") or []
+    if not isinstance(findings, list):
+        findings = []
+    valid = [f for f in findings if isinstance(f, dict) and f.get("category") != "Parse Error"]
+    category_counts = Counter(str(f.get("category", "")) for f in valid)
+    indicators = {clean_indicator(f.get("indicator")) for f in valid if clean_indicator(f.get("indicator"))}
+    out = {}
+    for category in SECURITY_CATEGORIES:
+        key = re.sub(r"[^a-z0-9]+", "_", category.lower()).strip("_")
+        out[f"category_count__{key}"] = int(category_counts[category])
+        out[f"category_present__{key}"] = int(category_counts[category] > 0)
+    for indicator in indicator_vocabulary:
+        out[f"indicator_present__{indicator}"] = int(indicator in indicators)
+    out["n_py_files"] = int(record.get("n_py_files", record.get("files_attempted", 0)) or 0)
+    out["n_findings"] = int(record.get("n_findings", len(valid)) or 0)
+    out["parse_error_count"] = int(record.get("parse_error_count", 0) or 0)
+    out["failed_static_analysis"] = int(bool(record.get("failed_static_analysis", 0)))
+    return out
 
-        # Handle Person A's parse error flag
-        if cat == "Parse Error" or ind == "SyntaxError":
-            features["feat_parse_failed"] = 1
-            return features  # Stop here if unparsable
+def top_indicator_vocabulary(records, limit=40):
+    # Package-presence frequency, not raw finding frequency.
+    counts = Counter()
+    for record in records:
+        findings = record.get("findings") or []
+        counts.update({clean_indicator(f.get("indicator")) for f in findings
+                       if isinstance(f, dict) and f.get("category") != "Parse Error"
+                       and clean_indicator(f.get("indicator"))})
+    return [name for name, _ in sorted(counts.items(), key=lambda x: (-x[1], x[0]))[:limit]]
 
-        # Tally dangerous indicators
-        if ind == "eval":
-            raw_counts["eval"] += 1
-        elif ind in ["exec", "compile"]:
-            raw_counts["exec"] += 1
-        elif ind == "os.system":
-            raw_counts["system"] += 1
-        elif ind.startswith("subprocess."):
-            raw_counts["subprocess"] += 1
+def feature_columns(indicator_vocabulary=()):
+    cats = []
+    for category in SECURITY_CATEGORIES:
+        key = re.sub(r"[^a-z0-9]+", "_", category.lower()).strip("_")
+        cats.extend([f"category_count__{key}", f"category_present__{key}"])
+    return cats + [f"indicator_present__{name}" for name in indicator_vocabulary]
 
-    # 3. Extract our own file-level features (Entropy & Total Calls)
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            source = f.read()
-            
-        # Compute Shannon Entropy per line to find obfuscation blocks
-        lines = source.split('\n')
-        entropies = [compute_shannon_entropy(line) for line in lines if line.strip()]
-        if entropies:
-            features["feat_max_entropy"] = max(entropies)
-            features["feat_avg_entropy"] = sum(entropies) / len(entropies)
-
-        # Count total calls for our ML ratio denominators
-        tree = ast.parse(source)
-        features["feat_total_calls"] = sum(1 for node in ast.walk(tree) if isinstance(node, ast.Call))
-
-    except Exception:
-        # Failsafe if the file is utterly broken
-        features["feat_parse_failed"] = 1
-
-    # 4. Compute Final ML Ratios
-    total = features["feat_total_calls"]
-    if total > 0:
-        features["feat_eval_ratio"] = raw_counts["eval"] / total
-        features["feat_exec_ratio"] = raw_counts["exec"] / total
-        features["feat_system_call_ratio"] = raw_counts["system"] / total
-        features["feat_subprocess_ratio"] = raw_counts["subprocess"] / total
-
-    return features
-
-if __name__ == "__main__":
-    # Quick sanity check on how our adapter handles Person A's output format
-    mock_findings = [
-        {"category": "Command Execution", "indicator": "os.system", "line": 4},
-        {"category": "Dynamic Code Execution", "indicator": "eval", "line": 10}
-    ]
-    
-    # We will test this against a real file once we wire up the full loop
-    print("[+] Feature extraction adapter ready for Person A's output schema.")
+DIAGNOSTIC_COLUMNS = ["n_py_files", "n_findings", "parse_error_count", "failed_static_analysis"]

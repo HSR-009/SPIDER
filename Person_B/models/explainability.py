@@ -1,115 +1,60 @@
-import os
-import sys
+"""SHAP explainability for the trained SPIDER baseline models."""
 from pathlib import Path
 import joblib
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import shap
+import matplotlib.pyplot as plt
 
-# Ensure root folder (SPIDER) is available in sys.path
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
+ROOT = Path(__file__).resolve().parents[2]
+DATA = ROOT / "data" / "processed" / "feature_table.csv"
+HOLDOUT = ROOT / "results" / "frozen_holdout_packages.csv"
+MODEL = ROOT / "Person_B" / "models" / "saved" / "xgboost_behavior_without_size.joblib"
+OUT = ROOT / "Person_B" / "models" / "saved"
 
-from Person_B.models.baseline_model import FEATURE_COLS
-
-
-def load_artifacts(
-    model_path: str = "Person_B/models/saved/xgboost_baseline.joblib",
-    data_path: str = "data/processed/feature_table.csv",
-):
-    """Loads trained model and test feature samples."""
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model weight not found at {model_path}")
-    if not os.path.exists(data_path):
-        raise FileNotFoundError(f"Data table not found at {data_path}")
-
+def load_holdout_artifacts(model_path=MODEL):
+    for path in (DATA, HOLDOUT, model_path):
+        if not path.exists():
+            raise FileNotFoundError(f"Required artifact missing: {path}")
     model = joblib.load(model_path)
-    df = pd.read_csv(data_path)
-    X = df[FEATURE_COLS].astype(float)
+    frame = pd.read_csv(DATA)
+    holdout_ids = set(pd.read_csv(HOLDOUT)["package_id"].astype(str))
+    test = frame[frame["package_id"].astype(str).isin(holdout_ids)].copy()
+    columns = list(getattr(model, "feature_names_in_", []))
+    if not columns:
+        raise ValueError("Model does not expose feature_names_in_; retrain using baseline_model.py.")
+    X = test[columns].astype(float).replace([float("inf"), float("-inf")], 0).fillna(0)
+    return model, X, test
 
-    return model, X, df
-
-
-def generate_shap_summary(
-    model, X: pd.DataFrame, output_dir: str = "Person_B/models/saved"
-):
-    """Generates and saves global SHAP feature importance plots."""
-    os.makedirs(output_dir, exist_ok=True)
-
+def generate_shap_summary(model, X, output_dir=OUT):
+    output_dir.mkdir(parents=True, exist_ok=True)
     explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(X)
-
-    # In binary XGBoost, shap_values is a 2D array (n_samples, n_features)
-    if isinstance(shap_values, list):
-        shap_vals_matrix = shap_values[1]
-    else:
-        shap_vals_matrix = shap_values
-
-    plt.figure(figsize=(10, 6))
-    shap.summary_plot(shap_vals_matrix, X, show=False)
-
-    summary_plot_path = os.path.join(output_dir, "shap_summary_plot.png")
+    values = explainer.shap_values(X)
+    if isinstance(values, list):
+        values = values[1]
+    shap.summary_plot(values, X, show=False, max_display=20)
+    path = output_dir / "shap_summary_plot.png"
     plt.tight_layout()
-    plt.savefig(summary_plot_path, dpi=300, bbox_inches="tight")
+    plt.savefig(path, dpi=250, bbox_inches="tight")
     plt.close()
+    return explainer, path
 
-    print(f"[+] Global SHAP summary plot saved to: {summary_plot_path}")
-    return explainer
-
-
-def explain_single_package(explainer, model, feature_vector: pd.DataFrame):
-    """Computes a clean dictionary breakdown of top contributing risk factors
-
-    for a single package (ready for Person C's dashboard).
-    """
-    prediction_prob = model.predict_proba(feature_vector)[0][1]
-    shap_vals = explainer.shap_values(feature_vector)
-
-    if isinstance(shap_vals, list):
-        sample_shap = shap_vals[1][0]
-    elif len(shap_vals.shape) == 2:
-        sample_shap = shap_vals[0]
-    else:
-        sample_shap = shap_vals
-
-    feature_impacts = []
-    for col, val, impact in zip(
-        feature_vector.columns, feature_vector.iloc[0], sample_shap
-    ):
-        feature_impacts.append(
-            {
-                "feature": col,
-                "value": round(float(val), 4),
-                "shap_impact": round(float(impact), 4),
-            }
-        )
-
-    # Sort by absolute SHAP impact (most influential features first)
-    feature_impacts.sort(key=lambda x: abs(x["shap_impact"]), reverse=True)
-
-    return {
-        "malicious_probability": round(float(prediction_prob), 4),
-        "top_contributing_factors": feature_impacts[:5],
-    }
-
+def explain_single_package(explainer, model, feature_vector):
+    probability = float(model.predict_proba(feature_vector)[0, 1])
+    values = explainer.shap_values(feature_vector)
+    if isinstance(values, list):
+        values = values[1]
+    values = values[0] if getattr(values, "ndim", 1) == 2 else values
+    impacts = [
+        {"feature": name, "value": float(value), "shap_impact": float(impact)}
+        for name, value, impact in zip(feature_vector.columns, feature_vector.iloc[0], values)
+    ]
+    impacts.sort(key=lambda item: abs(item["shap_impact"]), reverse=True)
+    return {"malicious_probability": probability, "top_contributing_factors": impacts[:5]}
 
 if __name__ == "__main__":
-    print("[*] Initializing Explainability Engine...")
-    model, X, raw_df = load_artifacts()
-
-    # 1. Global attribution summary
-    explainer = generate_shap_summary(model, X)
-
-    # 2. Local attribution check on a sample package
-    sample_row = X.iloc[[0]]
-    package_name = raw_df.iloc[0].get("package_name", "sample_pkg")
-    explanation = explain_single_package(explainer, model, sample_row)
-
-    print(f"\n--- SHAP Attribution for Package: '{package_name}' ---")
-    print(f"Predicted Malicious Probability: {explanation['malicious_probability'] * 100:.2f}%")
-    print("Top Influential Features:")
-    for item in explanation["top_contributing_factors"]:
-        sign = "+" if item["shap_impact"] > 0 else "-"
-        print(f"  [{sign}] {item['feature']} (Value: {item['value']}) -> Impact: {item['shap_impact']}")
+    model, X, frame = load_holdout_artifacts()
+    explainer, path = generate_shap_summary(model, X)
+    print(f"SHAP summary saved: {path}")
+    if not X.empty:
+        result = explain_single_package(explainer, model, X.iloc[[0]])
+        print({"package_id": frame.iloc[0]["package_id"], **result})

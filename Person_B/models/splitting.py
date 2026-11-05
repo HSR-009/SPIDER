@@ -1,39 +1,44 @@
+"""Grouped holdout and cross-validation helpers for SPIDER."""
+import re
+import numpy as np
 import pandas as pd
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import StratifiedGroupKFold
 
-def split_dataset_by_package(df: pd.DataFrame, group_col: str = "package_name", target_col: str = "label", test_size: float = 0.2, random_state: int = 42):
-    """
-    Splits feature table ensuring all versions/variants of the same package 
-    belong exclusively to either the training set or the testing set.
-    """
-    if group_col not in df.columns:
-        raise ValueError(f"Column '{group_col}' missing from dataset. Cannot perform group split.")
+LEAKAGE_COLUMNS = {
+    "label", "package_id", "package_name", "group_id", "version",
+    "source", "malicious_evidence", "in_index", "index_annotated",
+    "analyzer_version", "collection_date", "parse_error_count",
+    "failed_static_analysis", "n_findings",
+}
 
-    splitter = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
-    train_idx, test_idx = next(splitter.split(df, groups=df[group_col]))
+def assert_no_leakage(feature_columns):
+    forbidden = sorted(set(feature_columns) & LEAKAGE_COLUMNS)
+    if forbidden:
+        raise ValueError(f"Leakage guard blocked model fit; forbidden columns: {forbidden}")
 
-    train_df = df.iloc[train_idx].copy()
-    test_df = df.iloc[test_idx].copy()
+def make_frozen_holdout(df, group_col="group_id", target_col="label", n_splits=5, random_state=42):
+    if group_col not in df or target_col not in df:
+        raise ValueError(f"Missing required split columns: {group_col}, {target_col}")
+    groups = df[group_col].astype(str)
+    y = df[target_col].astype(int)
+    if groups.eq("").any():
+        raise ValueError("Empty group_id is not allowed.")
+    if df.assign(_g=groups).groupby("_g")[target_col].nunique().gt(1).any():
+        raise ValueError("A group_id has multiple labels.")
+    splitter = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+    for train_idx, hold_idx in splitter.split(df, y, groups):
+        y_train, y_hold = y.iloc[train_idx], y.iloc[hold_idx]
+        if y_train.nunique() == 2 and y_hold.nunique() == 2:
+            train, hold = df.iloc[train_idx].copy(), df.iloc[hold_idx].copy()
+            if set(train[group_col]).isdisjoint(set(hold[group_col])):
+                return train, hold
+    raise ValueError("Could not form a two-class grouped frozen holdout.")
 
-    # Integrity verification: Assert zero package leakage between splits
-    train_pkgs = set(train_df[group_col])
-    test_pkgs = set(test_df[group_col])
-    overlap = train_pkgs.intersection(test_pkgs)
-
-    if overlap:
-        raise AssertionError(f"Data leakage detected! Packages present in both sets: {overlap}")
-
-    return train_df, test_df
-
-if __name__ == "__main__":
-    # Quick sanity check with simulated versioned packages
-    mock_data = pd.DataFrame({
-        "package_name": ["pkg_alpha", "pkg_alpha", "pkg_beta", "pkg_gamma", "pkg_gamma"],
-        "package_version": ["1.0", "1.1", "0.1", "2.0", "2.1"],
-        "feat_eval_ratio": [0.1, 0.12, 0.0, 0.5, 0.48],
-        "label": [1, 1, 0, 1, 1]
-    })
-
-    train, test = split_dataset_by_package(mock_data)
-    print(f"Train packages: {train['package_name'].unique().tolist()}")
-    print(f"Test packages:  {test['package_name'].unique().tolist()}")
+def grouped_cv_splits(df, group_col="group_id", target_col="label", n_splits=5, random_state=42):
+    splitter = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+    groups = df[group_col].astype(str)
+    y = df[target_col].astype(int)
+    for train_idx, valid_idx in splitter.split(df, y, groups):
+        if set(groups.iloc[train_idx]).intersection(set(groups.iloc[valid_idx])):
+            raise AssertionError("Group leakage detected in CV split.")
+        yield train_idx, valid_idx
