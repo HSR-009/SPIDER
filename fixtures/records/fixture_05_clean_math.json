@@ -1,0 +1,20 @@
+{
+  "fixture_id": "fixture_05_clean_math",
+  "package_name": "toy-clean-calculator",
+  "version": "1.1.0",
+  "record_origin": "fixture",
+  "verdict": "Needs Review",
+  "findings": [],
+  "files": [
+    {
+      "filename": "calculator.py",
+      "path": "fixture_05_clean_math\\calculator.py",
+      "content": "# Clean arithmetic calculation\na = 10\nb = 20\nresult = a + b\nprint(\"Result:\", result)\n"
+    }
+  ],
+  "model_assessment": {
+    "risk_score": 0.12,
+    "model_status": "illustrative",
+    "label": "Illustrative (pre-training placeholder)"
+  }
+}
