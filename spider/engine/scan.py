@@ -91,6 +91,8 @@ def scan_directory(
                     continue
 
                 if entry.is_dir():
+                    if entry.name == "__pycache__":
+                        continue
                     walk_dir(Path(entry.path), depth + 1)
                 elif entry.is_file():
                     total_files_count += 1
@@ -419,6 +421,8 @@ def scan_directory(
     v_dict = derive_verdict(record)
     record["verdict"]["outcome"] = v_dict["outcome"]
     record["verdict"]["reasons"] = v_dict["reasons"]
+    if "review_recommended" in v_dict:
+        record["verdict"]["review_recommended"] = v_dict["review_recommended"]
 
     # Copy derive_verdict()'s limitations / coverage problems and keep the static-analysis sentence
     limitations = ["Static analysis only: 'none detected in this scan' does not mean the package is safe."]

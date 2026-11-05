@@ -149,7 +149,8 @@ class VerdictPolicyTests(unittest.TestCase):
 
     def test_vendored_findings_are_not_auto_suppressed(self):
         rec = load("05")
-        rec["findings"][2]["severity"] = "high"  # a vendored finding turns serious
+        # Under Verdict v2, vendored code is not suppressed when a strong signal is present
+        rec["findings"][2]["indicator"] = "setuptools.command.install"
         self.assertEqual(verdict.derive_verdict(rec)["outcome"], "suspicious")
 
     def test_unknown_severity_counts_as_medium(self):
