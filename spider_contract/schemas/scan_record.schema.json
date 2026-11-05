@@ -260,7 +260,8 @@
       "properties": {
         "outcome": { "enum": ["suspicious", "none_detected_in_this_scan", "unable_to_assess"] },
         "reasons": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-        "limitations": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        "limitations": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "review_recommended": { "type": "boolean" }
       }
     }
   }

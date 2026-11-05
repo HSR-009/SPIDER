@@ -120,6 +120,90 @@ class EngineTests(unittest.TestCase):
             self.assertIsNotNone(record["target"]["artifact"]["sha256"])
             self.assertEqual(len(record["target"]["artifact"]["sha256"]), 64)
 
+    def test_k_verdict_v2_combinations(self):
+        """Test Verdict v2 combination rules and review_recommended."""
+        # 1. os.system alone -> none_detected_in_this_scan with review_recommended true
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp)
+            (p / "mod.py").write_text("import os\nos.system('id')\n", encoding="utf-8")
+            rec = scan_directory(p)
+            self.assertEqual(rec["verdict"]["outcome"], "none_detected_in_this_scan")
+            self.assertEqual(rec["verdict"]["reasons"], [])
+            self.assertTrue(rec["verdict"].get("review_recommended"))
+
+        # 2. os.environ alone -> none_detected_in_this_scan
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp)
+            (p / "mod.py").write_text("import os\nx = os.environ\n", encoding="utf-8")
+            rec = scan_directory(p)
+            self.assertEqual(rec["verdict"]["outcome"], "none_detected_in_this_scan")
+            self.assertEqual(rec["verdict"]["reasons"], [])
+
+        # 3. exec + base64.b64decode -> suspicious
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp)
+            (p / "mod.py").write_text("import base64\nexec(base64.b64decode(b'x'))\n", encoding="utf-8")
+            rec = scan_directory(p)
+            self.assertEqual(rec["verdict"]["outcome"], "suspicious")
+            self.assertTrue("S2_dynamic_exec_plus" in rec["verdict"]["reasons"] or "S5_decode_exec" in rec["verdict"]["reasons"])
+
+        # 4. install command override -> suspicious
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp)
+            (p / "setup.py").write_text(
+                "from setuptools.command.install import install\n"
+                "class C(install):\n"
+                "    def run(self):\n"
+                "        pass\n",
+                encoding="utf-8"
+            )
+            rec = scan_directory(p)
+            self.assertEqual(rec["verdict"]["outcome"], "suspicious")
+            self.assertIn("S1_install_command", rec["verdict"]["reasons"])
+
+    def test_l_pycache_skipped_and_new_doc_extensions(self):
+        """Test: __pycache__ directory is completely skipped; new extensions classified kind 'doc'."""
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp)
+            pycache = p / "__pycache__"
+            pycache.mkdir()
+            (pycache / "compiled.cpython-313.pyc").write_bytes(b"dummy")
+
+            # Add various doc extension files
+            exts = [".c", ".cc", ".cpp", ".cxx", ".h", ".hpp", ".pyi", ".pxd", ".pxi", ".xsl", ".in", ".typed"]
+            for ext in exts:
+                (p / f"file{ext}").write_text("dummy content", encoding="utf-8")
+
+            # Add binary extension files to confirm they remain binary
+            bin_exts = [".so", ".pyd", ".dll", ".dylib", ".bin"]
+            for ext in bin_exts:
+                (p / f"bin_file{ext}").write_bytes(b"dummy binary")
+
+            (p / "main.py").write_text("x = 1\n", encoding="utf-8")
+
+            rec = scan_directory(p)
+            rel_paths = [f["path"] for f in rec["files"]]
+
+            # __pycache__ files not listed
+            self.assertFalse(any("__pycache__" in path for path in rel_paths))
+
+            # doc extensions classified as kind 'doc'
+            for ext in exts:
+                entry = next((f for f in rec["files"] if f["path"] == f"file{ext}"), None)
+                self.assertIsNotNone(entry, f"Missing file{ext}")
+                self.assertEqual(entry["kind"], "doc")
+
+            # binary extensions classified as kind 'binary' and in uninspected with binary_not_analyzed
+            for ext in bin_exts:
+                entry = next((f for f in rec["files"] if f["path"] == f"bin_file{ext}"), None)
+                self.assertIsNotNone(entry, f"Missing bin_file{ext}")
+                self.assertEqual(entry["kind"], "binary")
+
+            uninspected_map = {u["path"]: u["reason"] for u in rec["inventory"]["uninspected"]}
+            for ext in bin_exts:
+                self.assertIn(f"bin_file{ext}", uninspected_map)
+                self.assertEqual(uninspected_map[f"bin_file{ext}"], "binary_not_analyzed")
+
 
 if __name__ == "__main__":
     unittest.main()

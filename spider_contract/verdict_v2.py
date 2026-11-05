@@ -25,7 +25,23 @@ INSTALL = {"setuptools.command.install", "install_command_override"}
 
 def strong_signals(findings):
     inds = {f["indicator"] for f in findings if f["category"] != "Parse Error"}
-    cats = {f["category"] for f in findings if f["category"] != "Parse Error"}
+    cats = set()
+    for f in findings:
+        if f["category"] == "Parse Error":
+            continue
+        c = f["category"].lower().replace(" ", "_")
+        if "obfuscation" in c:
+            cats.add("Obfuscation")
+        if "network" in c:
+            cats.add("Network Activity")
+        if "dynamic" in c:
+            cats.add("Dynamic Code Execution")
+        if "command" in c:
+            cats.add("Command Execution")
+        if "credential" in c:
+            cats.add("Credential / Data Access")
+        if "install" in c:
+            cats.add("Install-Time / Package Execution")
     out = []
     if inds & INSTALL:
         out.append("S1_install_command")

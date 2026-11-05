@@ -132,8 +132,7 @@
   "verdict": {
     "outcome": "suspicious",
     "reasons": [
-      "F001",
-      "F002"
+      "S1_install_command"
     ],
     "limitations": []
   },

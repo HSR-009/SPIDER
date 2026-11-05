@@ -56,3 +56,12 @@ The following attack vectors are intentionally outside the scope of AST analyzer
 4. **Informational Plain Setup**: Standard `setup()` calls without custom overrides are rated `LOW` severity rather than `HIGH`, eliminating false-positive alerts on standard packaging files.
 5. **Parse Failure Segregation**: Syntax errors and I/O failures are returned as `parse_failure` objects for inventory accounting, never as security findings.
 
+## File Classification Notes (`classify.py`)
+
+- **`__pycache__` Directories**: Completely skipped during directory walk and omitted from file inventory.
+- **`doc` Extensions**: Non-analyzed documentation, header, and interface files. Marked kind `doc`:
+  `.md`, `.rst`, `.txt`, `.html`, `.htm`, `.css`, `.js`, `.json`, `.yaml`, `.yml`, `.csv`, `.tsv`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.ico`, `.pdf`, `.ipynb`, `.po`, `.mo`, `.ttf`, `.woff`, `.woff2`, `.xml`, `.lock`, `.c`, `.cc`, `.cpp`, `.cxx`, `.h`, `.hpp`, `.pyi`, `.pxd`, `.pxi`, `.xsl`, `.in`, `.typed`.
+- **`binary` Extensions**: Recorded as `binary` and placed in `uninspected` with reason `binary_not_analyzed`:
+  `.so`, `.pyd`, `.dll`, `.dylib`, `.exe`, `.bin`, `.o`, `.a`, `.pyc`, `.pyo`, `.class`, `.jar`, `.node`.
+
+

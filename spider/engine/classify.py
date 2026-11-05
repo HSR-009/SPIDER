@@ -12,7 +12,9 @@ DOC_EXTS = {
     ".md", ".rst", ".txt", ".html", ".htm", ".css", ".js", ".json",
     ".yaml", ".yml", ".csv", ".tsv", ".png", ".jpg", ".jpeg", ".gif",
     ".svg", ".ico", ".pdf", ".ipynb", ".po", ".mo", ".ttf", ".woff",
-    ".woff2", ".xml", ".lock"
+    ".woff2", ".xml", ".lock",
+    ".c", ".cc", ".cpp", ".cxx", ".h", ".hpp", ".pyi", ".pxd", ".pxi",
+    ".xsl", ".in", ".typed"
 }
 EXCLUDE_DIRS = {"tests", "test", "docs", "doc", "examples", "example"}
 VENDORED_DIRS = {"_vendor", "vendor", "vendored", "third_party", "extern", "site-packages"}
