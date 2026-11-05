@@ -29,7 +29,27 @@ def read_jsonl(path):
                     raise ValueError(f"Invalid JSON at {path}:{line_no}") from exc
 
 
-def build_feature_table():
+def get_frozen_holdout_ids(records=None):
+    holdout_path = ROOT / "results" / "frozen_holdout_packages.csv"
+    if holdout_path.exists():
+        holdout_df = pd.read_csv(holdout_path)
+        return set(holdout_df["package_id"].astype(str))
+    if records is not None:
+        from Person_B.models.splitting import make_frozen_holdout
+        split_records = [
+            {
+                "package_id": str(r["package_id"]),
+                "group_id": normalize_package_name(r.get("package_name") or r.get("package")),
+                "label": int(r["label"]),
+            }
+            for r in records
+        ]
+        _, hold_df = make_frozen_holdout(pd.DataFrame(split_records), n_splits=5, random_state=42)
+        return set(hold_df["package_id"].astype(str))
+    return set()
+
+
+def build_feature_table(holdout_ids=None):
     processed = ROOT / "data" / "processed"
     paths = [processed / "malicious_for_b.jsonl", processed / "benign_for_b.jsonl.gz"]
     missing = [str(path) for path in paths if not path.exists()]
@@ -52,7 +72,15 @@ def build_feature_table():
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate package_id detected.")
 
-    vocabulary = top_indicator_vocabulary(records, limit=40)
+    # Determine frozen holdout package IDs to prevent vocabulary leakage
+    if holdout_ids is None:
+        holdout_ids = get_frozen_holdout_ids(records)
+    else:
+        holdout_ids = set(str(pid) for pid in holdout_ids)
+
+    # Select top-40 indicator vocabulary using development records ONLY
+    dev_records = [r for r in records if str(r.get("package_id")) not in holdout_ids]
+    vocabulary = top_indicator_vocabulary(dev_records, limit=40)
     rows = []
     for record in records:
         package_name = normalize_package_name(record.get("package_name") or record.get("package"))

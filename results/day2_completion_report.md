@@ -45,18 +45,18 @@
 
 | Experiment | Model | Size Strata | Sample Count (Ben / Mal) | PR-AUC | ROC-AUC | Precision | Recall | F1 | FPR |
 | :--- | :--- | :--- | :---: | ---:| ---:| ---:| ---:| ---:| ---:|
-| **behavior_without_size** | Random Forest | 1–5 files | 407 (126 / 281) | 0.9293 | 0.8766 | 0.9727 | 0.6335 | 0.7672 | **0.0397** |
-| | | 6–20 files | 200 (139 / 61) | 0.7950 | 0.8243 | 0.8214 | 0.7541 | 0.7863 | **0.0719** |
-| | | >20 files | 359 (308 / 51) | 0.8053 | 0.9668 | 0.6857 | 0.9412 | 0.7934 | **0.0714** |
-| | | **All Packages** | 991 (582 / 409) | **0.8713** | **0.9012** | 0.8803 | 0.6650 | 0.7577 | **0.0636** |
-| **behavior_without_size** | XGBoost | 1–5 files | 407 (126 / 281) | 0.9308 | 0.8780 | 0.9677 | 0.6406 | 0.7709 | **0.0476** |
-| | | 6–20 files | 200 (139 / 61) | 0.8302 | 0.8383 | 0.7833 | 0.7705 | 0.7769 | **0.0935** |
-| | | >20 files | 359 (308 / 51) | 0.6273 | 0.8903 | 0.5455 | 0.5882 | 0.5660 | **0.0812** |
-| | | **All Packages** | 991 (582 / 409) | **0.8535** | **0.8844** | 0.8538 | 0.6284 | 0.7239 | **0.0756** |
-| **behavior_with_size** | Random Forest | 1–5 files | 407 (126 / 281) | 0.9430 | 0.8825 | 0.8006 | 0.9573 | 0.8720 | **0.5317** |
-| | | **All Packages** | 991 (582 / 409) | **0.9077** | **0.9178** | 0.8218 | 0.8117 | 0.8167 | **0.1237** |
-| **behavior_with_size** | XGBoost | 1–5 files | 407 (126 / 281) | 0.9381 | 0.8666 | 0.7943 | 0.8932 | 0.8409 | **0.5159** |
-| | | **All Packages** | 991 (582 / 409) | **0.8870** | **0.8905** | 0.8225 | 0.7702 | 0.7955 | **0.1168** |
+| **behavior_without_size** | Random Forest | 1–5 files | 407 (126 / 281) | 0.9293 | 0.8761 | 0.9749 | 0.6904 | 0.8083 | **0.0397** |
+| | | 6–20 files | 200 (139 / 61) | 0.8011 | 0.8249 | 0.8070 | 0.7541 | 0.7797 | **0.0791** |
+| | | >20 files | 359 (308 / 51) | 0.7926 | 0.9647 | 0.6957 | 0.9412 | 0.8000 | **0.0682** |
+| | | **All Packages** | 991 (582 / 409) | **0.8720** | **0.9006** | 0.8862 | 0.7042 | 0.7847 | **0.0636** |
+| **behavior_without_size** | XGBoost | 1–5 files | 407 (126 / 281) | 0.9312 | 0.8784 | 0.9703 | 0.6975 | 0.8116 | **0.0476** |
+| | | 6–20 files | 200 (139 / 61) | 0.8291 | 0.8388 | 0.7966 | 0.7705 | 0.7833 | **0.0863** |
+| | | >20 files | 359 (308 / 51) | 0.6378 | 0.8894 | 0.5472 | 0.5686 | 0.5577 | **0.0779** |
+| | | **All Packages** | 991 (582 / 409) | **0.8536** | **0.8854** | 0.8662 | 0.6650 | 0.7524 | **0.0722** |
+| **behavior_with_size** | Random Forest | 1–5 files | 407 (126 / 281) | 0.9444 | 0.8853 | 0.8006 | 0.9573 | 0.8720 | **0.5317** |
+| | | **All Packages** | 991 (582 / 409) | **0.9089** | **0.9194** | 0.8288 | 0.8166 | 0.8227 | **0.1186** |
+| **behavior_with_size** | XGBoost | 1–5 files | 407 (126 / 281) | 0.9378 | 0.8664 | 0.7968 | 0.8932 | 0.8423 | **0.5079** |
+| | | **All Packages** | 991 (582 / 409) | **0.8896** | **0.8948** | 0.8225 | 0.7702 | 0.7955 | **0.1168** |
 | **size_only** | Random Forest | 1–5 files | 407 (126 / 281) | 0.7543 | 0.6228 | 0.6904 | 1.0000 | 0.8169 | **1.0000** |
 | | | **All Packages** | 991 (582 / 409) | 0.6897 | 0.7798 | 0.6617 | 0.7653 | 0.7098 | **0.2749** |
 
@@ -64,6 +64,7 @@
 
 ## 5. Metadata Availability & Limitations (`results/day2_metadata_ablation.json`)
 
+* **Status:** `PARTIALLY COMPLETED`
 * **Classification:** `DIAGNOSTIC / LEAKAGE EXPERIMENT — NOT A PRODUCTION SAFE MODEL`
 * **Genuine Available Features (Evaluated):**
   - `feat_min_edit_distance` (offline Levenshtein distance to popular targets)
@@ -74,21 +75,34 @@
   - `feat_pypi_exists`: No stored snapshot; live API calls prohibited.
 
 ### Genuine Metadata Holdout Results:
+
+| Experiment | Model | PR-AUC | ROC-AUC | Precision | Recall | F1 | FPR | TN | FP | FN | TP |
+| :--- | :--- | ---:| ---:| ---:| ---:| ---:| ---:| ---:| ---:| ---:| ---:|
+| **metadata_only** | Random Forest | 0.5140 | 0.6423 | 0.5024 | 0.7555 | 0.6035 | **0.5258** | 276 | 306 | 100 | 309 |
+| | XGBoost | 0.5093 | 0.6366 | 0.4956 | 0.6822 | 0.5741 | **0.4880** | 298 | 284 | 130 | 279 |
+| **behavior_with_metadata** | Random Forest | 0.8912 | 0.9037 | 0.8411 | 0.7506 | 0.7933 | **0.0997** | 524 | 58 | 102 | 307 |
+| | XGBoost | 0.8804 | 0.8998 | 0.8882 | 0.6797 | 0.7701 | **0.0601** | 547 | 35 | 131 | 278 |
+| **behavior_with_size_and_metadata** | Random Forest | 0.9235 | 0.9321 | 0.8689 | 0.7775 | 0.8206 | **0.0825** | 534 | 48 | 91 | 318 |
+| | XGBoost | 0.9079 | 0.9149 | 0.8191 | 0.7751 | 0.7965 | **0.1203** | 512 | 70 | 92 | 317 |
+
 - **`metadata_only` (RF):** PR-AUC = 0.5140 | ROC-AUC = 0.6423 | F1 = 0.6035 | FPR = 0.5258
-- **`metadata_only` (XGB):** PR-AUC = 0.5093 | ROC-AUC = 0.6366 | F1 = 0.5741 | FPR = 0.4485
-- **`behavior_with_metadata` (RF):** PR-AUC = 0.8925 | ROC-AUC = 0.9051 | F1 = 0.7933 | FPR = 0.0893
-- **`behavior_with_size_and_metadata` (RF):** PR-AUC = 0.9220 | ROC-AUC = 0.9305 | F1 = 0.8174 | FPR = 0.1289
+- **`metadata_only` (XGB):** PR-AUC = 0.5093 | ROC-AUC = 0.6366 | F1 = 0.5741 | FPR = 0.4880
+- **`behavior_with_metadata` (RF):** PR-AUC = 0.8912 | ROC-AUC = 0.9037 | F1 = 0.7933 | FPR = 0.0997
+- **`behavior_with_metadata` (XGB):** PR-AUC = 0.8804 | ROC-AUC = 0.8998 | F1 = 0.7701 | FPR = 0.0601
+- **`behavior_with_size_and_metadata` (RF):** PR-AUC = 0.9235 | ROC-AUC = 0.9321 | F1 = 0.8206 | FPR = 0.0825
+- **`behavior_with_size_and_metadata` (XGB):** PR-AUC = 0.9079 | ROC-AUC = 0.9149 | F1 = 0.7965 | FPR = 0.1203
 
 ---
 
 ## 6. Test Suite Results
 
 Ran: `python -m unittest discover -s tests`  
-Output: `Ran 4 tests in 0.367s — OK`
+Output: `Ran 5 tests in 0.450s — OK`
 1. `test_parse_error_is_not_a_security_feature`: **PASS**
 2. `test_leakage_guard_rejects_identifiers_and_diagnostics`: **PASS**
 3. `test_grouped_holdout_and_cv_do_not_split_package_versions`: **PASS**
 4. `test_score_predictions_handles_edge_cases`: **PASS**
+5. `test_holdout_only_indicators_cannot_enter_vocabulary`: **PASS**
 
 ---
 

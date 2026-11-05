@@ -161,15 +161,20 @@ def run_size_stratified_evaluation(holdout):
                     f"{pr_auc_str} | {roc_auc_str} | {m['precision']:.4f} | {m['recall']:.4f} | {m['f1']:.4f} | {m['fpr']:.4f} |"
                 )
 
+    rf_bws = results["behavior_without_size"]["random_forest"]
+    xgb_bws = results["behavior_without_size"]["xgboost"]
+    rf_sz = results["behavior_with_size"]["random_forest"]
+    xgb_sz = results["behavior_with_size"]["xgboost"]
+
     md_lines.extend([
         "",
         "### Key Takeaways from Size Stratification:",
         "1. **AST-Only Baseline (`behavior_without_size`):**",
-        "   - **Random Forest** exhibits robust false positive control across all strata: **3.97%** on small packages (1-5 files), **7.19%** on medium packages (6-20 files), and **7.14%** on large packages (>20 files), yielding an overall holdout FPR of **6.36%** and ROC-AUC of **0.9012**.",
-        "   - **XGBoost** exhibits slightly higher variation across strata: **4.76%** on small packages (1-5 files), **9.35%** on medium packages (6-20 files), and **8.12%** on large packages (>20 files), with an overall holdout FPR of **7.56%** and ROC-AUC of **0.8844**.",
-        "   - Note that while Random Forest keeps FPR under 8% across all strata, XGBoost reaches **9.35% FPR** on medium-sized packages.",
+        f"   - **Random Forest** exhibits robust false positive control across all strata: **{rf_bws['1-5_files']['fpr']*100:.2f}%** on small packages (1-5 files), **{rf_bws['6-20_files']['fpr']*100:.2f}%** on medium packages (6-20 files), and **{rf_bws['>20_files']['fpr']*100:.2f}%** on large packages (>20 files), yielding an overall holdout FPR of **{rf_bws['all_packages']['fpr']*100:.2f}%** and ROC-AUC of **{rf_bws['all_packages']['roc_auc']:.4f}**.",
+        f"   - **XGBoost** exhibits slightly higher variation across strata: **{xgb_bws['1-5_files']['fpr']*100:.2f}%** on small packages (1-5 files), **{xgb_bws['6-20_files']['fpr']*100:.2f}%** on medium packages (6-20 files), and **{xgb_bws['>20_files']['fpr']*100:.2f}%** on large packages (>20 files), with an overall holdout FPR of **{xgb_bws['all_packages']['fpr']*100:.2f}%** and ROC-AUC of **{xgb_bws['all_packages']['roc_auc']:.4f}**.",
+        f"   - Note that while Random Forest keeps FPR under 8% across all strata, XGBoost reaches **{xgb_bws['6-20_files']['fpr']*100:.2f}% FPR** on medium-sized packages.",
         "2. **Severe Distortion from Size Feature (`behavior_with_size`):**",
-        "   - Introducing `n_py_files` to tree classifiers induces severe class-confounding: the False Positive Rate on small packages (1-5 files) explodes to **53.17% (RF)** and **51.59% (XGBoost)**.",
+        f"   - Introducing `n_py_files` to tree classifiers induces severe class-confounding: the False Positive Rate on small packages (1-5 files) explodes to **{rf_sz['1-5_files']['fpr']*100:.2f}% (RF)** and **{xgb_sz['1-5_files']['fpr']*100:.2f}% (XGBoost)**.",
         "   - Because benign training samples are predominantly larger libraries, the models learn an artificial shortcut linking small codebase size directly to malice.",
         "",
         "### Limitations of Experiments:",

@@ -29,16 +29,16 @@
           "indicator_present__setuptools.setup",
           "indicator_present__os.environ",
           "indicator_present__subprocess.Popen",
-          "indicator_present__base64.b64encode",
-          "indicator_present__base64.b64decode",
           "indicator_present__subprocess.run",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__.env",
           "indicator_present__requests.get",
           "indicator_present__exec",
-          "indicator_present__.env",
           "indicator_present__requests.post",
-          "indicator_present__socket",
           "indicator_present__setuptools.command.install",
           "indicator_present__eval",
+          "indicator_present__socket",
           "indicator_present__compile",
           "indicator_present__os.system",
           "indicator_present__urllib.request.urlopen",
@@ -46,18 +46,18 @@
           "indicator_present__base64.urlsafe_b64decode",
           "indicator_present__.ssh/",
           "indicator_present__.netrc",
-          "indicator_present__requests.request",
           "indicator_present__base64.encodebytes",
+          "indicator_present__requests.request",
           "indicator_present__.aws/credentials",
           "indicator_present__base64.decodebytes",
           "indicator_present__base64.standard_b64encode",
           "indicator_present__base64.b32encode",
           "indicator_present__base64.encodestring",
           "indicator_present__base64.standard_b64decode",
-          "indicator_present__base64.decodestring",
           "indicator_present__base64.b32decode",
           "indicator_present__base64.b16decode",
           "indicator_present__base64.b16encode",
+          "indicator_present__base64.decodestring",
           "indicator_present__base64.b85decode",
           "indicator_present__base64.a85encode",
           "indicator_present__base64.b85encode",
@@ -65,7 +65,7 @@
           "indicator_present__base64.encode",
           "indicator_present__base64.b32hexdecode",
           "indicator_present__base64.b32hexencode",
-          "indicator_present__base64.decode"
+          "indicator_present__base64.z85decode"
         ],
         "cv_5fold": {
           "mean_std": {
@@ -74,53 +74,53 @@
               "std": 0.0
             },
             "accuracy": {
-              "mean": 0.8185174570420474,
-              "std": 0.02261762975586663
+              "mean": 0.8170042161845441,
+              "std": 0.0196997645531686
             },
             "precision": {
-              "mean": 0.8651452388406072,
-              "std": 0.02469507215349426
+              "mean": 0.8613786690588932,
+              "std": 0.02573330791353958
             },
             "recall": {
-              "mean": 0.6638024912359215,
-              "std": 0.04878335604735954
+              "mean": 0.6638062206310137,
+              "std": 0.042502940065616716
             },
             "f1": {
-              "mean": 0.750586349136734,
-              "std": 0.0377090385983545
+              "mean": 0.7492322931107585,
+              "std": 0.03226494591676898
             },
             "pr_auc": {
-              "mean": 0.8535491940778439,
-              "std": 0.022578849106744667
+              "mean": 0.8538944756588561,
+              "std": 0.02332132220385478
             },
             "roc_auc": {
-              "mean": 0.8774754361789079,
-              "std": 0.022458237388843387
+              "mean": 0.8780632296176666,
+              "std": 0.02342860203394253
             },
             "fpr": {
-              "mean": 0.07266509760487332,
-              "std": 0.013590415631651842
+              "mean": 0.07524574276616365,
+              "std": 0.015323062202038872
             }
           },
           "confusion_counts_sum": {
-            "tn": 2157,
-            "fp": 169,
+            "tn": 2151,
+            "fp": 175,
             "fn": 550,
             "tp": 1086
           }
         },
         "frozen_holdout": {
           "threshold": 0.5,
-          "accuracy": 0.8244197780020182,
-          "precision": 0.8802588996763754,
-          "recall": 0.6650366748166259,
-          "f1": 0.7576601671309192,
-          "pr_auc": 0.8713012432415791,
-          "roc_auc": 0.9012195531805846,
+          "accuracy": 0.8405650857719476,
+          "precision": 0.8861538461538462,
+          "recall": 0.7041564792176039,
+          "f1": 0.784741144414169,
+          "pr_auc": 0.8719587829553914,
+          "roc_auc": 0.9006272107814718,
           "tn": 545,
           "fp": 37,
-          "fn": 137,
-          "tp": 272,
+          "fn": 121,
+          "tp": 288,
           "fpr": 0.06357388316151202
         },
         "model_path": "Person_B\\models\\saved\\random_forest_behavior_without_size.joblib"
@@ -145,16 +145,16 @@
           "indicator_present__setuptools.setup",
           "indicator_present__os.environ",
           "indicator_present__subprocess.Popen",
-          "indicator_present__base64.b64encode",
-          "indicator_present__base64.b64decode",
           "indicator_present__subprocess.run",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__.env",
           "indicator_present__requests.get",
           "indicator_present__exec",
-          "indicator_present__.env",
           "indicator_present__requests.post",
-          "indicator_present__socket",
           "indicator_present__setuptools.command.install",
           "indicator_present__eval",
+          "indicator_present__socket",
           "indicator_present__compile",
           "indicator_present__os.system",
           "indicator_present__urllib.request.urlopen",
@@ -162,18 +162,18 @@
           "indicator_present__base64.urlsafe_b64decode",
           "indicator_present__.ssh/",
           "indicator_present__.netrc",
-          "indicator_present__requests.request",
           "indicator_present__base64.encodebytes",
+          "indicator_present__requests.request",
           "indicator_present__.aws/credentials",
           "indicator_present__base64.decodebytes",
           "indicator_present__base64.standard_b64encode",
           "indicator_present__base64.b32encode",
           "indicator_present__base64.encodestring",
           "indicator_present__base64.standard_b64decode",
-          "indicator_present__base64.decodestring",
           "indicator_present__base64.b32decode",
           "indicator_present__base64.b16decode",
           "indicator_present__base64.b16encode",
+          "indicator_present__base64.decodestring",
           "indicator_present__base64.b85decode",
           "indicator_present__base64.a85encode",
           "indicator_present__base64.b85encode",
@@ -181,7 +181,7 @@
           "indicator_present__base64.encode",
           "indicator_present__base64.b32hexdecode",
           "indicator_present__base64.b32hexencode",
-          "indicator_present__base64.decode"
+          "indicator_present__base64.z85decode"
         ],
         "cv_5fold": {
           "mean_std": {
@@ -190,32 +190,32 @@
               "std": 0.0
             },
             "accuracy": {
-              "mean": 0.8111961353764633,
-              "std": 0.0309917726971258
+              "mean": 0.8111964538194046,
+              "std": 0.028188913608813822
             },
             "precision": {
-              "mean": 0.8536437840859726,
-              "std": 0.045261462039495805
+              "mean": 0.8537591049023205,
+              "std": 0.04041846528565972
             },
             "recall": {
               "mean": 0.6552379354068769,
-              "std": 0.05694633369711818
+              "std": 0.05632712421298159
             },
             "f1": {
-              "mean": 0.740591236516492,
-              "std": 0.048013540721244106
+              "mean": 0.740521206238556,
+              "std": 0.04529569987398767
             },
             "pr_auc": {
-              "mean": 0.855321808752886,
-              "std": 0.025279444106553323
+              "mean": 0.8534676595679196,
+              "std": 0.024425027542154035
             },
             "roc_auc": {
-              "mean": 0.8777232049330606,
-              "std": 0.025983901530736292
+              "mean": 0.8765428271020527,
+              "std": 0.024207360252175854
             },
             "fpr": {
-              "mean": 0.07911763348562462,
-              "std": 0.024804020298198896
+              "mean": 0.07911855646315012,
+              "std": 0.022814056834719206
             }
           },
           "confusion_counts_sum": {
@@ -227,17 +227,17 @@
         },
         "frozen_holdout": {
           "threshold": 0.5,
-          "accuracy": 0.8022199798183652,
-          "precision": 0.8538205980066446,
-          "recall": 0.628361858190709,
-          "f1": 0.723943661971831,
-          "pr_auc": 0.85353955399678,
-          "roc_auc": 0.8844260160142497,
-          "tn": 538,
-          "fp": 44,
-          "fn": 152,
-          "tp": 257,
-          "fpr": 0.07560137457044673
+          "accuracy": 0.8193743693239153,
+          "precision": 0.8662420382165605,
+          "recall": 0.6650366748166259,
+          "f1": 0.7524204702627939,
+          "pr_auc": 0.8535737503803593,
+          "roc_auc": 0.8853838462766448,
+          "tn": 540,
+          "fp": 42,
+          "fn": 137,
+          "tp": 272,
+          "fpr": 0.07216494845360824
         },
         "model_path": "Person_B\\models\\saved\\xgboost_behavior_without_size.joblib"
       }
@@ -263,16 +263,16 @@
           "indicator_present__setuptools.setup",
           "indicator_present__os.environ",
           "indicator_present__subprocess.Popen",
-          "indicator_present__base64.b64encode",
-          "indicator_present__base64.b64decode",
           "indicator_present__subprocess.run",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__.env",
           "indicator_present__requests.get",
           "indicator_present__exec",
-          "indicator_present__.env",
           "indicator_present__requests.post",
-          "indicator_present__socket",
           "indicator_present__setuptools.command.install",
           "indicator_present__eval",
+          "indicator_present__socket",
           "indicator_present__compile",
           "indicator_present__os.system",
           "indicator_present__urllib.request.urlopen",
@@ -280,18 +280,18 @@
           "indicator_present__base64.urlsafe_b64decode",
           "indicator_present__.ssh/",
           "indicator_present__.netrc",
-          "indicator_present__requests.request",
           "indicator_present__base64.encodebytes",
+          "indicator_present__requests.request",
           "indicator_present__.aws/credentials",
           "indicator_present__base64.decodebytes",
           "indicator_present__base64.standard_b64encode",
           "indicator_present__base64.b32encode",
           "indicator_present__base64.encodestring",
           "indicator_present__base64.standard_b64decode",
-          "indicator_present__base64.decodestring",
           "indicator_present__base64.b32decode",
           "indicator_present__base64.b16decode",
           "indicator_present__base64.b16encode",
+          "indicator_present__base64.decodestring",
           "indicator_present__base64.b85decode",
           "indicator_present__base64.a85encode",
           "indicator_present__base64.b85encode",
@@ -299,7 +299,7 @@
           "indicator_present__base64.encode",
           "indicator_present__base64.b32hexdecode",
           "indicator_present__base64.b32hexencode",
-          "indicator_present__base64.decode",
+          "indicator_present__base64.z85decode",
           "n_py_files"
         ],
         "cv_5fold": {
@@ -309,54 +309,54 @@
               "std": 0.0
             },
             "accuracy": {
-              "mean": 0.8558778198122461,
-              "std": 0.00868222645309955
+              "mean": 0.8563812781025895,
+              "std": 0.009373386344333828
             },
             "precision": {
-              "mean": 0.8417510341312227,
-              "std": 0.03316053986888374
+              "mean": 0.8425099425100205,
+              "std": 0.033041835295080264
             },
             "recall": {
               "mean": 0.805012307003804,
-              "std": 0.0448080697735908
+              "std": 0.03515996477539901
             },
             "f1": {
-              "mean": 0.8216128100965113,
-              "std": 0.012379615038145057
+              "mean": 0.8223094498371555,
+              "std": 0.01021485371612884
             },
             "pr_auc": {
-              "mean": 0.9122256942678243,
-              "std": 0.0124537692548944
+              "mean": 0.9125568663048984,
+              "std": 0.013988470376112784
             },
             "roc_auc": {
-              "mean": 0.9174057931892238,
-              "std": 0.01743913351763404
+              "mean": 0.9171532466219802,
+              "std": 0.01825046729068569
             },
             "fpr": {
-              "mean": 0.10834187087544418,
-              "std": 0.034433849370775566
+              "mean": 0.10748811666435923,
+              "std": 0.0326755875365349
             }
           },
           "confusion_counts_sum": {
-            "tn": 2074,
-            "fp": 252,
+            "tn": 2076,
+            "fp": 250,
             "fn": 319,
             "tp": 1317
           }
         },
         "frozen_holdout": {
           "threshold": 0.5,
-          "accuracy": 0.8496468213925328,
-          "precision": 0.8217821782178217,
-          "recall": 0.8117359413202934,
-          "f1": 0.8167281672816729,
-          "pr_auc": 0.907716600216845,
-          "roc_auc": 0.91780303985078,
-          "tn": 510,
-          "fp": 72,
-          "fn": 77,
-          "tp": 332,
-          "fpr": 0.12371134020618557
+          "accuracy": 0.8546922300706358,
+          "precision": 0.8287841191066998,
+          "recall": 0.8166259168704156,
+          "f1": 0.8226600985221675,
+          "pr_auc": 0.9088983063675098,
+          "roc_auc": 0.9193700165519791,
+          "tn": 513,
+          "fp": 69,
+          "fn": 75,
+          "tp": 334,
+          "fpr": 0.11855670103092783
         },
         "model_path": "Person_B\\models\\saved\\random_forest_behavior_with_size.joblib"
       },
@@ -380,16 +380,16 @@
           "indicator_present__setuptools.setup",
           "indicator_present__os.environ",
           "indicator_present__subprocess.Popen",
-          "indicator_present__base64.b64encode",
-          "indicator_present__base64.b64decode",
           "indicator_present__subprocess.run",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__.env",
           "indicator_present__requests.get",
           "indicator_present__exec",
-          "indicator_present__.env",
           "indicator_present__requests.post",
-          "indicator_present__socket",
           "indicator_present__setuptools.command.install",
           "indicator_present__eval",
+          "indicator_present__socket",
           "indicator_present__compile",
           "indicator_present__os.system",
           "indicator_present__urllib.request.urlopen",
@@ -397,18 +397,18 @@
           "indicator_present__base64.urlsafe_b64decode",
           "indicator_present__.ssh/",
           "indicator_present__.netrc",
-          "indicator_present__requests.request",
           "indicator_present__base64.encodebytes",
+          "indicator_present__requests.request",
           "indicator_present__.aws/credentials",
           "indicator_present__base64.decodebytes",
           "indicator_present__base64.standard_b64encode",
           "indicator_present__base64.b32encode",
           "indicator_present__base64.encodestring",
           "indicator_present__base64.standard_b64decode",
-          "indicator_present__base64.decodestring",
           "indicator_present__base64.b32decode",
           "indicator_present__base64.b16decode",
           "indicator_present__base64.b16encode",
+          "indicator_present__base64.decodestring",
           "indicator_present__base64.b85decode",
           "indicator_present__base64.a85encode",
           "indicator_present__base64.b85encode",
@@ -416,7 +416,7 @@
           "indicator_present__base64.encode",
           "indicator_present__base64.b32hexdecode",
           "indicator_present__base64.b32hexencode",
-          "indicator_present__base64.decode",
+          "indicator_present__base64.z85decode",
           "n_py_files"
         ],
         "cv_5fold": {
@@ -426,39 +426,39 @@
               "std": 0.0
             },
             "accuracy": {
-              "mean": 0.8604197714853452,
-              "std": 0.010907319951866782
+              "mean": 0.8573894684550423,
+              "std": 0.014677113095260446
             },
             "precision": {
-              "mean": 0.8470752451765637,
-              "std": 0.02981440057445876
+              "mean": 0.84108628482371,
+              "std": 0.03849659781846099
             },
             "recall": {
-              "mean": 0.8098903557842917,
-              "std": 0.03054050802609245
+              "mean": 0.8105019765793988,
+              "std": 0.03163593781847245
             },
             "f1": {
-              "mean": 0.8273221164794833,
-              "std": 0.012495149376139684
+              "mean": 0.8244908533222797,
+              "std": 0.014556513837427225
             },
             "pr_auc": {
-              "mean": 0.9119551363097822,
-              "std": 0.014235896300396154
+              "mean": 0.913226540956547,
+              "std": 0.013842871940271102
             },
             "roc_auc": {
-              "mean": 0.9157124876456579,
-              "std": 0.017168126419602626
+              "mean": 0.9178958106024646,
+              "std": 0.016505528156035756
             },
             "fpr": {
-              "mean": 0.10404817942683095,
-              "std": 0.028580886644808925
+              "mean": 0.10963865429876782,
+              "std": 0.03749018164372201
             }
           },
           "confusion_counts_sum": {
-            "tn": 2084,
-            "fp": 242,
-            "fn": 311,
-            "tp": 1325
+            "tn": 2071,
+            "fp": 255,
+            "fn": 310,
+            "tp": 1326
           }
         },
         "frozen_holdout": {
@@ -467,8 +467,8 @@
           "precision": 0.8224543080939948,
           "recall": 0.7701711491442543,
           "f1": 0.7954545454545454,
-          "pr_auc": 0.887044406348603,
-          "roc_auc": 0.8905006763625976,
+          "pr_auc": 0.8896136516387885,
+          "roc_auc": 0.8947647014342248,
           "tn": 514,
           "fp": 68,
           "fn": 94,
