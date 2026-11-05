@@ -1,21 +1,8 @@
-"""
-SPIDER Contract Package
-Defines the shared evidence schema, dataset validation contracts, and leakage guards.
+"""SPIDER shared contract: schemas, adapter, verdict policy, dataset guards.
+
+This package is the single place where the three people agree on data shapes.
+Nothing here executes package code; nothing here needs the network.
 """
 
-from spider_contract.dataset import (
-    BANNED_FEATURE_COLUMNS,
-    make_group_id,
-    assert_no_leaky_columns,
-    assert_group_disjoint,
-)
-from spider_contract.models import Finding, ScanRecord
-
-__all__ = [
-    "BANNED_FEATURE_COLUMNS",
-    "make_group_id",
-    "assert_no_leaky_columns",
-    "assert_group_disjoint",
-    "Finding",
-    "ScanRecord",
-]
+__version__ = "0.1.0"
+CONTRACT_VERSION = "0.1"

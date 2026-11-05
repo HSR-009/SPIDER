@@ -28,7 +28,7 @@ class ScanRecord:
     package_id: str = ""
     group_id: str = ""
     analyzer_version: str = "v1.0.0"
-    verdict: str = "unable_to_assess"  # suspicious | none_detected_in_scan | unable_to_assess
+    verdict: str = "unable_to_assess"  # suspicious | none_detected_in_this_scan | unable_to_assess
     review_recommended: bool = False
     findings: List[Dict[str, Any]] = field(default_factory=list)
     category_counts: Dict[str, int] = field(default_factory=dict)

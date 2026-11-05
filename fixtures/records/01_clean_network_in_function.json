@@ -1,0 +1,118 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "b6b6e5d3-5e05-5493-b716-da558ad2a81b",
+  "created_at": "2026-11-01T00:00:00Z",
+  "record_origin": "hand_written_fixture",
+  "tool": {
+    "spider_version": "fixture",
+    "analyzer_version": "fixture",
+    "ruleset_version": "fixture"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "demo-httpclient",
+    "version": "1.0.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "ad41b2eccd188df67048d83987c872efff4906ae3f2ceb16f801ef326bea3248",
+      "size_bytes": 481,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 3,
+    "python_files": 1,
+    "files_inspected": 2,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "kind": "doc",
+      "sha256": "0c7f65dd7d7b3a7e881bdc27a6fb71881660371f48324914ef1f88e6093f4797",
+      "lines": 3,
+      "inspected": false,
+      "roles": []
+    },
+    {
+      "path": "demo_httpclient/__init__.py",
+      "kind": "python",
+      "sha256": "d98ddfd78b07cd46c235f6e91b67994ee9698f48670f0a6026f6fa580a62141f",
+      "lines": 10,
+      "inspected": true,
+      "roles": [
+        "package_init"
+      ]
+    },
+    {
+      "path": "pyproject.toml",
+      "kind": "build_config",
+      "sha256": "4ce365cbb44692bc8aa2b3a4bb981e43fa48b2b1a2ccdb63322178918c9f2932",
+      "lines": 7,
+      "inspected": true,
+      "roles": [
+        "build_config"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "SPD-NET-001",
+      "category": "network_activity",
+      "indicator": "socket.create_connection",
+      "severity": "low",
+      "confidence": "medium",
+      "file": "demo_httpclient/__init__.py",
+      "span": {
+        "start_line": 9,
+        "start_col": 9,
+        "end_line": 9,
+        "end_col": 64
+      },
+      "snippet": "socket.create_connection((host, port), timeout=timeout)",
+      "explanation": "Opens a TCP connection inside a function; it runs only when can_connect() is called.",
+      "trigger_phase": "call",
+      "context": {
+        "enclosing_function": "can_connect",
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    }
+  ],
+  "relations": [],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": "Model not run."
+  },
+  "verdict": {
+    "outcome": "none_detected_in_this_scan",
+    "reasons": [],
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ]
+  },
+  "timings_ms": {
+    "acquire": 0,
+    "extract": 2,
+    "analyze": 14,
+    "features": 3,
+    "model": null
+  }
+}
