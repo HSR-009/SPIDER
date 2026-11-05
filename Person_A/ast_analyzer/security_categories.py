@@ -1,50 +1,34 @@
-# SECURITY_RULES = {
-#     "Command Execution": [
-#         "os.system",
-#         "subprocess.run",
-#         "subprocess.Popen",
-#     ],
+"""
+SPIDER Security Categories and Default Severities.
 
-#     "Dynamic Code Execution": [
-#         "eval",
-#         "exec",
-#         "compile",
-#     ],
+Six active behavioral categories are emitted by the AST analyzer for v1:
+1. Command Execution (HIGH)
+2. Dynamic Code Execution (HIGH)
+3. Credential / Data Access (HIGH)
+4. Network Activity (MEDIUM)
+5. Obfuscation (MEDIUM)
+6. Install-Time / Package Execution (HIGH for custom install commands/cmdclass, LOW for standard setup)
 
-#     "Credential / Data Access": [
-#         "os.environ",
-#         "~/.ssh/",
-#         "~/.aws/credentials",
-#         ".netrc",
-#         ".env",
-#     ],
+Note on categories:
+- "Supply-Chain Abuse" is reserved at the metadata/package-naming level (typosquatting, dependency confusion)
+  and is not emitted as an AST rule finding.
+- "Parse Error" is an analysis status (recorded in inventory.parse_failures and failed_static_analysis),
+  not a security behavior category.
+"""
 
-#     "Network Activity": [
-#         "socket",
-#         "requests",
-#         "urllib",
-#         "http",
-#     ],
+ACTIVE_CATEGORIES = [
+    "Command Execution",
+    "Dynamic Code Execution",
+    "Credential / Data Access",
+    "Network Activity",
+    "Obfuscation",
+    "Install-Time / Package Execution",
+]
 
-#     "Obfuscation": [
-#         "base64",
-#         "encoded_string",
-#         "dynamic_reconstruction",
-#     ],
+RESERVED_CATEGORIES = [
+    "Supply-Chain Abuse",
+]
 
-#     "Install-Time / Package Execution": [
-#         "setuptools.command.install",
-#         "cmdclass",
-#         "setup.py",
-#         "__init__.py",
-#     ],
-
-#     "Supply-Chain Abuse": [
-#         "typosquatting",
-#         "dependency_confusion",
-#         "package_impersonation",
-#     ],
-# }
 SECURITY_CATEGORIES = {
     "Command Execution": "HIGH",
     "Dynamic Code Execution": "HIGH",
@@ -52,5 +36,5 @@ SECURITY_CATEGORIES = {
     "Network Activity": "MEDIUM",
     "Obfuscation": "MEDIUM",
     "Install-Time / Package Execution": "HIGH",
-    "Supply-Chain Abuse": "HIGH",
+    "Supply-Chain Abuse": "HIGH",  # Reserved metadata category
 }

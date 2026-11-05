@@ -1,162 +1,64 @@
-# SPIDER Evasion Catalog (T01–T05)
-**Author:** Person C (Jeet Dave)  
-**Role:** Evasion, Defense & Dashboard  
-**Status:** Active Sprint Standard (7-Day Sprint Plan, Day 1)  
-**Baseline Evaluation Reference:** [`results/evasion_baseline_v1.md`](../results/evasion_baseline_v1.md)
+# SPIDER Evasion Catalog (v1 Baseline)
+
+This document formalizes the evasion techniques developed in the Adversarial Evasion Laboratory (Person C). Each technique is assigned a stable identifier (T01–T05) and documents the syntax transformation, underlying target behavior, and detection visibility against the AST analyzer.
 
 ---
 
-## 1. Overview and Core Research Objective
+## Catalog Index
 
-In SPIDER, malicious package detection is evaluated under the paradigm:
-```
-DETECT → ATTACK/EVASION → DEFEND → RE-TEST
-```
-The goal of this evasion catalog is not merely to alter source code appearance, but to systematically test whether controlled static transformations cause our AST-based analyzer (`analyzer.py`) to lose visibility into known malicious primitives.
-
-### Strict Safety Boundaries
-- **No Malicious Execution:** Transformed samples are analyzed as static source text or parsed via Python AST. Untrusted code is never executed directly.
-- **Harmless Markers in Equivalence Tests:** Any functional testing uses benign marker prints (`print("MARKER_...")`), with zero network, filesystem, or process spawning.
-- **AST Pre-flight:** An AST validator rejects any dangerous calls before subprocess testing.
+| ID | Technique Name | Target Behavior Hidden | Visibility in Analyzer v1 |
+|---|---|---|---|
+| **T01** | String Splitting | Sensitive API / module / command string literals | **Visible** (Direct call remains intact; only argument string is split) |
+| **T02** | Base64 Encoding | Entire executable code payload | **Wrapper Visible** (Wrapper's `b64decode` + `exec` flagged; payload unseen) |
+| **T03** | ROT13 Encoding | Entire executable code payload | **Wrapper Visible** (Wrapper's `exec` flagged; payload unseen) |
+| **T04** | `getattr` Dynamic Invocation | Function / method dispatch (`os.system`, `subprocess.run`) | **EVADED** (0% detected; AST rule only matches direct attribute calls) |
+| **T05** | Delayed / Conditional Trigger | Deferred execution flow via counters / conditions | **Visible** (Syntax remains standard Python calls within blocks) |
 
 ---
 
-## 2. Three-Outcome Detection Scoring
+## Detailed Specifications
 
-Each transformation applied to a known malicious sample produces one of three distinct outcomes against the detector:
-
-1. **`recovered`**: The detector identifies the exact same `(category, indicator)` as the baseline sample.
-2. **`different_signal`**: The detector fires on an obfuscation/wrapper artifact (e.g. `base64.b64decode` or `exec`), but loses visibility into the underlying malicious call.
-3. **`missed`**: The detector produces zero security findings (`[]`), representing a complete evasion.
-
----
-
-## 3. The Catalog: Techniques T01–T05
-
-### T01: String Splitting / Concatenation
-- **Stable ID:** `T01`
-- **Name:** String Splitting and Concatenation
-- **Implementation:** `Person_c/disguises.py::string_split_disguise(sensitive_word, seed=42)`
-- **Target Behavior It Hides:** Conceals sensitive literal strings (e.g., `"whoami"`, `"os.system"`, hostnames, file paths) from naive regex, string grep, or keyword search.
-- **Harmless Source Example:**
+### T01 — String Splitting
+- **Mechanism**: Splits a sensitive string literal into random substrings of 1–3 characters and joins them via binary string addition (`+`).
+- **Implementation**: `string_split_disguise(sensitive_word, seed=42)`
+- **Example**:
   ```python
-  import os
+  # Original
   os.system("whoami")
+  # Transformed
+  os.system("wh" + "oa" + "mi")
   ```
-- **Transformed Code:**
-  ```python
-  import os
-  os.system('w' + 'ho' + 'a' + 'mi')
-  ```
-- **Expected Analyzer Behavior:**
-  - `recovered`: Person A's AST analyzer inspects `Call.func` (`os.system`) directly, rather than matching on string arguments. The AST call structure remains intact, so `os.system` is reliably detected.
-- **Empirical Baseline Result:** 10 / 10 Recovered (0% Missed).
-- **Limitations:** Does not bypass AST call-node rules unless the function identifier itself is split and resolved dynamically (see T04).
+- **Analysis Impact**: If the analyzer matches function names directly (e.g. `os.system`), this transform does not evade. It only hides argument-based sensitive paths or commands.
 
----
-
-### T02: Base64 Payload Encoding
-- **Stable ID:** `T02`
-- **Name:** Base64 Payload Encoding and Dynamic Execution
-- **Implementation:** `Person_c/disguises.py::base64_disguise(payload_code)`
-- **Target Behavior It Hides:** Hides arbitrary command execution, socket connections, or environment access inside an opaque base64 string literal.
-- **Harmless Source Example:**
-  ```python
-  import os
-  os.system("whoami")
-  ```
-- **Transformed Code:**
+### T02 — Base64 Encoding
+- **Mechanism**: Encodes the entire payload into standard Base64 ascii text, wrapping it in `base64.b64decode(...)` followed by `exec(...)`.
+- **Implementation**: `base64_disguise(payload_code)`
+- **Example**:
   ```python
   import base64
-  encoded_data = 'aW1wb3J0IG9zCgpvcy5zeXN0ZW0oIndob2FtaSIp'
+  encoded_data = 'aW1wb3J0IG9zOyBvcy5zeXN0ZW0oIndob2FtaSIp'
   decoded_code = base64.b64decode(encoded_data)
   exec(decoded_code)
   ```
-- **Expected Analyzer Behavior:**
-  - `different_signal`: The analyzer detects `base64.b64decode` (Obfuscation) and `exec` (Dynamic Code Execution). However, it **loses visibility** into the underlying `os.system` (Command Execution).
-- **Empirical Baseline Result:** 8 / 10 Different Signal, 2 / 10 Recovered (0% Missed, 80% Signal Shift).
-- **Limitations:** Introduces explicit high-entropy indicator calls (`base64.b64decode`, `exec`) that flag the sample as suspicious or obfuscated.
+- **Analysis Impact**: The analyzer flags the wrapper (`base64.b64decode` and `exec`), but the underlying malicious action (`os.system`) is completely masked from static AST inspection without normalization.
 
----
+### T03 — ROT13 Encoding
+- **Mechanism**: Encodes the payload using codecs ROT-13 reversible substitution, executed via `exec(codecs.decode(..., 'rot_13'))`.
+- **Implementation**: `rot13_disguise(payload_code)`
+- **Analysis Impact**: Flags the wrapper `exec`, but obfuscated payload is hidden from keyword and indicator matchers.
 
-### T03: ROT13 Payload Encoding
-- **Stable ID:** `T03`
-- **Name:** ROT13 Encoding and Dynamic Execution
-- **Implementation:** `Person_c/disguises.py::rot13_disguise(payload_code)`
-- **Target Behavior It Hides:** Reversible substitution cipher masking payload source text without standard binary encoding headers.
-- **Harmless Source Example:**
-  ```python
-  import subprocess
-  subprocess.run(["whoami"])
-  ```
-- **Transformed Code:**
-  ```python
-  import codecs
-  encoded_data = 'vzcbeg fhocebprff\n\nfhocebprff.eha(["jxbav"])'
-  decoded_code = codecs.decode(encoded_data, 'rot_13')
-  exec(decoded_code)
-  ```
-- **Expected Analyzer Behavior:**
-  - `different_signal`: The baseline analyzer detects `exec` (Dynamic Code Execution), but does not detect `subprocess.run`.
-- **Empirical Baseline Result:** 8 / 10 Different Signal, 2 / 10 Recovered (0% Missed, 80% Signal Shift).
-- **Limitations:** Calls `exec()`, which is a high-severity indicator in SPIDER's taxonomy.
-
----
-
-### T04: `getattr` Dynamic Indirection
-- **Stable ID:** `T04`
-- **Name:** Dynamic Attribute Access via `getattr()`
-- **Implementation:** `Person_c/disguises.py::getattr_disguise(module, func_name, args_code)`
-- **Target Behavior It Hides:** Conceals direct function calls (`os.system`, `subprocess.run`, `socket.socket`, `exec`, `eval`) from AST call-attribute matchers.
-- **Harmless Source Example:**
-  ```python
-  import os
-  os.system("whoami")
-  ```
-- **Transformed Code:**
+### T04 — `getattr` Dynamic Dispatch (Critical Gap)
+- **Mechanism**: Reconstructs the target function name dynamically using fragmented string literals and accesses the module method via Python's built-in `getattr(module, function_name)`.
+- **Implementation**: `getattr_disguise(module, func_name, args_code)`
+- **Example**:
   ```python
   import os
   function_name = 'sy' + 'st' + 'em'
   getattr(os, function_name)("whoami")
   ```
-- **Expected Analyzer Behavior:**
-  - `missed`: Because `node.func` is a `getattr` Call node rather than an `Attribute` node matching `node.func.attr == 'system'`, the baseline analyzer fails to match the rule and emits zero findings.
-- **Empirical Baseline Result:** 8 / 10 Missed (80% Evasion Success Rate).
-- **Defense Implication:** Directly motivates the Day 4 normalization defense (`spider/normalize.py`) to resolve `getattr(obj, "literal")` into attribute access prior to AST rule evaluation.
+- **Analysis Impact**: **100% Evasion Success against Analyzer v1.** The AST pattern `node.func.attr == "system"` fails because `node.func` is a `Call` to `getattr`, not an `Attribute`. Motivates the need for AST constant-folding and normalization in v1.1.
 
----
-
-### T05: Delayed / Conditional Trigger Execution
-- **Stable ID:** `T05`
-- **Name:** Counter-Based Delayed Trigger Execution
-- **Implementation:** `Person_c/disguises.py::delay_disguise(payload_code, trigger_count=3)`
-- **Target Behavior It Hides:** Intended to evade dynamic sandboxes by executing only after multiple invocations or specific runtime environmental checks.
-- **Harmless Source Example:**
-  ```python
-  import os
-  os.system("whoami")
-  ```
-- **Transformed Code:**
-  ```python
-  counter = 0
-  counter += 1
-  if counter >= 3:
-      import os
-      os.system("whoami")
-  ```
-- **Expected Analyzer Behavior:**
-  - `recovered`: Static AST traversal walks all nodes inside `If` bodies regardless of condition values. The underlying `os.system` call is located and detected identically to baseline.
-- **Empirical Baseline Result:** 10 / 10 Recovered (0% Missed).
-- **Limitations:** Ineffective against static AST analysis; primarily targets dynamic analysis sandboxes.
-
----
-
-## 4. Summary Matrix across 10 Baseline Malicious Samples
-
-| Technique | Recovered (Original Caught) | Different Signal (Obfuscation Caught) | Missed (Evaded) | Primary Defense Opportunity |
-| :--- | :---: | :---: | :---: | :--- |
-| **T01 String Split** | 100% | 0% | 0% | Constant folding |
-| **T02 Base64** | 20% | 80% | 0% | Static base64 decoding |
-| **T03 ROT13** | 20% | 80% | 0% | Static decode folding |
-| **T04 getattr** | 20% | 0% | **80%** | `getattr` attribute normalization |
-| **T05 Delayed** | 100% | 0% | 0% | Static control-flow inspection |
+### T05 — Delayed / Conditional Trigger
+- **Mechanism**: Wraps the target payload inside an iteration counter or deferred conditional block (`if counter >= 3:`).
+- **Implementation**: `delay_disguise(payload_code, trigger_count=3)`
+- **Analysis Impact**: The AST analyzer continues to flag AST nodes regardless of their control flow nesting level.
