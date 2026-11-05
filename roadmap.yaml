@@ -7,7 +7,7 @@ levels:
     id: "level-0-contract"
     title: "Evidence Contract & Research Checks"
     group: "v1"
-    status: "in_progress"
+    status: "built"
     description: "Shared schema contract, leakage guards, group-safe splits, size-bias evaluation."
     deliverables:
       - "Versioned scan_record JSON schema"
