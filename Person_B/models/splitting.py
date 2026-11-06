@@ -5,10 +5,13 @@ import pandas as pd
 from sklearn.model_selection import StratifiedGroupKFold
 
 LEAKAGE_COLUMNS = {
-    "label", "package_id", "package_name", "group_id", "version",
-    "source", "malicious_evidence", "in_index", "index_annotated",
-    "analyzer_version", "collection_date", "parse_error_count",
-    "failed_static_analysis", "n_findings",
+    "strong_signals", "verdict_outcome", "review_recommended", "s2_same_file",
+    "package_id", "package_name", "version", "group_id", "label", "source",
+    "analyzer_version", "ruleset_version", "in_index", "index_annotated",
+    "malicious_evidence", "collection_date", "parse_error_count",
+    "failed_static_analysis", "n_findings", "n_parse_failures", "n_py_files_all",
+    "max_severity", "scan_seconds", "coverage_problems", "limits_hit",
+    "archive_used", "artifact_sha256", "category_counts", "findings",
 }
 
 def assert_no_leakage(feature_columns):

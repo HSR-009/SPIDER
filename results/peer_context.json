@@ -1,0 +1,395 @@
+{
+  "title": "SPIDER Peer-Context Package Size Statistics",
+  "intended_use": "Person C Capability Web contextualization and radar calibration",
+  "analyzer_version": "1.1",
+  "dataset_version": "v1.1",
+  "dataset_sources": {
+    "malicious": "data/processed/malicious_v11.jsonl",
+    "benign": "data/processed/benign_v11.jsonl.gz"
+  },
+  "total_corpus_packages": 4948,
+  "total_holdout_packages": 991,
+  "frozen_holdout_file": "results/frozen_holdout_packages.csv",
+  "size_strata": [
+    {
+      "bucket_name": "0_files",
+      "min_py_files": 0,
+      "max_py_files": 0,
+      "description": "No analyzed python files (e.g. metadata-only, binary, or unparsed)",
+      "corpus_package_count": 73,
+      "corpus_malicious_count": 18,
+      "corpus_benign_count": 55,
+      "malicious_prevalence": 0.2466,
+      "category_presence_rates": {
+        "network_activity": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        },
+        "credential_data_access": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        },
+        "command_execution": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        },
+        "obfuscation": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        },
+        "install_time_package_execution": {
+          "all": 0.0685,
+          "malicious": 0.0,
+          "benign": 0.0909
+        },
+        "dynamic_code_execution": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        },
+        "supply_chain_abuse": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        }
+      },
+      "holdout_evaluation": {
+        "sample_count": 25,
+        "benign_count": 9,
+        "malicious_count": 16,
+        "random_forest_behavior_without_size": {
+          "pr_auc": 0.6956521739130435,
+          "roc_auc": 0.6111111111111112,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "tn": 9,
+          "fp": 0,
+          "fn": 16,
+          "tp": 0
+        },
+        "xgboost_behavior_without_size": {
+          "pr_auc": 0.6956521739130435,
+          "roc_auc": 0.6111111111111112,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "tn": 9,
+          "fp": 0,
+          "fn": 16,
+          "tp": 0
+        }
+      }
+    },
+    {
+      "bucket_name": "1-5_files",
+      "min_py_files": 1,
+      "max_py_files": 5,
+      "description": "Small packages (1 to 5 analyzed python files)",
+      "corpus_package_count": 2515,
+      "corpus_malicious_count": 1645,
+      "corpus_benign_count": 870,
+      "malicious_prevalence": 0.6541,
+      "category_presence_rates": {
+        "network_activity": {
+          "all": 0.3173,
+          "malicious": 0.4657,
+          "benign": 0.0368
+        },
+        "credential_data_access": {
+          "all": 0.1841,
+          "malicious": 0.1854,
+          "benign": 0.1816
+        },
+        "command_execution": {
+          "all": 0.326,
+          "malicious": 0.4359,
+          "benign": 0.1184
+        },
+        "obfuscation": {
+          "all": 0.1563,
+          "malicious": 0.2116,
+          "benign": 0.0517
+        },
+        "install_time_package_execution": {
+          "all": 0.7364,
+          "malicious": 0.7927,
+          "benign": 0.6299
+        },
+        "dynamic_code_execution": {
+          "all": 0.105,
+          "malicious": 0.0918,
+          "benign": 0.1299
+        },
+        "supply_chain_abuse": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        }
+      },
+      "holdout_evaluation": {
+        "sample_count": 497,
+        "benign_count": 178,
+        "malicious_count": 319,
+        "random_forest_behavior_without_size": {
+          "pr_auc": 0.9322358687539787,
+          "roc_auc": 0.8965869465675743,
+          "precision": 0.9469387755102041,
+          "recall": 0.7272727272727273,
+          "f1": 0.8226950354609929,
+          "fpr": 0.07303370786516854,
+          "tn": 165,
+          "fp": 13,
+          "fn": 87,
+          "tp": 232
+        },
+        "xgboost_behavior_without_size": {
+          "pr_auc": 0.9347328065791383,
+          "roc_auc": 0.896639780212039,
+          "precision": 0.9488188976377953,
+          "recall": 0.7554858934169278,
+          "f1": 0.8411867364746946,
+          "fpr": 0.07303370786516854,
+          "tn": 165,
+          "fp": 13,
+          "fn": 78,
+          "tp": 241
+        }
+      }
+    },
+    {
+      "bucket_name": "6-20_files",
+      "min_py_files": 6,
+      "max_py_files": 20,
+      "description": "Medium packages (6 to 20 analyzed python files)",
+      "corpus_package_count": 1116,
+      "corpus_malicious_count": 224,
+      "corpus_benign_count": 892,
+      "malicious_prevalence": 0.2007,
+      "category_presence_rates": {
+        "network_activity": {
+          "all": 0.1855,
+          "malicious": 0.4777,
+          "benign": 0.1121
+        },
+        "credential_data_access": {
+          "all": 0.3772,
+          "malicious": 0.5179,
+          "benign": 0.3419
+        },
+        "command_execution": {
+          "all": 0.2912,
+          "malicious": 0.5402,
+          "benign": 0.2287
+        },
+        "obfuscation": {
+          "all": 0.2222,
+          "malicious": 0.433,
+          "benign": 0.1693
+        },
+        "install_time_package_execution": {
+          "all": 0.6317,
+          "malicious": 0.4643,
+          "benign": 0.6738
+        },
+        "dynamic_code_execution": {
+          "all": 0.2742,
+          "malicious": 0.375,
+          "benign": 0.2489
+        },
+        "supply_chain_abuse": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        }
+      },
+      "holdout_evaluation": {
+        "sample_count": 199,
+        "benign_count": 164,
+        "malicious_count": 35,
+        "random_forest_behavior_without_size": {
+          "pr_auc": 0.7736748966497298,
+          "roc_auc": 0.9042682926829267,
+          "precision": 0.6744186046511628,
+          "recall": 0.8285714285714286,
+          "f1": 0.7435897435897436,
+          "fpr": 0.08536585365853659,
+          "tn": 150,
+          "fp": 14,
+          "fn": 6,
+          "tp": 29
+        },
+        "xgboost_behavior_without_size": {
+          "pr_auc": 0.798856659837605,
+          "roc_auc": 0.9110627177700348,
+          "precision": 0.6326530612244898,
+          "recall": 0.8857142857142857,
+          "f1": 0.7380952380952381,
+          "fpr": 0.10975609756097561,
+          "tn": 146,
+          "fp": 18,
+          "fn": 4,
+          "tp": 31
+        }
+      }
+    },
+    {
+      "bucket_name": ">20_files",
+      "min_py_files": 21,
+      "max_py_files": null,
+      "description": "Large packages (more than 20 analyzed python files)",
+      "corpus_package_count": 1244,
+      "corpus_malicious_count": 152,
+      "corpus_benign_count": 1092,
+      "malicious_prevalence": 0.1222,
+      "category_presence_rates": {
+        "network_activity": {
+          "all": 0.3867,
+          "malicious": 0.6711,
+          "benign": 0.3471
+        },
+        "credential_data_access": {
+          "all": 0.6375,
+          "malicious": 0.6974,
+          "benign": 0.6291
+        },
+        "command_execution": {
+          "all": 0.4373,
+          "malicious": 0.5197,
+          "benign": 0.4258
+        },
+        "obfuscation": {
+          "all": 0.4855,
+          "malicious": 0.5263,
+          "benign": 0.4799
+        },
+        "install_time_package_execution": {
+          "all": 0.619,
+          "malicious": 0.5724,
+          "benign": 0.6255
+        },
+        "dynamic_code_execution": {
+          "all": 0.5675,
+          "malicious": 0.5395,
+          "benign": 0.5714
+        },
+        "supply_chain_abuse": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        }
+      },
+      "holdout_evaluation": {
+        "sample_count": 270,
+        "benign_count": 231,
+        "malicious_count": 39,
+        "random_forest_behavior_without_size": {
+          "pr_auc": 0.6307506411895955,
+          "roc_auc": 0.8958818958818959,
+          "precision": 0.5897435897435898,
+          "recall": 0.5897435897435898,
+          "f1": 0.5897435897435898,
+          "fpr": 0.06926406926406926,
+          "tn": 215,
+          "fp": 16,
+          "fn": 16,
+          "tp": 23
+        },
+        "xgboost_behavior_without_size": {
+          "pr_auc": 0.28182779628698046,
+          "roc_auc": 0.6716616716616717,
+          "precision": 0.25,
+          "recall": 0.1282051282051282,
+          "f1": 0.1694915254237288,
+          "fpr": 0.06493506493506493,
+          "tn": 216,
+          "fp": 15,
+          "fn": 34,
+          "tp": 5
+        }
+      }
+    },
+    {
+      "bucket_name": "all_packages",
+      "min_py_files": 0,
+      "max_py_files": null,
+      "description": "Entire corpus across all package sizes",
+      "corpus_package_count": 4948,
+      "corpus_malicious_count": 2039,
+      "corpus_benign_count": 2909,
+      "malicious_prevalence": 0.4121,
+      "category_presence_rates": {
+        "network_activity": {
+          "all": 0.3003,
+          "malicious": 0.4782,
+          "benign": 0.1757
+        },
+        "credential_data_access": {
+          "all": 0.3389,
+          "malicious": 0.2585,
+          "benign": 0.3953
+        },
+        "command_execution": {
+          "all": 0.3414,
+          "malicious": 0.4497,
+          "benign": 0.2654
+        },
+        "obfuscation": {
+          "all": 0.2516,
+          "malicious": 0.2575,
+          "benign": 0.2475
+        },
+        "install_time_package_execution": {
+          "all": 0.6734,
+          "malicious": 0.7332,
+          "benign": 0.6315
+        },
+        "dynamic_code_execution": {
+          "all": 0.2579,
+          "malicious": 0.1555,
+          "benign": 0.3297
+        },
+        "supply_chain_abuse": {
+          "all": 0.0,
+          "malicious": 0.0,
+          "benign": 0.0
+        }
+      },
+      "holdout_evaluation": {
+        "sample_count": 991,
+        "benign_count": 582,
+        "malicious_count": 409,
+        "random_forest_behavior_without_size": {
+          "pr_auc": 0.8745184684399354,
+          "roc_auc": 0.8988249775245969,
+          "precision": 0.8685015290519877,
+          "recall": 0.6943765281173594,
+          "f1": 0.7717391304347826,
+          "fpr": 0.07388316151202749,
+          "tn": 539,
+          "fp": 43,
+          "fn": 125,
+          "tp": 284
+        },
+        "xgboost_behavior_without_size": {
+          "pr_auc": 0.8468369983892453,
+          "roc_auc": 0.8661453213352491,
+          "precision": 0.8575851393188855,
+          "recall": 0.6772616136919315,
+          "f1": 0.7568306010928961,
+          "fpr": 0.07903780068728522,
+          "tn": 536,
+          "fp": 46,
+          "fn": 132,
+          "tp": 277
+        }
+      }
+    }
+  ]
+}

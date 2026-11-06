@@ -222,5 +222,113 @@ class TestDay3Predictor(unittest.TestCase):
             self.assertIsInstance(factor["shap_impact"], float)
 
 
+class TestDay4BaselineV11(unittest.TestCase):
+    """Day 4 — v1.1 dataset validation, leakage guards, holdout preservation, and peer-context checks."""
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        cls.ROOT = Path(__file__).resolve().parents[1]
+
+    def test_v11_dataset_row_counts_and_uniqueness(self):
+        import gzip
+        import json
+
+        def load_counts(p, is_gz=False):
+            op = gzip.open if is_gz else open
+            ids = set()
+            cnt = 0
+            with op(p, "rt", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        cnt += 1
+                        rec = json.loads(line)
+                        ids.add(rec["package_id"])
+            return cnt, len(ids)
+
+        m_cnt, m_uids = load_counts(self.ROOT / "data/processed/malicious_v11.jsonl", False)
+        b_cnt, b_uids = load_counts(self.ROOT / "data/processed/benign_v11.jsonl.gz", True)
+        self.assertEqual(m_cnt, 2039)
+        self.assertEqual(m_uids, 2039)
+        self.assertEqual(b_cnt, 2909)
+        self.assertEqual(b_uids, 2909)
+
+    def test_frozen_holdout_exact_match_in_v11(self):
+        import gzip
+        import json
+
+        holdout_df = pd.read_csv(self.ROOT / "results/frozen_holdout_packages.csv")
+        self.assertEqual(len(holdout_df), 991)
+        self.assertEqual(int((holdout_df["label"] == 1).sum()), 409)
+        self.assertEqual(int((holdout_df["label"] == 0).sum()), 582)
+
+        v11_records = {}
+        for p, is_gz in [
+            (self.ROOT / "data/processed/malicious_v11.jsonl", False),
+            (self.ROOT / "data/processed/benign_v11.jsonl.gz", True),
+        ]:
+            op = gzip.open if is_gz else open
+            with op(p, "rt", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        r = json.loads(line)
+                        v11_records[str(r["package_id"])] = r
+
+        holdout_pids = set(holdout_df["package_id"].astype(str))
+        missing = holdout_pids - set(v11_records.keys())
+        self.assertEqual(len(missing), 0, f"Missing holdout IDs in v1.1: {missing}")
+
+        for _, row in holdout_df.iterrows():
+            pid = str(row["package_id"])
+            self.assertEqual(row["label"], v11_records[pid]["label"])
+
+        holdout_groups = {v11_records[pid]["group_id"] for pid in holdout_pids}
+        dev_groups = {
+            rec["group_id"] for pid, rec in v11_records.items() if pid not in holdout_pids
+        }
+        self.assertTrue(holdout_groups.isdisjoint(dev_groups))
+
+    def test_all_forbidden_columns_blocked(self):
+        from Person_B.models.splitting import assert_no_leakage, LEAKAGE_COLUMNS
+
+        forbidden_sample = [
+            "strong_signals", "verdict_outcome", "review_recommended", "s2_same_file",
+            "package_id", "package_name", "version", "group_id", "label", "source",
+            "analyzer_version", "ruleset_version", "in_index", "index_annotated",
+            "n_findings", "parse_error_count", "failed_static_analysis", "max_severity",
+        ]
+        for col in forbidden_sample:
+            self.assertIn(col, LEAKAGE_COLUMNS)
+            with self.assertRaises(ValueError):
+                assert_no_leakage([col])
+
+    def test_peer_context_schema_and_statistics(self):
+        import json
+
+        peer_context_path = self.ROOT / "results/peer_context.json"
+        self.assertTrue(peer_context_path.exists())
+        data = json.loads(peer_context_path.read_text(encoding="utf-8"))
+        self.assertEqual(data["dataset_version"], "v1.1")
+        self.assertEqual(data["total_corpus_packages"], 4948)
+        self.assertEqual(data["total_holdout_packages"], 991)
+        self.assertIn("size_strata", data)
+        strata = {s["bucket_name"]: s for s in data["size_strata"]}
+        for expected in ["0_files", "1-5_files", "6-20_files", ">20_files", "all_packages"]:
+            self.assertIn(expected, strata)
+            s = strata[expected]
+            self.assertGreater(s["corpus_package_count"], 0)
+            self.assertGreaterEqual(s["malicious_prevalence"], 0.0)
+            self.assertLessEqual(s["malicious_prevalence"], 1.0)
+            self.assertIn("holdout_evaluation", s)
+
+    def test_v1_artifacts_preserved(self):
+        self.assertTrue((self.ROOT / "results/baseline_v1.json").exists())
+        self.assertTrue((self.ROOT / "results/baseline_v1.md").exists())
+        self.assertTrue((self.ROOT / "results/frozen_holdout_packages.csv").exists())
+        self.assertTrue((self.ROOT / "results/baseline_v11.json").exists())
+        self.assertTrue((self.ROOT / "results/baseline_v11.md").exists())
+        self.assertTrue((self.ROOT / "results/v1_vs_v11_comparison.md").exists())
+
+
 if __name__ == "__main__":
     unittest.main()
