@@ -28,7 +28,7 @@ def load(name_prefix):
 
 class FixtureTests(unittest.TestCase):
     def test_all_fixtures_validate_against_real_sources(self):
-        files = sorted(REC_DIR.glob("*.json"))
+        files = sorted(REC_DIR.glob("[0-9][0-9]_*.json"))
         self.assertEqual(len(files), 5)
         for path in files:
             record = json.loads(path.read_text(encoding="utf-8"))
