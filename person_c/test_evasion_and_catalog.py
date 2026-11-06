@@ -4,14 +4,14 @@ from pathlib import Path
 import unittest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-from Person_c.disguises import (
+from person_c.disguises import (
     base64_disguise,
     rot13_disguise,
     getattr_disguise,
     delay_disguise,
     string_split_disguise,
 )
-from Person_c.run_baseline_evasion_experiment import classify_outcome
+from person_c.run_baseline_evasion_experiment import classify_outcome
 
 
 class TestPersonCEvasionAndCatalog(unittest.TestCase):
@@ -39,7 +39,7 @@ class TestPersonCEvasionAndCatalog(unittest.TestCase):
         self.assertEqual(s1, s2, "string_split_disguise must be deterministic with the same seed")
 
     def test_fixtures_loaded_and_schema(self):
-        records_dir = PROJECT_ROOT / "fixtures" / "records"
+        records_dir = PROJECT_ROOT / "person_c" / "fixtures" / "records"
         self.assertTrue(records_dir.exists(), "fixtures/records directory must exist")
 
         fixture_files = list(records_dir.glob("*.json"))

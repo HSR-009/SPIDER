@@ -79,7 +79,7 @@ st.markdown(
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-RECORDS_DIR = PROJECT_ROOT / "fixtures" / "records"
+RECORDS_DIR = PROJECT_ROOT / "person_c" / "fixtures" / "records"
 
 
 @st.cache_data
@@ -136,7 +136,7 @@ def main():
     fixtures = load_all_fixtures()
 
     if not fixtures:
-        st.error(f"No fixture records found in {RECORDS_DIR}. Run `Person_c/make_fixtures.py` first.")
+        st.error(f"No fixture records found in {RECORDS_DIR}. Run `person_c/make_fixtures.py` first.")
         return
 
     # Sidebar: Fixture Picker & Filters

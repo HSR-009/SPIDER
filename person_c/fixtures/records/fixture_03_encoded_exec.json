@@ -1,8 +1,8 @@
 {
-  "fixture_id": "fixture_03_encoded_exec",
   "package_name": "toy-encoded-exec",
   "version": "0.2.1",
-  "record_origin": "fixture",
+  "package_id": "toy-encoded-exec==0.2.1",
+  "group_id": "toy-encoded-exec",
   "verdict": "Suspicious",
   "findings": [
     {
@@ -22,16 +22,17 @@
       "evidence": "exec() call detected"
     }
   ],
-  "files": [
-    {
-      "filename": "encoded_exec.py",
-      "path": "fixture_03_encoded_exec\\encoded_exec.py",
-      "content": "import base64\n\ncode = base64.b64decode(\"cHJpbnQoJ0hlbGxvJyk=\")\nexec(code)\n"
-    }
-  ],
-  "model_assessment": {
-    "risk_score": 0.72,
-    "model_status": "illustrative",
-    "label": "Illustrative (pre-training placeholder)"
-  }
+  "n_findings": 2,
+  "n_py_files": 1,
+  "analyzer_version": "v1",
+  "category_counts": {
+    "Obfuscation": 1,
+    "Dynamic Code Execution": 1
+  },
+  "failed_static_analysis": false,
+  "inventory": {},
+  "parse_error_count": 0,
+  "review_recommended": true,
+  "schema_version": "0.1",
+  "record_origin": "fixture"
 }

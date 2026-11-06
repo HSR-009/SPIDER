@@ -1,0 +1,29 @@
+{
+  "package_name": "toy-subproc",
+  "version": "1.0.0",
+  "package_id": "toy-subproc==1.0.0",
+  "group_id": "toy-subproc",
+  "verdict": "Malicious",
+  "findings": [
+    {
+      "category": "Command Execution",
+      "indicator": "subprocess.run",
+      "severity": "HIGH",
+      "file": "subprocess_call.py",
+      "line": 3,
+      "evidence": "subprocess.run() call detected"
+    }
+  ],
+  "n_findings": 1,
+  "n_py_files": 1,
+  "analyzer_version": "v1",
+  "category_counts": {
+    "Command Execution": 1
+  },
+  "failed_static_analysis": false,
+  "inventory": {},
+  "parse_error_count": 0,
+  "review_recommended": true,
+  "schema_version": "0.1",
+  "record_origin": "fixture"
+}

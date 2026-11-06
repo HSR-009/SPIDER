@@ -36,7 +36,7 @@ Each transformation applied to a known malicious sample produces one of three di
 ### T01: String Splitting / Concatenation
 - **Stable ID:** `T01`
 - **Name:** String Splitting and Concatenation
-- **Implementation:** `Person_c/disguises.py::string_split_disguise(sensitive_word, seed=42)`
+- **Implementation:** `person_c/disguises.py::string_split_disguise(sensitive_word, seed=42)`
 - **Target Behavior It Hides:** Conceals sensitive literal strings (e.g., `"whoami"`, `"os.system"`, hostnames, file paths) from naive regex, string grep, or keyword search.
 - **Harmless Source Example:**
   ```python
@@ -58,7 +58,7 @@ Each transformation applied to a known malicious sample produces one of three di
 ### T02: Base64 Payload Encoding
 - **Stable ID:** `T02`
 - **Name:** Base64 Payload Encoding and Dynamic Execution
-- **Implementation:** `Person_c/disguises.py::base64_disguise(payload_code)`
+- **Implementation:** `person_c/disguises.py::base64_disguise(payload_code)`
 - **Target Behavior It Hides:** Hides arbitrary command execution, socket connections, or environment access inside an opaque base64 string literal.
 - **Harmless Source Example:**
   ```python
@@ -82,7 +82,7 @@ Each transformation applied to a known malicious sample produces one of three di
 ### T03: ROT13 Payload Encoding
 - **Stable ID:** `T03`
 - **Name:** ROT13 Encoding and Dynamic Execution
-- **Implementation:** `Person_c/disguises.py::rot13_disguise(payload_code)`
+- **Implementation:** `person_c/disguises.py::rot13_disguise(payload_code)`
 - **Target Behavior It Hides:** Reversible substitution cipher masking payload source text without standard binary encoding headers.
 - **Harmless Source Example:**
   ```python
@@ -106,7 +106,7 @@ Each transformation applied to a known malicious sample produces one of three di
 ### T04: `getattr` Dynamic Indirection
 - **Stable ID:** `T04`
 - **Name:** Dynamic Attribute Access via `getattr()`
-- **Implementation:** `Person_c/disguises.py::getattr_disguise(module, func_name, args_code)`
+- **Implementation:** `person_c/disguises.py::getattr_disguise(module, func_name, args_code)`
 - **Target Behavior It Hides:** Conceals direct function calls (`os.system`, `subprocess.run`, `socket.socket`, `exec`, `eval`) from AST call-attribute matchers.
 - **Harmless Source Example:**
   ```python
@@ -129,7 +129,7 @@ Each transformation applied to a known malicious sample produces one of three di
 ### T05: Delayed / Conditional Trigger Execution
 - **Stable ID:** `T05`
 - **Name:** Counter-Based Delayed Trigger Execution
-- **Implementation:** `Person_c/disguises.py::delay_disguise(payload_code, trigger_count=3)`
+- **Implementation:** `person_c/disguises.py::delay_disguise(payload_code, trigger_count=3)`
 - **Target Behavior It Hides:** Intended to evade dynamic sandboxes by executing only after multiple invocations or specific runtime environmental checks.
 - **Harmless Source Example:**
   ```python

@@ -10,7 +10,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from Person_A.ast_analyzer.analyzer import analyze_file
-from Person_c.disguises import (
+from person_c.disguises import (
     base64_disguise,
     rot13_disguise,
     getattr_disguise,
