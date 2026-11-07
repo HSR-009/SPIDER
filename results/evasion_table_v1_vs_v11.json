@@ -1,0 +1,739 @@
+{
+  "metadata": {
+    "batch_name": "adv-batch-v1",
+    "manifest_hash_sha256": "bb7f4fe8676000ef1e2f06e08d8387738e8ee4a3c33ac68ade289ffd8875aaa3",
+    "analyzer_v1": "Person_A/ast_analyzer/analyzer_v1_frozen.py",
+    "analyzer_v1_1": "Person_A/ast_analyzer/analyzer_v1_1.py",
+    "normalizer": "spider/normalize.py"
+  },
+  "summary": {
+    "manifest_hash_sha256": "bb7f4fe8676000ef1e2f06e08d8387738e8ee4a3c33ac68ade289ffd8875aaa3",
+    "total_samples": 12,
+    "overall_counts": {
+      "v1": {
+        "recovered": 2,
+        "different_signal": 2,
+        "missed": 8
+      },
+      "v1_1": {
+        "recovered": 4,
+        "different_signal": 8,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 5,
+        "different_signal": 2,
+        "missed": 5
+      },
+      "v1_1_normalized": {
+        "recovered": 6,
+        "different_signal": 5,
+        "missed": 1
+      }
+    },
+    "miss_rates_asr": {
+      "v1": 66.67,
+      "v1_1": 0.0,
+      "v1_normalized": 41.67,
+      "v1_1_normalized": 8.33
+    },
+    "recovered_rates": {
+      "v1": 16.67,
+      "v1_1": 33.33,
+      "v1_normalized": 41.67,
+      "v1_1_normalized": 50.0
+    }
+  },
+  "by_technique": {
+    "T01_string_split": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_1_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      }
+    },
+    "T02_base64": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_1_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T03_rot13": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_1_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T04_getattr": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T05_delay": {
+      "v1": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_1": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_1_normalized": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      }
+    },
+    "T06_import_alias": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      }
+    },
+    "T07_dunder_import": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1_normalized": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      }
+    },
+    "T08_chr_build": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T09_hex_escape": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T06_import_alias+T04_getattr": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_1_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      }
+    },
+    "T06_import_alias+T01_string_split+T04_getattr": {
+      "v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "v1_1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "v1_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "v1_1_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      }
+    }
+  },
+  "per_sample": [
+    {
+      "sample_id": "adv_000",
+      "technique": "T01_string_split",
+      "description": "String concatenation split on function attribute name",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_001",
+      "technique": "T02_base64",
+      "description": "Base64 encoded payload with dynamic execution",
+      "v1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Obfuscation",
+            "base64.b64decode"
+          ],
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Obfuscation",
+            "base64.b64decode"
+          ],
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Obfuscation",
+            "base64.b64decode"
+          ],
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      },
+      "v1_1_normalized": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Obfuscation",
+            "base64.b64decode"
+          ],
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_002",
+      "technique": "T03_rot13",
+      "description": "ROT13 encoded payload with dynamic execution",
+      "v1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      },
+      "v1_1_normalized": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "exec"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_003",
+      "technique": "T04_getattr",
+      "description": "Dynamic function resolution via getattr with split name",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1_normalized": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_004",
+      "technique": "T05_delay",
+      "description": "Delayed execution trigger with counter threshold = 7",
+      "v1": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_1": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_005",
+      "technique": "T05_delay",
+      "description": "Delayed execution trigger with counter threshold = 3",
+      "v1": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_1": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_006",
+      "technique": "T06_import_alias",
+      "description": "Module import aliasing concealing os.popen",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.popen"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.popen"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_007",
+      "technique": "T07_dunder_import",
+      "description": "Dynamic import resolution via __import__ and dynamic string arg",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "__import__(dynamic)"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1_normalized": {
+        "outcome": "missed",
+        "findings": []
+      }
+    },
+    {
+      "sample_id": "adv_008",
+      "technique": "T08_chr_build",
+      "description": "Attribute name constructed via chr() joins and resolved with getattr",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1_normalized": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_009",
+      "technique": "T09_hex_escape",
+      "description": "Attribute name hex-decoded via bytes.fromhex and resolved with getattr",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ],
+          [
+            "Obfuscation",
+            "bytes.fromhex"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1_normalized": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ],
+          [
+            "Obfuscation",
+            "bytes.fromhex"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_010",
+      "technique": "T06_import_alias+T04_getattr",
+      "description": "Combination: aliased import followed by 2-arg getattr call",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      },
+      "v1_1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "os.system"
+          ]
+        ]
+      }
+    },
+    {
+      "sample_id": "adv_011",
+      "technique": "T06_import_alias+T01_string_split+T04_getattr",
+      "description": "Combination: aliased import, string split function name, and getattr call",
+      "v1": {
+        "outcome": "missed",
+        "findings": []
+      },
+      "v1_1": {
+        "outcome": "different_signal",
+        "findings": [
+          [
+            "Dynamic Code Execution",
+            "getattr.dynamic"
+          ]
+        ]
+      },
+      "v1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "subprocess.run"
+          ]
+        ]
+      },
+      "v1_1_normalized": {
+        "outcome": "recovered",
+        "findings": [
+          [
+            "Command Execution",
+            "subprocess.run"
+          ]
+        ]
+      }
+    }
+  ]
+}
