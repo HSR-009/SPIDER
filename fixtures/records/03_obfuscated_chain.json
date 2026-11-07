@@ -1,0 +1,188 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "86a2b274-3480-5abb-828d-a6197f18eac1",
+  "created_at": "2026-11-01T00:00:00Z",
+  "record_origin": "hand_written_fixture",
+  "tool": {
+    "spider_version": "fixture",
+    "analyzer_version": "fixture",
+    "ruleset_version": "fixture"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "demo-obfuscated",
+    "version": "0.2.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "36a29cb8cd982fb9fbd552a2e1c4492085b3a2fa1578e0c9536949950e5b7feb",
+      "size_bytes": 309,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 1,
+    "python_files": 1,
+    "files_inspected": 1,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "demo_obfuscated/__init__.py",
+      "kind": "python",
+      "sha256": "4008a866e60ac86b6968f242be279dcc74ff605fa6021bf202ecbac59553cc84",
+      "lines": 13,
+      "inspected": true,
+      "roles": [
+        "package_init"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "SPD-OBF-001",
+      "category": "obfuscation",
+      "indicator": "base64.b64decode",
+      "severity": "medium",
+      "confidence": "high",
+      "file": "demo_obfuscated/__init__.py",
+      "span": {
+        "start_line": 7,
+        "start_col": 7,
+        "end_line": 7,
+        "end_col": 41
+      },
+      "snippet": "base64.b64decode(PAYLOAD).decode()",
+      "explanation": "Decodes an embedded string at module level, so it runs on import.",
+      "trigger_phase": "import",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    },
+    {
+      "id": "F002",
+      "rule_id": "SPD-DYN-001",
+      "category": "dynamic_execution",
+      "indicator": "exec",
+      "severity": "high",
+      "confidence": "high",
+      "file": "demo_obfuscated/__init__.py",
+      "span": {
+        "start_line": 8,
+        "start_col": 0,
+        "end_line": 8,
+        "end_col": 10
+      },
+      "snippet": "exec(blob)",
+      "explanation": "Executes a dynamically built string at module level.",
+      "trigger_phase": "import",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    },
+    {
+      "id": "F003",
+      "rule_id": "SPD-CMD-INDIRECT-001",
+      "category": "command_execution",
+      "indicator": "os.system",
+      "severity": "medium",
+      "confidence": "medium",
+      "file": "demo_obfuscated/__init__.py",
+      "span": {
+        "start_line": 12,
+        "start_col": 9,
+        "end_line": 12,
+        "end_col": 35
+      },
+      "snippet": "getattr(os, \"sys\" + \"tem\")",
+      "explanation": "Indirect call to os.system built from concatenated strings; visible only after string-constant folding.",
+      "trigger_phase": "call",
+      "context": {
+        "enclosing_function": "helper",
+        "after_normalization": true,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "R001",
+      "from": "F001",
+      "to": "F002",
+      "type": "possible_flow",
+      "basis": "`blob` is assigned from the decode expression (line 7) and passed to exec (line 8) in the same scope. v0.1 tracks only straight-line assignment, so this is not marked confirmed.",
+      "confidence": "medium"
+    },
+    {
+      "id": "R002",
+      "from": "F003",
+      "to": "F002",
+      "type": "co_occurrence",
+      "basis": "Both findings are in the same file.",
+      "confidence": "low"
+    }
+  ],
+  "model_assessment": {
+    "status": "ok",
+    "model_name": "illustrative_model",
+    "model_version": "none",
+    "label": "malicious",
+    "score": 0.93,
+    "calibrated": false,
+    "illustrative": true,
+    "top_features": [
+      {
+        "name": "exec_at_import",
+        "value": 1,
+        "contribution": 0.31
+      },
+      {
+        "name": "base64_decode_count",
+        "value": 1,
+        "contribution": 0.18
+      },
+      {
+        "name": "indirect_call_after_normalization",
+        "value": 1,
+        "contribution": 0.11
+      }
+    ],
+    "note": "Illustrative values for UI development; not from a trained model."
+  },
+  "verdict": {
+    "outcome": "suspicious",
+    "reasons": [
+      "S2_dynamic_exec_plus",
+      "S5_decode_exec"
+    ],
+    "limitations": []
+  },
+  "timings_ms": {
+    "acquire": 0,
+    "extract": 1,
+    "analyze": 19,
+    "features": 4,
+    "model": 7
+  }
+}

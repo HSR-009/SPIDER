@@ -1,0 +1,146 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "8631c4d5-3b26-52c5-89c8-a3b06f7e7696",
+  "created_at": "2026-11-01T00:00:00Z",
+  "record_origin": "hand_written_fixture",
+  "tool": {
+    "spider_version": "fixture",
+    "analyzer_version": "fixture",
+    "ruleset_version": "fixture"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "demo-installhook",
+    "version": "0.1.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "d5b0ccb3582669f57d1e6a0e34fe28228dc7934fccfe234ac707bbfddc81bc4c",
+      "size_bytes": 434,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 2,
+    "python_files": 2,
+    "files_inspected": 2,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "demo_installhook/__init__.py",
+      "kind": "python",
+      "sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+      "lines": 1,
+      "inspected": true,
+      "roles": [
+        "package_init"
+      ]
+    },
+    {
+      "path": "setup.py",
+      "kind": "python",
+      "sha256": "2b7de140a616e270415656a276a24cb6a7420aa123d1f8f09ff30fc709f189aa",
+      "lines": 18,
+      "inspected": true,
+      "roles": [
+        "install_hook"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "SPD-INS-002",
+      "category": "install_time",
+      "indicator": "setuptools.command.install",
+      "severity": "medium",
+      "confidence": "high",
+      "file": "setup.py",
+      "span": {
+        "start_line": 7,
+        "start_col": 0,
+        "end_line": 7,
+        "end_col": 27
+      },
+      "snippet": "class PostInstall(install):",
+      "explanation": "Custom install command class: code inside it runs during `pip install` of a source distribution.",
+      "trigger_phase": "install",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    },
+    {
+      "id": "F002",
+      "rule_id": "SPD-CMD-001",
+      "category": "command_execution",
+      "indicator": "os.system",
+      "severity": "high",
+      "confidence": "high",
+      "file": "setup.py",
+      "span": {
+        "start_line": 10,
+        "start_col": 8,
+        "end_line": 10,
+        "end_col": 57
+      },
+      "snippet": "os.system(\"echo SPIDER-FIXTURE install hook ran\")",
+      "explanation": "Shell command executed from the custom install command.",
+      "trigger_phase": "install",
+      "context": {
+        "enclosing_function": "PostInstall.run",
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static estimate: does not prove the code executed."
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "R001",
+      "from": "F001",
+      "to": "F002",
+      "type": "co_occurrence",
+      "basis": "F002 sits inside the class flagged by F001 (PostInstall.run).",
+      "confidence": "high"
+    }
+  ],
+  "model_assessment": {
+    "status": "abstained",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": true,
+    "top_features": [],
+    "note": "Illustrative: the model abstained (low confidence). Not a real model output."
+  },
+  "verdict": {
+    "outcome": "suspicious",
+    "reasons": [
+      "S1_install_command"
+    ],
+    "limitations": []
+  },
+  "timings_ms": {
+    "acquire": 0,
+    "extract": 2,
+    "analyze": 11,
+    "features": 3,
+    "model": 6
+  }
+}

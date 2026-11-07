@@ -1,0 +1,178 @@
+"""SPIDER command line interface (section 3.5)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from spider.engine.extract import safe_extract
+from spider.engine.scan import scan_directory
+from spider_contract.validate import validate_record
+from spider.fetch import fetch_package_archive, FetchError
+
+STATIC_ANALYSIS_DISCLAIMER = "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+ARCHIVE_EXTENSIONS = (".tar.gz", ".tgz", ".tar.bz2", ".tar.xz", ".tar", ".zip", ".whl")
+
+
+def format_human_summary(record: Dict[str, Any]) -> str:
+    verdict = record.get("verdict", {})
+    outcome = verdict.get("outcome", "unknown")
+    reasons = verdict.get("reasons", [])
+    review_rec = verdict.get("review_recommended", False)
+    findings = record.get("findings", [])
+    inv = record.get("inventory", {})
+
+    lines = []
+    lines.append(f"Verdict: {outcome}")
+    if reasons:
+        lines.append(f"Reasons: {', '.join(reasons)}")
+    if review_rec:
+        lines.append("Review Recommended: True")
+
+    lines.append(f"Coverage: {inv.get('files_inspected', 0)}/{inv.get('files_total', 0)} files inspected ({inv.get('python_files', 0)} Python files)")
+    if inv.get("parse_failures"):
+        lines.append(f"Parse Failures: {len(inv['parse_failures'])}")
+    if inv.get("uninspected"):
+        lines.append(f"Uninspected: {len(inv['uninspected'])}")
+
+    if findings:
+        lines.append("\nTop Findings:")
+        for f in findings[:5]:
+            span = f.get("span", {})
+            loc = f"{f.get('file')}:{span.get('start_line', '?')}"
+            lines.append(f"  [{f.get('severity', '').upper()}] {f.get('indicator')} ({f.get('category')}) at {loc}")
+            if f.get("explanation"):
+                lines.append(f"      {f.get('explanation')}")
+
+    lines.append(f"\n{STATIC_ANALYSIS_DISCLAIMER}")
+    return "\n".join(lines)
+
+
+def scan_target(
+    target: str,
+    *,
+    out_dir: Path,
+    json_output: bool = False,
+    no_network: bool = False,
+) -> int:
+    target_path = Path(target)
+    temp_dir_to_clean: Optional[Path] = None
+
+    scan_dir: Path
+    pkg_name: Optional[str] = None
+    pkg_version: Optional[str] = None
+    hash_verified: Optional[bool] = None
+
+    try:
+        if target_path.is_dir():
+            scan_dir = target_path
+            pkg_name = scan_dir.name
+        elif target_path.is_file() and any(target.lower().endswith(ext) for ext in ARCHIVE_EXTENSIONS):
+            # Safe extract archive into temporary directory
+            td = tempfile.mkdtemp(prefix="spider_scan_")
+            temp_dir_to_clean = Path(td)
+            ext_res = safe_extract(target_path, temp_dir_to_clean)
+            scan_dir = temp_dir_to_clean
+            pkg_name = target_path.name.split(".")[0]
+        elif "==" in target:
+            if no_network:
+                sys.stderr.write("Error: Network access disabled (--no-network), cannot fetch package.\n")
+                return 2
+            name, sep, version = target.partition("==")
+            try:
+                archive_path, expected_sha, verified = fetch_package_archive(name, version)
+            except FetchError as e:
+                sys.stderr.write(f"Error fetching package: {e}\n")
+                return 2
+            hash_verified = verified
+            td = tempfile.mkdtemp(prefix="spider_scan_")
+            temp_dir_to_clean = Path(td)
+            ext_res = safe_extract(archive_path, temp_dir_to_clean)
+            scan_dir = temp_dir_to_clean
+            pkg_name = name
+            pkg_version = version
+        else:
+            sys.stderr.write(f"Error: Target '{target}' is not an existing directory, supported archive, or name==version specifier.\n")
+            return 2
+
+        # Run directory scan
+        record = scan_directory(scan_dir, name=pkg_name, version=pkg_version)
+
+        if hash_verified is not None:
+            record["target"]["hash_verified"] = hash_verified
+            # Re-derive verdict with hash_verified knowledge
+            from spider_contract.verdict import derive_verdict, coverage_problems
+            v_dict = derive_verdict(record)
+            record["verdict"]["outcome"] = v_dict["outcome"]
+            record["verdict"]["reasons"] = v_dict["reasons"]
+            if "review_recommended" in v_dict:
+                record["verdict"]["review_recommended"] = v_dict["review_recommended"]
+            limitations = [STATIC_ANALYSIS_DISCLAIMER]
+            for p in coverage_problems(record):
+                limitations.append(f"Coverage problem: {p}")
+            record["verdict"]["limitations"] = limitations
+
+        # Validate against schema
+        errs = validate_record(record)
+        if errs:
+            sys.stderr.write(f"Schema validation errors in generated record: {errs}\n")
+            return 2
+
+        # Write scans/<scan_id>.json
+        out_dir.mkdir(parents=True, exist_ok=True)
+        scan_file = out_dir / f"{record['scan_id']}.json"
+        scan_file.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+
+        if json_output:
+            print(json.dumps(record, indent=2))
+        else:
+            print(format_human_summary(record))
+
+        outcome = record.get("verdict", {}).get("outcome")
+        if outcome == "none_detected_in_this_scan":
+            return 0
+        elif outcome == "suspicious":
+            return 10
+        elif outcome == "unable_to_assess":
+            return 20
+        return 2
+    except Exception as e:
+        sys.stderr.write(f"Unexpected scan error: {e}\n")
+        return 2
+    finally:
+        if temp_dir_to_clean and temp_dir_to_clean.exists():
+            import shutil
+            shutil.rmtree(temp_dir_to_clean, ignore_errors=True)
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = argparse.ArgumentParser(prog="spider", description="SPIDER Package Security Scanner")
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    scan_parser = subparsers.add_parser("scan", help="Scan a package directory, archive, or PyPI release")
+    scan_parser.add_argument("target", help="Directory, archive (.tar.gz, .zip, .whl), or name==version")
+    scan_parser.add_argument("--json", action="store_true", help="Output full JSON scan record")
+    scan_parser.add_argument("--out", default="scans", help="Output directory for scan records (default: scans/)")
+    scan_parser.add_argument("--no-network", action="store_true", help="Disable network operations")
+
+    args = parser.parse_args(argv)
+
+    if args.subcommand == "scan":
+        return scan_target(
+            args.target,
+            out_dir=Path(args.out),
+            json_output=args.json,
+            no_network=args.no_network,
+        )
+    else:
+        parser.print_help()
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+

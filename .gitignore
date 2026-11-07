@@ -21,3 +21,6 @@ data/raw_malicious/
 
 # Intermediary scan outputs
 data/processed/malicious_scan*.jsonl
+scans/
+hunts/
+
