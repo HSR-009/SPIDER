@@ -155,7 +155,16 @@ def generate_single_replay_fixture(archive_path, pkg_row, out_dir, index_num):
         else:
             record["target"]["artifact"]["format"] = "other"
 
-        record["target"]["hash_verified"] = True
+        record["target"]["hash_verified"] = None
+
+        # Compare new verdict outcome with table row's verdict_outcome
+        expected_outcome = pkg_row.get("verdict_outcome")
+        actual_outcome = record.get("verdict", {}).get("outcome")
+        if expected_outcome and actual_outcome != expected_outcome:
+            raise ValueError(
+                f"Verdict outcome mismatch for package {pkg_name}=={ver}: "
+                f"expected {expected_outcome!r} from table, got {actual_outcome!r} from rescan."
+            )
 
         # Copy any extraction limits
         for lim in extract_rep.get("limits_hit", []):

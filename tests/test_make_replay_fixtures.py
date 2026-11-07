@@ -62,6 +62,7 @@ class TestMakeReplayFixtures(unittest.TestCase):
                 "package_name": "synthetic_pkg",
                 "version": "1.0.0",
                 "archive_used": str(arc_path),
+                "verdict_outcome": "none_detected_in_this_scan",
             }
 
             dest = generate_single_replay_fixture(arc_path, pkg_row, out_dir, 1)
@@ -71,11 +72,36 @@ class TestMakeReplayFixtures(unittest.TestCase):
             rec = json.loads(dest.read_text(encoding="utf-8"))
             self.assertEqual(rec["record_origin"], "replay")
             self.assertEqual(rec["target"]["kind"], "archive")
+            self.assertIsNone(rec["target"]["hash_verified"])
             self.assertEqual(schema_errors(rec), [])
             self.assertEqual(semantic_errors(rec), [])
 
             # Confirm no files were written to fixtures/
             self.assertFalse(str(dest).startswith("fixtures"))
+
+    def test_verdict_mismatch_raises(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            arc_path = tmp_path / "synthetic_pkg-1.0.0.tar.gz"
+            out_dir = tmp_path / "replay_out"
+
+            setup_code = b"import setuptools\nsetuptools.setup(name='synthetic_pkg', version='1.0.0')\n"
+            ti = tarfile.TarInfo("synthetic_pkg-1.0.0/setup.py")
+            ti.size = len(setup_code)
+            with tarfile.open(arc_path, "w:gz") as tf:
+                tf.addfile(ti, io.BytesIO(setup_code))
+
+            pkg_row = {
+                "package_id": "synthetic_pkg==1.0.0",
+                "package_name": "synthetic_pkg",
+                "version": "1.0.0",
+                "archive_used": str(arc_path),
+                "verdict_outcome": "suspicious",  # mismatch with actual none_detected_in_this_scan
+            }
+
+            with self.assertRaises(ValueError) as cm:
+                generate_single_replay_fixture(arc_path, pkg_row, out_dir, 1)
+            self.assertIn("Verdict outcome mismatch for package synthetic_pkg==1.0.0", str(cm.exception))
 
 
 if __name__ == "__main__":

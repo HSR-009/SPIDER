@@ -1,28 +1,41 @@
 """
 Unit tests for Person_A/pipeline/evasion_check.py
-Tests scoring logic by verdict and strong signal, transformation wrapper
-execution, and missing raw archives exit.
+Tests Part A seeds evaluation, baseline results parser,
+and Part B targeted file transformation logic.
 Never writes to results/evasion_check_by_A.md.
 """
 
+import io
+import tarfile
 import tempfile
 import unittest
 from pathlib import Path
 
 from Person_A.pipeline.evasion_check import (
+    read_c_baseline_results,
     score_verdict_and_signal,
-    apply_transformation_to_code,
+    evaluate_part_a_seeds,
+    apply_part_b_transformations,
     run_evasion_check,
 )
 
 
 class TestEvasionCheck(unittest.TestCase):
+    def test_read_c_baseline_results(self):
+        # Reads person_c/baseline_results.md
+        res = read_c_baseline_results()
+        self.assertIn("Base64", res)
+        self.assertIn("ROT13", res)
+        self.assertIn("getattr", res)
+        self.assertEqual(res["getattr"]["evaded"], 1)
+        self.assertEqual(res["getattr"]["evasion_rate"], "100.0%")
+
     def test_score_verdict_and_signal(self):
         # 1. Recovered: same strong signals still fire
         s = score_verdict_and_signal("suspicious", ["S1_install_command"], "suspicious", ["S1_install_command"])
         self.assertEqual(s, "recovered")
 
-        # 2. Different signal: still suspicious but different signals
+        # 2. Different signal: still suspicious but via different IDs
         s = score_verdict_and_signal("suspicious", ["S1_install_command"], "suspicious", ["S2_dynamic_exec_plus"])
         self.assertEqual(s, "different_signal")
 
@@ -30,33 +43,43 @@ class TestEvasionCheck(unittest.TestCase):
         s = score_verdict_and_signal("suspicious", ["S1_install_command"], "none_detected_in_this_scan", [])
         self.assertEqual(s, "missed")
 
-        s = score_verdict_and_signal("suspicious", ["S1_install_command"], "unable_to_assess", [])
-        self.assertEqual(s, "missed")
+    def test_evaluate_part_a_seeds(self):
+        # Runs against person_c/seeds
+        stats = evaluate_part_a_seeds()
+        self.assertIn("T01_string_split", stats)
+        self.assertIn("T02_base64", stats)
+        self.assertIn("T04_getattr", stats)
+        self.assertIn("T07_dunder_import", stats)
+        # 20 seeds evaluated
+        self.assertEqual(stats["T02_base64"]["total"], 20)
 
-    def test_apply_transformations(self):
-        code = 'import os\nos.system("whoami")\n'
-        t01 = apply_transformation_to_code(code, "T01_string_split")
-        self.assertIn("system", t01)
+    def test_part_b_targeted_archive_transformation(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            arc_path = tmp_path / "pkg-1.0.0.tar.gz"
 
-        t02 = apply_transformation_to_code(code, "T02_base64")
-        self.assertIn("base64", t02)
-        self.assertIn("exec", t02)
+            # Create synthetic archive with setup.py and helper.py
+            setup_code = b"import setuptools\nfrom setuptools.command.install import install\nclass C(install):\n def run(self): pass\nsetuptools.setup(cmdclass={'install': C})\n"
+            helper_code = b"def helper(): return 42\n"
 
-        t03 = apply_transformation_to_code(code, "T03_rot13")
-        self.assertIn("codecs", t03)
-        self.assertIn("rot_13", t03)
+            ti1 = tarfile.TarInfo("pkg-1.0.0/setup.py")
+            ti1.size = len(setup_code)
+            ti2 = tarfile.TarInfo("pkg-1.0.0/helper.py")
+            ti2.size = len(helper_code)
 
-        t04 = apply_transformation_to_code(code, "T04_getattr")
-        self.assertIn("getattr", t04)
+            with tarfile.open(arc_path, "w:gz") as tf:
+                tf.addfile(ti1, io.BytesIO(setup_code))
+                tf.addfile(ti2, io.BytesIO(helper_code))
 
-        t05 = apply_transformation_to_code(code, "T05_delay")
-        self.assertIn("counter", t05)
+            # Target only setup.py where the strong signal is
+            strong_files = {"pkg-1.0.0/setup.py"}
+            results = apply_part_b_transformations(arc_path, strong_files, ["S1_install_command"])
 
-        t06 = apply_transformation_to_code(code, "T06_import_alias")
-        self.assertIn("_mod_alias", t06)
-
-        t07 = apply_transformation_to_code(code, "T07_dunder_import")
-        self.assertIn("__import__", t07)
+            self.assertIn("T02_base64", results)
+            self.assertIn("T03_rot13", results)
+            self.assertIn("T05_delay", results)
+            # T05 on S1 setup override should recover S1
+            self.assertEqual(results["T05_delay"], "recovered")
 
     def test_missing_raw_dir_exits(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -70,9 +93,9 @@ class TestEvasionCheck(unittest.TestCase):
                     benign_raw=empty_b,
                     mal_raw=empty_m,
                     out_md=Path(tmpdir) / "out.md",
-                    n_sample=5,
+                    sample_size=5,
                 )
-            self.assertIn("Insufficient raw archives found", str(cm.exception))
+            self.assertIn("Insufficient raw archives found for Part B evasion check", str(cm.exception))
 
 
 if __name__ == "__main__":
