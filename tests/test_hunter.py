@@ -376,6 +376,146 @@ class TestHunter(unittest.TestCase):
             self.assertEqual(bad_items[0]["severity"], "MEDIUM")
             self.assertEqual(bad_items[0]["digest_format"], "hex")
 
+    def test_debian_entrypoint_filesystem_ownership(self):
+        """Test Debian dist with no RECORD/top_level.txt, entry nxc.netexec:main, directory nxc/ beside dist-info -> no item"""
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist_dir = site_dir / "netexec-1.0.dist-info"
+            dist_dir.mkdir()
+            (dist_dir / "METADATA").write_text("Metadata-Version: 2.1\nName: netexec\nVersion: 1.0\n", encoding="utf-8")
+            # No RECORD, no top_level.txt!
+            (dist_dir / "entry_points.txt").write_text(
+                "[console_scripts]\n"
+                "netexec = nxc.netexec:main\n",
+                encoding="utf-8",
+            )
+            # Create nxc/ directory beside dist-info
+            nxc_dir = site_dir / "nxc"
+            nxc_dir.mkdir()
+            (nxc_dir / "__init__.py").write_text("# code\n", encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            ep_items = [it for it in res["items"] if it.get("dist") == "netexec" and it.get("artifact") == "entrypoint"]
+            self.assertEqual(ep_items, [])
+
+    def test_markdown_it_filesystem_ownership(self):
+        """Test markdown-it = markdown_it.cli.parse:main with dist name markdown-it-py -> no item"""
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist_dir = site_dir / "markdown_it_py-1.0.dist-info"
+            dist_dir.mkdir()
+            (dist_dir / "METADATA").write_text("Metadata-Version: 2.1\nName: markdown-it-py\nVersion: 1.0\n", encoding="utf-8")
+            (dist_dir / "entry_points.txt").write_text(
+                "[console_scripts]\n"
+                "markdown-it = markdown_it.cli.parse:main\n",
+                encoding="utf-8",
+            )
+            # Create markdown_it/ directory beside dist-info
+            md_dir = site_dir / "markdown_it"
+            md_dir.mkdir()
+            (md_dir / "__init__.py").write_text("# code\n", encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            ep_items = [it for it in res["items"] if it.get("dist") == "markdown-it-py" and it.get("artifact") == "entrypoint"]
+            self.assertEqual(ep_items, [])
+
+    def test_entrypoint_nowhere_on_disk_no_record_is_low(self):
+        """No RECORD, entry points at a module that exists nowhere -> LOW with unknown-ownership reason"""
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist_dir = site_dir / "ghost_tool-1.0.dist-info"
+            dist_dir.mkdir()
+            (dist_dir / "METADATA").write_text("Metadata-Version: 2.1\nName: ghost-tool\nVersion: 1.0\n", encoding="utf-8")
+            (dist_dir / "entry_points.txt").write_text(
+                "[console_scripts]\n"
+                "ghost = nonexistent_module.x:main\n",
+                encoding="utf-8",
+            )
+            # No RECORD, no top_level.txt, and nonexistent_module does not exist on disk
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            ep_items = [it for it in res["items"] if it.get("dist") == "ghost-tool" and it.get("artifact") == "entrypoint"]
+            self.assertEqual(len(ep_items), 1)
+            self.assertEqual(ep_items[0]["severity"], "LOW")
+            self.assertIn("ownership unknown (no RECORD/top_level.txt)", ep_items[0]["reason"])
+
+            # Check coverage count
+            self.assertGreaterEqual(res["coverage"]["counts"].get("entrypoint_ownership_unknown", 0), 1)
+
+    def test_entrypoint_with_record_not_listing_target_is_medium(self):
+        """Dist with RECORD that does not list the target, module not on disk -> MEDIUM (unchanged)"""
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist_dir = site_dir / "my_pkg-1.0.dist-info"
+            dist_dir.mkdir()
+            (dist_dir / "METADATA").write_text("Metadata-Version: 2.1\nName: my-pkg\nVersion: 1.0\n", encoding="utf-8")
+            (dist_dir / "RECORD").write_text("my_pkg/__init__.py,,0\n", encoding="utf-8")
+            (dist_dir / "entry_points.txt").write_text(
+                "[console_scripts]\n"
+                "evil = otherpkg.x:main\n",
+                encoding="utf-8",
+            )
+            my_dir = site_dir / "my_pkg"
+            my_dir.mkdir()
+            (my_dir / "__init__.py").write_text("# my code\n", encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            ep_items = [it for it in res["items"] if it.get("dist") == "my-pkg" and it.get("artifact") == "entrypoint"]
+            self.assertEqual(len(ep_items), 1)
+            self.assertEqual(ep_items[0]["severity"], "MEDIUM")
+            self.assertIn("outside package ownership", ep_items[0]["reason"])
+
+    def test_entrypoint_symlink_outside_site_dir_not_owned(self):
+        """Entry_points target dir is a symlink pointing outside the site dir -> not treated as owned"""
+        if sys.platform == "win32":
+            # On Windows without developer mode/admin symlinks may fail, test or skip safely
+            try:
+                os.symlink
+            except AttributeError:
+                self.skipTest("Symlinks not supported on this platform")
+
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            site_dir = td_path / "site-packages"
+            site_dir.mkdir()
+            outside_dir = td_path / "outside_payload"
+            outside_dir.mkdir()
+            db_file = td_path / "hunter.db"
+
+            dist_dir = site_dir / "sneaky_tool-1.0.dist-info"
+            dist_dir.mkdir()
+            (dist_dir / "METADATA").write_text("Metadata-Version: 2.1\nName: sneaky-tool\nVersion: 1.0\n", encoding="utf-8")
+            (dist_dir / "entry_points.txt").write_text(
+                "[console_scripts]\n"
+                "sneaky = sneaky_pkg.main:run\n",
+                encoding="utf-8",
+            )
+
+            # Create symlink sneaky_pkg pointing outside site_dir
+            link_path = site_dir / "sneaky_pkg"
+            try:
+                os.symlink(outside_dir, link_path)
+            except OSError:
+                self.skipTest("Symlink creation requires elevated permissions on Windows")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            ep_items = [it for it in res["items"] if it.get("dist") == "sneaky-tool" and it.get("artifact") == "entrypoint"]
+            # Must NOT be treated as owned! Because both RECORD/top_level are missing, it's flagged (LOW or MEDIUM)
+            self.assertEqual(len(ep_items), 1)
+            self.assertIn(ep_items[0]["severity"], ("LOW", "MEDIUM"))
+
 
 if __name__ == "__main__":
     unittest.main()

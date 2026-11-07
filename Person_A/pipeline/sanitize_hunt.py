@@ -85,6 +85,7 @@ def sanitize_hunt_data(data: Dict[str, Any], low_sample_size: int = 40, seed: in
             "missing_in_RECORD": sum(1 for e in coverage_errors if "missing file listed in record" in str(e).lower()),
             "inspection_timed_out": sum(1 for e in coverage_errors if "inspection_timed_out" in str(e).lower()),
             "file_list_unavailable": len(dists_without) + sum(1 for e in coverage_errors if "file_list_unavailable" in str(e).lower()),
+            "entrypoint_ownership_unknown": sum(1 for e in coverage_errors if "entrypoint_ownership_unknown" in str(e).lower()),
         }
         cov["counts"] = counts
         clean_data["coverage"] = cov

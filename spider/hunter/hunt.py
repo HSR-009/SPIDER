@@ -59,6 +59,63 @@ def is_regular_file(path: Path) -> bool:
         return False
 
 
+def is_regular_dir(path: Path) -> bool:
+    """Return True only if path is a regular directory (not a symlink to a dir)."""
+    try:
+        st = os.lstat(path)
+        return stat.S_ISDIR(st.st_mode)
+    except Exception:
+        return False
+
+
+def check_filesystem_module_ownership(site_dir: Path, top_mod: str) -> bool:
+    """Check if top_mod exists in site_dir as a regular directory or file without following symlinks outside.
+    
+    Checks:
+    - <site_dir>/<top_mod>/ exists as a directory (not symlink pointing outside)
+    - <site_dir>/<top_mod>.py exists as a regular file
+    - <site_dir>/<top_mod>.*.so or <top_mod>.*.pyd exists as a regular file
+    """
+    if not top_mod:
+        return False
+
+    cand_dir = site_dir / top_mod
+    try:
+        if cand_dir.exists():
+            # Check lstat: if directory, ensure it doesn't resolve outside site_dir
+            st = os.lstat(cand_dir)
+            if stat.S_ISLNK(st.st_mode):
+                # Symlink: must resolve to a directory within site_dir
+                target = cand_dir.resolve()
+                try:
+                    target.relative_to(site_dir.resolve())
+                    if target.is_dir():
+                        return True
+                except ValueError:
+                    return False
+            elif stat.S_ISDIR(st.st_mode):
+                return True
+    except Exception:
+        pass
+
+    cand_py = site_dir / f"{top_mod}.py"
+    if is_regular_file(cand_py):
+        return True
+
+    # Check .so / .pyd / .dll C extensions next to metadata dir
+    try:
+        prefix = f"{top_mod}."
+        for item in site_dir.iterdir():
+            name = item.name.lower()
+            if name.startswith(prefix.lower()) and any(name.endswith(ext) for ext in (".so", ".pyd", ".dll")):
+                if is_regular_file(item):
+                    return True
+    except Exception:
+        pass
+
+    return False
+
+
 def sha256_of_file(file_path: Path, max_bytes: int = MAX_HASH_FILE_BYTES) -> Tuple[str, Optional[str]]:
     """Stream hash of a regular file up to max_bytes.
     
@@ -378,6 +435,10 @@ def inspect_distribution(
     ep_file = meta_dir / "entry_points.txt"
     targeted_ep_modules, raw_ep_entries = get_entry_points_modules(ep_file)
 
+    has_record = is_regular_file(record_file)
+    has_top_level = is_regular_file(meta_dir / "top_level.txt")
+    site_dir = meta_dir.parent
+
     if raw_ep_entries:
         ep_sha, ep_skip = sha256_of_file(ep_file)
         if ep_skip:
@@ -389,7 +450,36 @@ def inspect_distribution(
         for ep in raw_ep_entries:
             mod_part = ep["module"]
             top_mod = mod_part.split(".")[0].strip().lower().replace("-", "_")
-            if top_mod and top_mod not in normalized_top:
+            if not top_mod:
+                continue
+
+            # 1. Already in normalized_top (from RECORD, top_level.txt, or dist name)
+            if top_mod in normalized_top:
+                continue
+
+            # 2. Ownership by filesystem:
+            # <metadata_dir>/../<top_mod>/ exists as a directory, or <top_mod>.py or <top_mod>.*.so exists next to metadata_dir.
+            # (stays inside site_dir, regular files/dirs only, no symlink following outside)
+            if check_filesystem_module_ownership(site_dir, top_mod):
+                # Owned via filesystem!
+                continue
+
+            # 3. Ownership could not be established:
+            if not has_record and not has_top_level:
+                # BOTH RECORD and top_level.txt are missing -> LOW with unknown ownership
+                items.append({
+                    "dist": dist_name,
+                    "version": dist_version,
+                    "artifact": "entrypoint",
+                    "path": str(ep_file),
+                    "sha256": ep_sha,
+                    "severity": "LOW",
+                    "reason": f"Entry point '{ep['name']} = {ep['target']}' ownership unknown (no RECORD/top_level.txt)",
+                    "evidence_snippet": f"[{ep['section']}] {ep['name']} = {ep['target']}",
+                })
+                errors.append(f"{dist_name}: entrypoint_ownership_unknown ({ep['name']} -> {top_mod})")
+            else:
+                # Dist has RECORD (or top_level.txt) that does not list it, and module not on disk -> MEDIUM
                 items.append({
                     "dist": dist_name,
                     "version": dist_version,
@@ -702,6 +792,7 @@ def run_hunt(
         "missing_in_RECORD": 0,
         "inspection_timed_out": 0,
         "file_list_unavailable": len(coverage_dists_without_file_list),
+        "entrypoint_ownership_unknown": 0,
     }
 
     for err in coverage_errors:
@@ -714,6 +805,8 @@ def run_hunt(
             coverage_counts["inspection_timed_out"] += 1
         elif "file_list_unavailable" in err_lower:
             coverage_counts["file_list_unavailable"] += 1
+        elif "entrypoint_ownership_unknown" in err_lower:
+            coverage_counts["entrypoint_ownership_unknown"] += 1
 
     return {
         "hunt_id": scan_id,
