@@ -58,16 +58,16 @@ class TestMakeReplayFixtures(unittest.TestCase):
                 tf.addfile(ti, io.BytesIO(setup_code))
 
             pkg_row = {
-                "package_id": "synthetic_pkg==1.0.0",
-                "package_name": "synthetic_pkg",
-                "version": "1.0.0",
+                "package_id": "synthetic pkg==1.0 beta",
+                "package_name": "synthetic pkg",
+                "version": "1.0 beta",
                 "archive_used": str(arc_path),
                 "verdict_outcome": "none_detected_in_this_scan",
             }
 
             dest = generate_single_replay_fixture(arc_path, pkg_row, out_dir, 1)
             self.assertTrue(dest.exists())
-            self.assertEqual(dest.name, "01_synthetic_pkg-1.0.0.json")
+            self.assertEqual(dest.name, "01_synthetic_pkg-1.0_beta.json")
 
             rec = json.loads(dest.read_text(encoding="utf-8"))
             self.assertEqual(rec["record_origin"], "replay")

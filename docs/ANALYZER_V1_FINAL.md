@@ -37,4 +37,13 @@ The initial v1 analyzer has known syntactic blind spots:
 These blind spots are addressed and hardened in `analyzer_v1_1.py` under the v1.1 ruleset.
 
 ## Parity Numbers
-TO FILL
+Measured from 300 benign and 300 malicious archives on Kali (seed 42):
+- **v1 equals scan_benign**: 296 of 300 benign (98.7%).
+- **v1 equals v1.1**: 140 of 300 benign (46.7%) and 188 of 300 malicious (62.7%).
+- **Lost indicators (with manually confirmed reasons)**:
+  - `.env` (93 benign, 9 malicious): v1 matched docstring text; v1.1 requires a real path component.
+  - `.netrc` (2): docstring text.
+  - `compile` (7): `re.compile` imported by name.
+  - `setuptools.setup` (15): non-setuptools setup.
+- **v1 analyzer exceptions**: 7 exceptions (UnicodeDecodeError on `._*` macOS metadata files and one binary-looking file).
+- **Note on manual checking**: Examples were manually checked for 1 to 3 cases per indicator, not all.

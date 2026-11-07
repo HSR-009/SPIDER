@@ -183,7 +183,9 @@ def generate_single_replay_fixture(archive_path, pkg_row, out_dir, index_num):
 
         out_path = Path(out_dir)
         out_path.mkdir(parents=True, exist_ok=True)
-        fname = f"{index_num:02d}_{pkg_name}-{ver}.json"
+        safe_name = pkg_name.replace(" ", "_")
+        safe_ver = ver.replace(" ", "_")
+        fname = f"{index_num:02d}_{safe_name}-{safe_ver}.json"
         dest_file = out_path / fname
         with open(dest_file, "w", encoding="utf-8", newline="\n") as f:
             json.dump(record, f, indent=2, sort_keys=True)
