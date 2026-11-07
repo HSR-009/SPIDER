@@ -6,8 +6,10 @@ import csv
 import json
 import random
 import sys
-import tempfile
+import time
 import urllib.request
+import zipfile
+import tarfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -21,6 +23,7 @@ from spider_contract.dataset import make_group_id
 HUGOVK_TOP_URL = "https://hugovk.github.io/top-pypi-packages/top-pypi-packages-30-days.min.json"
 DEFAULT_OUT_DIR = ROOT / "fp_check"
 DEFAULT_CSV = ROOT / "results/fp_check_selection.csv"
+FP_CHECK_CSV = ROOT / "fp_check/selection.csv"
 MAL_TABLE = ROOT / "data/processed/malicious_v11.jsonl"
 BEN_TABLE = ROOT / "data/processed/benign_v11.jsonl.gz"
 
@@ -55,7 +58,7 @@ def fetch_top_packages(url: str = HUGOVK_TOP_URL) -> List[Dict[str, Any]]:
 def select_candidates(
     rows: List[Dict[str, Any]],
     corpus_groups: Set[str],
-    rank_start: int = 1500,
+    rank_start: int = 5000,
     rank_end: int = 15000,
     seed: int = 42,
 ) -> List[Tuple[int, str]]:
@@ -122,15 +125,43 @@ def query_pypi_candidate(
     }
 
 
+def archive_has_py_file(archive_path: Path) -> bool:
+    """Check if archive contains at least one .py file without extracting/executing."""
+    path_str = str(archive_path).lower()
+    try:
+        if path_str.endswith(".zip") or path_str.endswith(".whl"):
+            with zipfile.ZipFile(archive_path, "r") as zf:
+                for name in zf.namelist():
+                    if name.endswith(".py") and not name.endswith("/"):
+                        return True
+            return False
+        elif (
+            path_str.endswith(".tar.gz")
+            or path_str.endswith(".tgz")
+            or path_str.endswith(".tar.bz2")
+            or path_str.endswith(".tar.xz")
+            or path_str.endswith(".tar")
+        ):
+            with tarfile.open(archive_path, "r:*") as tf:
+                for member in tf.getmembers():
+                    if member.name.endswith(".py") and member.isfile():
+                        return True
+            return False
+    except Exception:
+        return False
+    return False
+
+
 def run_selection(
-    count: int = 100,
+    count: int = 150,
     csv_out: Path = DEFAULT_CSV,
     seed: int = 42,
-    rank_start: int = 1500,
+    rank_start: int = 5000,
     rank_end: int = 15000,
     custom_candidates: Optional[List[Tuple[int, str]]] = None,
+    delay_sec: float = 1.0,
 ) -> List[Dict[str, Any]]:
-    """Select count packages and write to CSV."""
+    """Select count packages (default 150 candidates to allow filtering) and write to CSV."""
     if custom_candidates is None:
         rows = fetch_top_packages()
         corpus_groups = load_corpus_groups()
@@ -145,7 +176,10 @@ def run_selection(
             selected.append(match)
             if len(selected) >= count:
                 break
+        if delay_sec > 0:
+            time.sleep(delay_sec)
 
+    # Write primary CSV (e.g. results/fp_check_selection.csv)
     csv_out.parent.mkdir(parents=True, exist_ok=True)
     with csv_out.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["name", "version", "rank", "size", "sha256"])
@@ -159,16 +193,34 @@ def run_selection(
                 "sha256": item["sha256"],
             })
 
-    print(f"Selection of {len(selected)} packages written to {csv_out}")
+    # Also write fp_check/selection.csv as the brief says
+    try:
+        FP_CHECK_CSV.parent.mkdir(parents=True, exist_ok=True)
+        with FP_CHECK_CSV.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["name", "version", "rank", "size", "sha256"])
+            writer.writeheader()
+            for item in selected:
+                writer.writerow({
+                    "name": item["name"],
+                    "version": item["version"],
+                    "rank": item["rank"],
+                    "size": item["size"],
+                    "sha256": item["sha256"],
+                })
+    except Exception as e:
+        print(f"Warning: could not write {FP_CHECK_CSV}: {e}")
+
+    print(f"Selection of {len(selected)} packages written to {csv_out} and {FP_CHECK_CSV}")
     return selected
 
 
 def run_download(
     csv_file: Path = DEFAULT_CSV,
     out_dir: Path = DEFAULT_OUT_DIR,
+    target_count: int = 100,
     workers: int = 8,
-) -> None:
-    """Download archives listed in selection CSV using spider.fetch."""
+) -> List[Dict[str, Any]]:
+    """Download archives listed in selection CSV using spider.fetch, stopping at target_count that have >= 1 .py file."""
     if not csv_file.exists():
         sys.exit(f"CSV file not found: {csv_file}")
 
@@ -179,54 +231,95 @@ def run_download(
         for row in reader:
             items.append(row)
 
-    print(f"Downloading {len(items)} packages into {out_dir} with {workers} threads...")
+    print(f"Processing candidate list of {len(items)} packages into {out_dir} (stopping at {target_count} valid)...")
 
-    def _dl(item):
+    accepted_packages: List[Dict[str, Any]] = []
+    skipped_no_py: List[Dict[str, Any]] = []
+    failed_downloads: List[Dict[str, Any]] = []
+
+    # Process items in order to respect rank/selection order
+    for item in items:
+        if len(accepted_packages) >= target_count:
+            break
         name = item["name"]
         ver = item["version"]
         try:
-            path, sha, verified = fetch_package_archive(name, ver, cache_dir=out_dir)
-            return name, ver, True, verified, None
+            archive_path, sha, verified = fetch_package_archive(name, ver, cache_dir=out_dir)
+            if not archive_has_py_file(archive_path):
+                print(f"Skipping {name}=={ver}: no .py file inside archive")
+                skipped_no_py.append(item)
+                # Remove non-compliant archive to keep fp_check clean
+                try:
+                    archive_path.unlink()
+                except Exception:
+                    pass
+                continue
+            
+            accepted_packages.append(item)
+            print(f"Accepted [{len(accepted_packages)}/{target_count}] {name}=={ver}")
         except Exception as e:
-            return name, ver, False, False, str(e)
+            print(f"Failed {name}=={ver}: {e}")
+            failed_downloads.append({"item": item, "error": str(e)})
 
-    success_count = 0
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = [pool.submit(_dl, item) for item in items]
-        for fut in as_completed(futures):
-            name, ver, ok, verified, err = fut.result()
-            if ok:
-                success_count += 1
-            else:
-                print(f"Failed {name}=={ver}: {err}")
+    # Record skipped/accepted in fp_check log
+    summary_file = out_dir / "download_summary.json"
+    try:
+        summary_file.write_text(
+            json.dumps({
+                "target_count": target_count,
+                "accepted_count": len(accepted_packages),
+                "skipped_no_py_count": len(skipped_no_py),
+                "failed_count": len(failed_downloads),
+                "skipped_no_py": skipped_no_py,
+            }, indent=2),
+            encoding="utf-8"
+        )
+    except Exception:
+        pass
 
-    print(f"Download complete: {success_count}/{len(items)} downloaded successfully.")
+    print(f"Download complete: {len(accepted_packages)} accepted, {len(skipped_no_py)} skipped (no .py), {len(failed_downloads)} failed.")
+    return accepted_packages
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SPIDER FP Package Selector and Downloader")
     subparsers = parser.add_subparsers(dest="subcommand")
 
-    sel_p = subparsers.add_parser("select", help="Select 100 packages from PyPI and write selection CSV")
-    sel_p.add_argument("--count", type=int, default=100)
+    sel_p = subparsers.add_parser("select", help="Select candidates from PyPI and write selection CSV")
+    sel_p.add_argument("--count", type=int, default=150)
     sel_p.add_argument("--csv", default=str(DEFAULT_CSV))
     sel_p.add_argument("--seed", type=int, default=42)
+    sel_p.add_argument("--rank-start", type=int, default=5000)
+    sel_p.add_argument("--rank-end", type=int, default=15000)
+    sel_p.add_argument("--throttle", type=float, default=1.0)
 
     dl_p = subparsers.add_parser("download", help="Download packages from selection CSV into fp_check/")
     dl_p.add_argument("--csv", default=str(DEFAULT_CSV))
     dl_p.add_argument("--out", default=str(DEFAULT_OUT_DIR))
+    dl_p.add_argument("--target-count", type=int, default=100)
     dl_p.add_argument("--workers", type=int, default=8)
 
     args = parser.parse_args()
 
     if args.subcommand == "select":
-        run_selection(count=args.count, csv_out=Path(args.csv), seed=args.seed)
+        run_selection(
+            count=args.count,
+            csv_out=Path(args.csv),
+            seed=args.seed,
+            rank_start=args.rank_start,
+            rank_end=args.rank_end,
+            delay_sec=args.throttle,
+        )
     elif args.subcommand == "download":
-        run_download(csv_file=Path(args.csv), out_dir=Path(args.out), workers=args.workers)
+        run_download(
+            csv_file=Path(args.csv),
+            out_dir=Path(args.out),
+            target_count=args.target_count,
+            workers=args.workers,
+        )
     else:
         parser.print_help()
 
 
 if __name__ == "__main__":
     main()
-

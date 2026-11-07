@@ -10,73 +10,79 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
 
-def list_environments(extra_site_packages: Optional[List[str | Path]] = None) -> List[Path]:
-    """Return default search roots for python environments.
+def list_environments(
+    extra_site_packages: Optional[List[str | Path]] = None,
+    include_system_defaults: bool = True,
+) -> List[Path]:
+    """Return search roots for python environments.
     
-    Linux defaults:
-      /usr/lib/python3/dist-packages
-      /usr/local/lib/python3*/dist-packages
-      ~/.local/lib/python3*/site-packages
-      active venv site-packages
-    Windows defaults:
-      site-packages of sys.prefix
-      user site
+    If include_system_defaults is True:
+      Linux defaults:
+        /usr/lib/python3/dist-packages
+        /usr/local/lib/python3*/dist-packages
+        ~/.local/lib/python3*/site-packages
+        active venv site-packages
+      Windows defaults:
+        site-packages of sys.prefix
+        user site
     Plus any extra --site-packages paths provided.
+    If include_system_defaults is False, only extra_site_packages are returned.
     """
     roots: List[Path] = []
 
-    if sys.platform == "win32":
-        # Windows: sys.prefix site-packages
-        prefix_sp = Path(sys.prefix) / "Lib" / "site-packages"
-        if prefix_sp.exists():
-            roots.append(prefix_sp)
+    if include_system_defaults:
+        if sys.platform == "win32":
+            # Windows: sys.prefix site-packages
+            prefix_sp = Path(sys.prefix) / "Lib" / "site-packages"
+            if prefix_sp.exists():
+                roots.append(prefix_sp)
 
-        # User site
-        try:
-            user_sp = Path(site.getusersitepackages())
-            if user_sp.exists() and user_sp not in roots:
-                roots.append(user_sp)
-        except Exception:
-            pass
+            # User site
+            try:
+                user_sp = Path(site.getusersitepackages())
+                if user_sp.exists() and user_sp not in roots:
+                    roots.append(user_sp)
+            except Exception:
+                pass
 
-        # Also check all getsitepackages()
-        try:
-            for sp in site.getsitepackages():
-                p = Path(sp)
+            # Also check all getsitepackages()
+            try:
+                for sp in site.getsitepackages():
+                    p = Path(sp)
+                    if p.exists() and p not in roots:
+                        roots.append(p)
+            except Exception:
+                pass
+        else:
+            # Linux / Unix
+            fixed_candidates = [
+                "/usr/lib/python3/dist-packages",
+            ]
+            for c in fixed_candidates:
+                p = Path(c)
                 if p.exists() and p not in roots:
                     roots.append(p)
-        except Exception:
-            pass
-    else:
-        # Linux / Unix
-        fixed_candidates = [
-            "/usr/lib/python3/dist-packages",
-        ]
-        for c in fixed_candidates:
-            p = Path(c)
-            if p.exists() and p not in roots:
-                roots.append(p)
 
-        # Glob patterns: /usr/local/lib/python3*/dist-packages
-        for match in glob.glob("/usr/local/lib/python3*/dist-packages"):
-            p = Path(match)
-            if p.exists() and p not in roots:
-                roots.append(p)
-
-        # Glob patterns: ~/.local/lib/python3*/site-packages
-        home = os.path.expanduser("~")
-        for match in glob.glob(os.path.join(home, ".local/lib/python3*/site-packages")):
-            p = Path(match)
-            if p.exists() and p not in roots:
-                roots.append(p)
-
-        # Active virtual environment
-        venv = os.environ.get("VIRTUAL_ENV")
-        if venv:
-            for match in glob.glob(os.path.join(venv, "lib/python3*/site-packages")):
+            # Glob patterns: /usr/local/lib/python3*/dist-packages
+            for match in glob.glob("/usr/local/lib/python3*/dist-packages"):
                 p = Path(match)
                 if p.exists() and p not in roots:
                     roots.append(p)
+
+            # Glob patterns: ~/.local/lib/python3*/site-packages
+            home = os.path.expanduser("~")
+            for match in glob.glob(os.path.join(home, ".local/lib/python3*/site-packages")):
+                p = Path(match)
+                if p.exists() and p not in roots:
+                    roots.append(p)
+
+            # Active virtual environment
+            venv = os.environ.get("VIRTUAL_ENV")
+            if venv:
+                for match in glob.glob(os.path.join(venv, "lib/python3*/site-packages")):
+                    p = Path(match)
+                    if p.exists() and p not in roots:
+                        roots.append(p)
 
     # Any extra requested directories
     if extra_site_packages:

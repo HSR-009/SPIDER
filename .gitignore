@@ -23,4 +23,5 @@ data/raw_malicious/
 data/processed/malicious_scan*.jsonl
 scans/
 hunts/
+fp_check/
 
