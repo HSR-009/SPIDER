@@ -1,0 +1,167 @@
+{
+  "created_at": "2026-11-07T10:48:59Z",
+  "files": [
+    {
+      "inspected": false,
+      "kind": "other",
+      "lines": null,
+      "path": "1000pip Climber System Review-1/LICENSE",
+      "roles": [],
+      "sha256": "133358265badc203bd6e4321a06073d01b9686f5c15f19e944059156724ee25d"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Review-1/PKG-INFO",
+      "roles": [],
+      "sha256": "13a9dc745142dc94e367ea950871cd1fdddf82c4e61499bb5a74042fd4e7f707"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "1000pip Climber System Review-1/README.md",
+      "roles": [],
+      "sha256": "46a829b2d101f586645c84de1233fbcda89ddb818c5c796529e6b376655426cf"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 4,
+      "path": "1000pip Climber System Review-1/setup.cfg",
+      "roles": [],
+      "sha256": "1c473cbaee8da5fc46e7f0158794af5cea4414c34a3cf3f180c2001f5e38bd3e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 31,
+      "path": "1000pip Climber System Review-1/setup.py",
+      "roles": [],
+      "sha256": "123645a30fc2d124108e2c451f9ddfc446aba1b41f9feeef94d6947c82c76124"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Review-1/src/1000pip_Climber_System_Review.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "a772e3af50696d944375158c2dd9cb46cebf185325b4c6fc493b586b527c729c"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Review-1/src/1000pip_Climber_System_Review.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "91df50b9b00e6a0eeaf70c6cf33e7e0b639add39499ab611baaae53f24cbb144"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Review-1/src/1000pip_Climber_System_Review.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Review-1/src/1000pip_Climber_System_Review.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    }
+  ],
+  "findings": [
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setuptools.setup() call detected",
+      "file": "1000pip Climber System Review-1/setup.py",
+      "id": "F001",
+      "indicator": "setuptools.setup",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.plain_setup",
+      "severity": "low",
+      "snippet": "setuptools.setup(",
+      "span": {
+        "end_col": 1,
+        "end_line": 31,
+        "start_col": 0,
+        "start_line": 9
+      },
+      "trigger_phase": "install"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 7,
+    "files_total": 9,
+    "limits_hit": [],
+    "parse_failures": [],
+    "python_files": 1,
+    "uninspected": [
+      {
+        "path": "1000pip Climber System Review-1/LICENSE",
+        "reason": "unknown_type"
+      }
+    ],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [],
+  "scan_id": "ed8696dd-bef4-4dc1-bd05-78c4635fb220",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "1000pip climber system review-1.tar.gz",
+      "format": "tar.gz",
+      "sha256": "b9e6a60a40eee4bc21743617633e9fac9daf8ea6a2cdd13bd839dabef58b355f",
+      "size_bytes": 8981
+    },
+    "hash_verified": null,
+    "kind": "archive",
+    "name": "1000pip-climber-system-review",
+    "version": "1000pip climber system review-1"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "outcome": "none_detected_in_this_scan",
+    "reasons": []
+  }
+}

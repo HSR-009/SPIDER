@@ -1,0 +1,167 @@
+{
+  "created_at": "2026-11-07T10:48:59Z",
+  "files": [
+    {
+      "inspected": false,
+      "kind": "other",
+      "lines": null,
+      "path": "1000pip Climber System Free Download-1/LICENSE",
+      "roles": [],
+      "sha256": "133358265badc203bd6e4321a06073d01b9686f5c15f19e944059156724ee25d"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Free Download-1/PKG-INFO",
+      "roles": [],
+      "sha256": "6b909aaf39efcca0d12292a510e937cc974b141b84a1d4348a75a84f7dc3be37"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "1000pip Climber System Free Download-1/README.md",
+      "roles": [],
+      "sha256": "2990634e7f171371c6d763685b4f4079e8148b3cf8e27ecea67ca13caf97f428"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 4,
+      "path": "1000pip Climber System Free Download-1/setup.cfg",
+      "roles": [],
+      "sha256": "1c473cbaee8da5fc46e7f0158794af5cea4414c34a3cf3f180c2001f5e38bd3e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 31,
+      "path": "1000pip Climber System Free Download-1/setup.py",
+      "roles": [],
+      "sha256": "ec1a99f333260b7200632e0d7f518833707679f37760b73b3a04971fcad3d729"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Free Download-1/src/1000pip_Climber_System_Free_Download.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "5284c1f5060594e095537cb8ef2f0cda4c3a77db14d95432ec5eb9d73ae8730e"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Free Download-1/src/1000pip_Climber_System_Free_Download.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "d23728f5e90cf8a202462cf808a62f3243c2c045b62079082cdd5c760388a13d"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Free Download-1/src/1000pip_Climber_System_Free_Download.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "1000pip Climber System Free Download-1/src/1000pip_Climber_System_Free_Download.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    }
+  ],
+  "findings": [
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setuptools.setup() call detected",
+      "file": "1000pip Climber System Free Download-1/setup.py",
+      "id": "F001",
+      "indicator": "setuptools.setup",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.plain_setup",
+      "severity": "low",
+      "snippet": "setuptools.setup(",
+      "span": {
+        "end_col": 1,
+        "end_line": 31,
+        "start_col": 0,
+        "start_line": 9
+      },
+      "trigger_phase": "install"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 7,
+    "files_total": 9,
+    "limits_hit": [],
+    "parse_failures": [],
+    "python_files": 1,
+    "uninspected": [
+      {
+        "path": "1000pip Climber System Free Download-1/LICENSE",
+        "reason": "unknown_type"
+      }
+    ],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [],
+  "scan_id": "3e18e368-2cf1-4faf-aa8e-dcbccb974900",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "1000pip climber system free download-1.tar.gz",
+      "format": "tar.gz",
+      "sha256": "6eb5657b73219d3e0c4356ec3fc6d885d6d2f296006005e725ac04b2423e10ee",
+      "size_bytes": 9121
+    },
+    "hash_verified": null,
+    "kind": "archive",
+    "name": "1000pip-climber-system-free-download",
+    "version": "1000pip climber system free download-1"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "outcome": "none_detected_in_this_scan",
+    "reasons": []
+  }
+}

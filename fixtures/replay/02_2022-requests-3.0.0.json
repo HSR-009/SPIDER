@@ -1,0 +1,2120 @@
+{
+  "created_at": "2026-11-07T10:48:58Z",
+  "files": [
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "2022-requests-3.0.0/2022_requests.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "fa5a2a6c4ec9cebcbda70122c868d754cace1e374a3006ecf1a16c0f9a012caa"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "2022-requests-3.0.0/2022_requests.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "3a33ce53ee3ba7bae7210a3425f0768b2c4d4be49c6d046a6dcdec2873901db3"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "2022-requests-3.0.0/2022_requests.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "2022-requests-3.0.0/2022_requests.egg-info/not-zip-safe",
+      "roles": [],
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "2022-requests-3.0.0/2022_requests.egg-info/requires.txt",
+      "roles": [],
+      "sha256": "9269f9388be68e1ccd0b1646bd07d20e1168cfdc52b4fde0216e6919c0ea66bd"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "2022-requests-3.0.0/2022_requests.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "7cc4959877dbe6b6c63a8eb1bfe3bfb545fa8fe5b28b1b2c13e4a7c1c0d1c4d4"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/HISTORY.md",
+      "roles": [],
+      "sha256": "594a39e45186628dcc2711d859bbc182efa05811f8e19cf1a825fa5471ffb3af"
+    },
+    {
+      "inspected": false,
+      "kind": "other",
+      "lines": null,
+      "path": "2022-requests-3.0.0/LICENSE",
+      "roles": [],
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 2,
+      "path": "2022-requests-3.0.0/MANIFEST.in",
+      "roles": [],
+      "sha256": "7caa1d6b5f562ee868f8719eb9a311b00c1baec207d65fa65ab087664dcaf3c4"
+    },
+    {
+      "inspected": false,
+      "kind": "other",
+      "lines": null,
+      "path": "2022-requests-3.0.0/NOTICE",
+      "roles": [],
+      "sha256": "f5110972dedad2b4e9d314518daf3b7d72d6e02e499acd802181de6f74571dcc"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "2022-requests-3.0.0/PKG-INFO",
+      "roles": [],
+      "sha256": "fa5a2a6c4ec9cebcbda70122c868d754cace1e374a3006ecf1a16c0f9a012caa"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/README.md",
+      "roles": [],
+      "sha256": "150fd62db4024e240040be44b32d7ce98df80ab86dfd564a173cd231f2254abc"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 180,
+      "path": "2022-requests-3.0.0/requests/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "4b62b48e754fe824ab4f9d5272d172881d177c8f07f4db7b12acc44400f8e208"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 14,
+      "path": "2022-requests-3.0.0/requests/__version__.py",
+      "roles": [],
+      "sha256": "9c955adde7f6c91c9e60c872ef21e74728e3a673530f2919b04e12a7d8ab042e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 48,
+      "path": "2022-requests-3.0.0/requests/_internal_utils.py",
+      "roles": [],
+      "sha256": "6923e5178b8386d7cac446b264927b2a4031b68ae67937e9c0a4814b0b66014c"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 584,
+      "path": "2022-requests-3.0.0/requests/adapters.py",
+      "roles": [],
+      "sha256": "b049c71a5e26273e101c14fc8c6e9b53968f8a752d7681f7048b802334fe5fbe"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 157,
+      "path": "2022-requests-3.0.0/requests/api.py",
+      "roles": [],
+      "sha256": "772be40dde62b42f73da0d301e5fd87c3d727fa630a4658b3bbffff1edb59e4b"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 315,
+      "path": "2022-requests-3.0.0/requests/auth.py",
+      "roles": [],
+      "sha256": "87e1cb955c7d8fcaca57985f480c9c3f60293928254f3efb474b73eea09b6c41"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 17,
+      "path": "2022-requests-3.0.0/requests/certs.py",
+      "roles": [],
+      "sha256": "67d49be35d009efea35054f2b2cd23145854eb1b2df1cb442ea7f2f04bf6de0c"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 79,
+      "path": "2022-requests-3.0.0/requests/compat.py",
+      "roles": [],
+      "sha256": "cb19ed54e4841c632b9fb14daffdf61046a6d5934074f45d484d77ff2687cd39"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 561,
+      "path": "2022-requests-3.0.0/requests/cookies.py",
+      "roles": [],
+      "sha256": "903de43447028fe9b16ed7f97c9b12693f3a786a046290f75f4092829ce5ec13"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 141,
+      "path": "2022-requests-3.0.0/requests/exceptions.py",
+      "roles": [],
+      "sha256": "0e1bde1417255634d1c6145db95a4ef866cc60c203da09a374b7cd12a36923f5"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 134,
+      "path": "2022-requests-3.0.0/requests/help.py",
+      "roles": [],
+      "sha256": "80f5f977f1fb5ddf3c6830017a386a1a097d075545453b79066898bcbdcfcc84"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 33,
+      "path": "2022-requests-3.0.0/requests/hooks.py",
+      "roles": [],
+      "sha256": "0a2bb2b221c0dfd57951f702057148c7cdc8ac3a6ec1f37d45c4d482fdbc7ed4"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 1034,
+      "path": "2022-requests-3.0.0/requests/models.py",
+      "roles": [],
+      "sha256": "3a257188e765873a5b668c6eb763a12ada58941ed65b888741c7ea495993e07e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 28,
+      "path": "2022-requests-3.0.0/requests/packages.py",
+      "roles": [],
+      "sha256": "0d782ff852487336484e6bf4bc40408568f85bee4218220dfe4b2f811d7b0efb"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 831,
+      "path": "2022-requests-3.0.0/requests/sessions.py",
+      "roles": [],
+      "sha256": "294a8971144ba2f35e7d4b3b49c39749454271f49ac93156b5b889ee03929532"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 128,
+      "path": "2022-requests-3.0.0/requests/status_codes.py",
+      "roles": [],
+      "sha256": "16f1e64f9b87fbfba29ad473e611fd5426eded557e35e8b627dba96de8fa8fc8"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 99,
+      "path": "2022-requests-3.0.0/requests/structures.py",
+      "roles": [],
+      "sha256": "f886e6855cf4e92fb968f499b94b6167afba0fd5ce8d1b935c739a6d8d38d573"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 1086,
+      "path": "2022-requests-3.0.0/requests/utils.py",
+      "roles": [],
+      "sha256": "e7fc2cf9bb0a23d10797b8f6ef28bee871733c12ae96d3e077b1df3eb513a162"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/requirements-dev.txt",
+      "roles": [],
+      "sha256": "974152bb4941c4db65ad9a4b46257192d8d7559513f08080451c9a4b8e34259a"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 22,
+      "path": "2022-requests-3.0.0/setup.cfg",
+      "roles": [],
+      "sha256": "3545921fb98d63d78e95dc3505073149299cee2dd8ccb9762004441fa53033a3"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 246,
+      "path": "2022-requests-3.0.0/setup.py",
+      "roles": [],
+      "sha256": "15507092967fbd28ccb833d98c2ee49da09e7c79fd41759cd6f783672fe1c5cc"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "1ce44cf0de798ecbb6f24fa0b8ef302e39db6fd6eda5c275cc8d434c4f2d53c9"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/compat.py",
+      "roles": [],
+      "sha256": "d58ff5e3167de0140a667cc51427f809c552e485875c95b9dad43ce13ba15083"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/conftest.py",
+      "roles": [],
+      "sha256": "c31d83bf96fbf585c0d497fbf21a39b2e69411948ddb947e5ad51e5857976c5c"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_help.py",
+      "roles": [],
+      "sha256": "4581acb9c3f69a3ca8c9c1b574d77b11a3b11c0a0aaa0645d16988cc444c4075"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_hooks.py",
+      "roles": [],
+      "sha256": "a9e5163f538543a660be3b06650cd0b803ff0c503f5948f66b6fc50ede38109c"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_lowlevel.py",
+      "roles": [],
+      "sha256": "2dc5990ef15fbbfcf1681827a337e6195144ee0e2031fb951ed1d32e29cdc27d"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_packages.py",
+      "roles": [],
+      "sha256": "90875423db059d65b39416d7b6d01b18938851b8071279877400beb506e08676"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_requests.py",
+      "roles": [],
+      "sha256": "9fa6f7abaf70a55304dcae8a03e098803cd0f1944702f9578f19d4183c48b836"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_structures.py",
+      "roles": [],
+      "sha256": "f7b80e00888105ae80312203279e0cf9256726740bcaa15c6cee7c2c07d33d60"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_testserver.py",
+      "roles": [],
+      "sha256": "5c388f68ff0bb13c255856ed19c5943ed493cfa52a62ad557c5ae84887b5da1f"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/test_utils.py",
+      "roles": [],
+      "sha256": "5a98862b9e19412592ff497fd9df5920e6c3ab5852f581c21280bbb6af773fc2"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/testserver/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/testserver/server.py",
+      "roles": [],
+      "sha256": "242ffb78788e384a47cd3278df58064d6f480f306ffd0f789ce357969d3cb7a8"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "2022-requests-3.0.0/tests/utils.py",
+      "roles": [],
+      "sha256": "cfaec86690eba62573c8c730a121332837809333fb2b1006a20e2e8f4d34d4de"
+    }
+  ],
+  "findings": [
+    {
+      "category": "obfuscation",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "_basic_auth_str",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "base64 operation detected",
+      "file": "2022-requests-3.0.0/requests/auth.py",
+      "id": "F001",
+      "indicator": "base64.b64encode",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "obf.base64",
+      "severity": "medium",
+      "snippet": "b64encode(b\":\".join((username, password)))",
+      "span": {
+        "end_col": 50,
+        "end_line": 63,
+        "start_col": 8,
+        "start_line": 63
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "dynamic_execution",
+      "confidence": "medium",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "import with a non-constant name",
+      "file": "2022-requests-3.0.0/requests/packages.py",
+      "id": "F002",
+      "indicator": "__import__(dynamic)",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "dyn.dynamic_import",
+      "severity": "medium",
+      "snippet": "__import__(package)",
+      "span": {
+        "end_col": 43,
+        "end_line": 16,
+        "start_col": 24,
+        "start_line": 16
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "merge_environment_settings",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/sessions.py",
+      "id": "F003",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 30,
+        "end_line": 767,
+        "start_col": 20,
+        "start_line": 767
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "merge_environment_settings",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/sessions.py",
+      "id": "F004",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 33,
+        "end_line": 768,
+        "start_col": 23,
+        "start_line": 768
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "medium",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "Sensitive path .netrc detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F005",
+      "indicator": ".netrc",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.path",
+      "severity": "high",
+      "snippet": "\".netrc\"",
+      "span": {
+        "end_col": 23,
+        "end_line": 56,
+        "start_col": 15,
+        "start_line": 56
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "get_netrc_auth",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F006",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 27,
+        "end_line": 197,
+        "start_col": 17,
+        "start_line": 197
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "set_environ",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F007",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 30,
+        "end_line": 747,
+        "start_col": 20,
+        "start_line": 747
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "set_environ",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F008",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 18,
+        "end_line": 748,
+        "start_col": 8,
+        "start_line": 748
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "set_environ",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F009",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 30,
+        "end_line": 754,
+        "start_col": 20,
+        "start_line": 754
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "set_environ",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F010",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 26,
+        "end_line": 756,
+        "start_col": 16,
+        "start_line": 756
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "get_proxy",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F011",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 25,
+        "end_line": 768,
+        "start_col": 15,
+        "start_line": 768
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "get_proxy",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "2022-requests-3.0.0/requests/utils.py",
+      "id": "F012",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 48,
+        "end_line": 768,
+        "start_col": 38,
+        "start_line": 768
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "dynamic_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "exec() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F013",
+      "indicator": "exec",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "dyn.exec",
+      "severity": "high",
+      "snippet": "exec(f.read(), about)",
+      "span": {
+        "end_col": 25,
+        "end_line": 72,
+        "start_col": 4,
+        "start_line": 72
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setuptools.setup() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F014",
+      "indicator": "setuptools.setup",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.plain_setup",
+      "severity": "low",
+      "snippet": "setup(",
+      "span": {
+        "end_col": 1,
+        "end_line": 125,
+        "start_col": 0,
+        "start_line": 77
+      },
+      "trigger_phase": "install"
+    },
+    {
+      "category": "install_time",
+      "confidence": "medium",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setup(cmdclass=...) overrides build commands",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F015",
+      "indicator": "setuptools.setup.cmdclass",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.cmdclass",
+      "severity": "medium",
+      "snippet": "setup(",
+      "span": {
+        "end_col": 1,
+        "end_line": 125,
+        "start_col": 0,
+        "start_line": 77
+      },
+      "trigger_phase": "install"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F016",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"echo %temp%\", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,",
+      "span": {
+        "end_col": 48,
+        "end_line": 174,
+        "start_col": 8,
+        "start_line": 173
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.check_call() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F017",
+      "indicator": "subprocess.check_call",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_check_call",
+      "severity": "high",
+      "snippet": "subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'requests'], shell=True, stdin=subprocess.PIPE,",
+      "span": {
+        "end_col": 75,
+        "end_line": 181,
+        "start_col": 6,
+        "start_line": 180
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "network_activity",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "requests.get() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F018",
+      "indicator": "requests.get",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "net.requests_get",
+      "severity": "medium",
+      "snippet": "requests.get(remote_url)",
+      "span": {
+        "end_col": 35,
+        "end_line": 187,
+        "start_col": 11,
+        "start_line": 187
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F019",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"cmd /c move local_copy.txt local.bat\", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stde",
+      "span": {
+        "end_col": 143,
+        "end_line": 191,
+        "start_col": 4,
+        "start_line": 191
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F020",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"cmd /c local.bat\", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)",
+      "span": {
+        "end_col": 122,
+        "end_line": 197,
+        "start_col": 4,
+        "start_line": 197
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F021",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"cmd /c del local.bat\", shell=True, stdin=subprocess.PIPE,",
+      "span": {
+        "end_col": 70,
+        "end_line": 201,
+        "start_col": 6,
+        "start_line": 200
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F022",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"net session\", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)",
+      "span": {
+        "end_col": 122,
+        "end_line": 204,
+        "start_col": 8,
+        "start_line": 204
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "network_activity",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "requests.get() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F023",
+      "indicator": "requests.get",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "net.requests_get",
+      "severity": "medium",
+      "snippet": "requests.get(remote_url)",
+      "span": {
+        "end_col": 37,
+        "end_line": 211,
+        "start_col": 13,
+        "start_line": 211
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F024",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"cmd /c move local_b.txt loc.bat\", shell=True, stdin=subprocess.PIPE,",
+      "span": {
+        "end_col": 70,
+        "end_line": 216,
+        "start_col": 6,
+        "start_line": 215
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F025",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"cmd /c loc.bat\", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,",
+      "span": {
+        "end_col": 46,
+        "end_line": 218,
+        "start_col": 6,
+        "start_line": 217
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "command_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "subprocess.Popen() call detected",
+      "file": "2022-requests-3.0.0/setup.py",
+      "id": "F026",
+      "indicator": "subprocess.Popen",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cmd.subprocess_popen",
+      "severity": "high",
+      "snippet": "subprocess.Popen(\"cmd /c del loc.bat\", shell=True, stdin=subprocess.PIPE,",
+      "span": {
+        "end_col": 72,
+        "end_line": 222,
+        "start_col": 8,
+        "start_line": 221
+      },
+      "trigger_phase": "import"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 28,
+    "files_total": 47,
+    "limits_hit": [],
+    "parse_failures": [],
+    "python_files": 19,
+    "uninspected": [
+      {
+        "path": "2022-requests-3.0.0/LICENSE",
+        "reason": "unknown_type"
+      },
+      {
+        "path": "2022-requests-3.0.0/NOTICE",
+        "reason": "unknown_type"
+      }
+    ],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R001",
+      "to": "F004",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R002",
+      "to": "F006",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R003",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R004",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R005",
+      "to": "F009",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R006",
+      "to": "F010",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R007",
+      "to": "F011",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F005",
+      "id": "R008",
+      "to": "F012",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R009",
+      "to": "F007",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R010",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R011",
+      "to": "F009",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R012",
+      "to": "F010",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R013",
+      "to": "F011",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F006",
+      "id": "R014",
+      "to": "F012",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F007",
+      "id": "R015",
+      "to": "F008",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F007",
+      "id": "R016",
+      "to": "F009",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F007",
+      "id": "R017",
+      "to": "F010",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F007",
+      "id": "R018",
+      "to": "F011",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F007",
+      "id": "R019",
+      "to": "F012",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F008",
+      "id": "R020",
+      "to": "F009",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F008",
+      "id": "R021",
+      "to": "F010",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F008",
+      "id": "R022",
+      "to": "F011",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F008",
+      "id": "R023",
+      "to": "F012",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F009",
+      "id": "R024",
+      "to": "F010",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F009",
+      "id": "R025",
+      "to": "F011",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F009",
+      "id": "R026",
+      "to": "F012",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F010",
+      "id": "R027",
+      "to": "F011",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F010",
+      "id": "R028",
+      "to": "F012",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same function",
+      "confidence": "medium",
+      "from": "F011",
+      "id": "R029",
+      "to": "F012",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R030",
+      "to": "F014",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R031",
+      "to": "F015",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R032",
+      "to": "F016",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R033",
+      "to": "F017",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R034",
+      "to": "F018",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R035",
+      "to": "F019",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R036",
+      "to": "F020",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R037",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R038",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R039",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R040",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R041",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F013",
+      "id": "R042",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R043",
+      "to": "F015",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R044",
+      "to": "F016",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R045",
+      "to": "F017",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R046",
+      "to": "F018",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R047",
+      "to": "F019",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R048",
+      "to": "F020",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R049",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R050",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R051",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R052",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R053",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F014",
+      "id": "R054",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R055",
+      "to": "F016",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R056",
+      "to": "F017",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R057",
+      "to": "F018",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R058",
+      "to": "F019",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R059",
+      "to": "F020",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R060",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R061",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R062",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R063",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R064",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F015",
+      "id": "R065",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R066",
+      "to": "F017",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R067",
+      "to": "F018",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R068",
+      "to": "F019",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R069",
+      "to": "F020",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R070",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R071",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R072",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R073",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R074",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F016",
+      "id": "R075",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R076",
+      "to": "F018",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R077",
+      "to": "F019",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R078",
+      "to": "F020",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R079",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R080",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R081",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R082",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R083",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F017",
+      "id": "R084",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R085",
+      "to": "F019",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R086",
+      "to": "F020",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R087",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R088",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R089",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R090",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R091",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F018",
+      "id": "R092",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F019",
+      "id": "R093",
+      "to": "F020",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F019",
+      "id": "R094",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F019",
+      "id": "R095",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F019",
+      "id": "R096",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F019",
+      "id": "R097",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F019",
+      "id": "R098",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F019",
+      "id": "R099",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F020",
+      "id": "R100",
+      "to": "F021",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F020",
+      "id": "R101",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F020",
+      "id": "R102",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F020",
+      "id": "R103",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F020",
+      "id": "R104",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F020",
+      "id": "R105",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F021",
+      "id": "R106",
+      "to": "F022",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F021",
+      "id": "R107",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F021",
+      "id": "R108",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F021",
+      "id": "R109",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F021",
+      "id": "R110",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F022",
+      "id": "R111",
+      "to": "F023",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F022",
+      "id": "R112",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F022",
+      "id": "R113",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F022",
+      "id": "R114",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F023",
+      "id": "R115",
+      "to": "F024",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F023",
+      "id": "R116",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F023",
+      "id": "R117",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F024",
+      "id": "R118",
+      "to": "F025",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F024",
+      "id": "R119",
+      "to": "F026",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F025",
+      "id": "R120",
+      "to": "F026",
+      "type": "co_occurrence"
+    }
+  ],
+  "scan_id": "65f56040-cc58-45c8-8f00-6a0b2acd0465",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "2022-requests-3.0.0.tar.gz",
+      "format": "tar.gz",
+      "sha256": "3dd0d369c90a0a776eeb8cc79f342fe30238fb7a198aa6adfad8b77379a6023e",
+      "size_bytes": 422575
+    },
+    "hash_verified": null,
+    "kind": "archive",
+    "name": "2022-requests",
+    "version": "3.0.0"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "outcome": "suspicious",
+    "reasons": [
+      "S2_dynamic_exec_plus",
+      "S3_credential_net"
+    ]
+  }
+}
