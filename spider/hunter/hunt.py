@@ -5,19 +5,22 @@ Flags install-time persistence artifacts:
 - .pth files with executable lines (starting with import or import\t)
 - sitecustomize.py and usercustomize.py
 - console_scripts and gui_scripts pointing outside the distribution's own package
-- Per-distribution scan of install-relevant files
-- Tamper check when RECORD has hashes
+- Per-distribution scan of install-relevant files (one file at a time, per-file decide())
+- Tamper check when RECORD has hashes (skipping bin/ and Scripts/)
 - Fallback for missing RECORD with file_list_unavailable coverage note
+- Safety checks: regular files only, size caps (20MB hash, 1MB py AST), per-dist time limits
 """
 from __future__ import annotations
 
 import base64
-import csv
 import configparser
+import csv
 import hashlib
 import os
 import re
+import stat
 import sys
+import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,22 +44,77 @@ PTH_HIGH_KEYWORDS = {
 
 DISCLAIMER = "Static inspection of installed files only; a clean hunt does not mean the machine is clean."
 
+MAX_HASH_FILE_BYTES = 20 * 1024 * 1024  # 20 MB
+MAX_PY_SCAN_BYTES = 1 * 1024 * 1024     # 1 MB
+DIST_TIMEOUT_SECONDS = 10.0             # 10 s per distribution
 
-def sha256_of_file(file_path: Path) -> str:
+
+def is_regular_file(path: Path) -> bool:
+    """Return True only if path is a regular file (not directory, symlink, fifo, socket, device)."""
+    try:
+        # Use lstat to check file type without following symlinks into FIFOs/devices
+        st = os.lstat(path)
+        return stat.S_ISREG(st.st_mode)
+    except Exception:
+        return False
+
+
+def sha256_of_file(file_path: Path, max_bytes: int = MAX_HASH_FILE_BYTES) -> Tuple[str, Optional[str]]:
+    """Stream hash of a regular file up to max_bytes.
+    
+    Returns (sha256_hex, skip_note).
+    If file exceeds max_bytes, returns ('', 'skipped_too_large').
+    If file is not a regular file or cannot be opened, returns ('', 'skipped_not_regular_file').
+    """
+    if not is_regular_file(file_path):
+        return "", "skipped_not_regular_file"
+
+    try:
+        size = os.path.getsize(file_path)
+        if size > max_bytes:
+            return "", "skipped_too_large"
+    except Exception:
+        return "", "file_stat_failed"
+
     h = hashlib.sha256()
+    read_bytes = 0
     try:
         with open(file_path, "rb") as f:
             while chunk := f.read(65536):
+                read_bytes += len(chunk)
+                if read_bytes > max_bytes:
+                    return "", "skipped_too_large"
                 h.update(chunk)
-        return h.hexdigest().lower()
+        return h.hexdigest().lower(), None
     except Exception:
-        return ""
+        return "", "file_read_error"
 
 
-def urlsafe_b64_sha256(data: bytes) -> str:
+def urlsafe_b64_sha256_stream(file_path: Path, max_bytes: int = MAX_HASH_FILE_BYTES) -> Tuple[str, Optional[str]]:
     """Return urlsafe base64 sha256 without padding (as used in RECORD files)."""
-    digest = hashlib.sha256(data).digest()
-    return base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")
+    if not is_regular_file(file_path):
+        return "", "skipped_not_regular_file"
+
+    try:
+        size = os.path.getsize(file_path)
+        if size > max_bytes:
+            return "", "skipped_too_large"
+    except Exception:
+        return "", "file_stat_failed"
+
+    h = hashlib.sha256()
+    read_bytes = 0
+    try:
+        with open(file_path, "rb") as f:
+            while chunk := f.read(65536):
+                read_bytes += len(chunk)
+                if read_bytes > max_bytes:
+                    return "", "skipped_too_large"
+                h.update(chunk)
+        digest = h.digest()
+        return base64.urlsafe_b64encode(digest).decode("ascii").rstrip("="), None
+    except Exception:
+        return "", "file_read_error"
 
 
 def calculate_priority(severity: str, artifact: str, new_since_last: bool, allowlisted: bool) -> int:
@@ -88,14 +146,20 @@ def sanitize_path(path_str: str) -> str:
     return path_str
 
 
-def inspect_pth_files(root: Path) -> List[Dict[str, Any]]:
+def inspect_pth_files(root: Path) -> Tuple[List[Dict[str, Any]], List[str]]:
     """Inspect .pth files directly under root for executable lines."""
     items = []
+    coverage_notes = []
     try:
         for pth in root.glob("*.pth"):
-            if not pth.is_file():
+            if not is_regular_file(pth):
                 continue
-            sha = sha256_of_file(pth)
+            sha, skip_note = sha256_of_file(pth)
+            if skip_note:
+                coverage_notes.append(f"{pth}: {skip_note}")
+                if skip_note == "skipped_too_large":
+                    continue
+
             try:
                 content = pth.read_text(encoding="utf-8", errors="replace")
             except Exception:
@@ -120,19 +184,29 @@ def inspect_pth_files(root: Path) -> List[Dict[str, Any]]:
                     })
     except Exception:
         pass
-    return items
+    return items, coverage_notes
 
 
-def inspect_custom_startup_hooks(root: Path) -> List[Dict[str, Any]]:
+def inspect_custom_startup_hooks(root: Path) -> Tuple[List[Dict[str, Any]], List[str]]:
     """Inspect sitecustomize.py and usercustomize.py directly under root."""
     items = []
+    coverage_notes = []
     for name in ("sitecustomize.py", "usercustomize.py"):
         hook_path = root / name
-        if not hook_path.is_file():
+        if not is_regular_file(hook_path):
             continue
 
-        sha = sha256_of_file(hook_path)
+        sha, skip_note = sha256_of_file(hook_path)
+        if skip_note:
+            coverage_notes.append(f"{hook_path}: {skip_note}")
+            if skip_note == "skipped_too_large":
+                continue
+
         try:
+            sz = os.path.getsize(hook_path)
+            if sz > MAX_PY_SCAN_BYTES:
+                coverage_notes.append(f"{hook_path}: skipped_py_too_large ({sz} bytes)")
+                continue
             content = hook_path.read_text(encoding="utf-8", errors="replace")
         except Exception:
             continue
@@ -176,14 +250,14 @@ def inspect_custom_startup_hooks(root: Path) -> List[Dict[str, Any]]:
             "reason": reason,
             "evidence_snippet": content[:160],
         })
-    return items
+    return items, coverage_notes
 
 
 def find_top_level_packages(dist_dir: Path) -> Set[str]:
     """Identify top-level packages owned by distribution from top_level.txt or dist-info name."""
     top_levels = set()
     top_txt = dist_dir / "top_level.txt"
-    if top_txt.is_file():
+    if is_regular_file(top_txt):
         try:
             for line in top_txt.read_text(encoding="utf-8", errors="replace").splitlines():
                 t = line.strip()
@@ -192,7 +266,6 @@ def find_top_level_packages(dist_dir: Path) -> Set[str]:
         except Exception:
             pass
 
-    # From directory name (e.g. foo-1.0.dist-info -> foo)
     folder_name = dist_dir.name
     if ".dist-info" in folder_name:
         base = folder_name.split(".dist-info")[0]
@@ -206,23 +279,18 @@ def find_top_level_packages(dist_dir: Path) -> Set[str]:
     return top_levels
 
 
-def inspect_entry_points(dist_dir: Path, dist_name: str, dist_version: str, top_levels: Set[str]) -> List[Dict[str, Any]]:
-    """Check console_scripts and gui_scripts for entry points outside own package."""
-    items = []
-    ep_file = dist_dir / "entry_points.txt"
-    if not ep_file.is_file():
-        return items
+def get_entry_points_modules(ep_file: Path) -> Tuple[Set[str], List[Dict[str, Any]]]:
+    """Parse entry_points.txt and return targeted module names and raw items."""
+    targeted_modules: Set[str] = set()
+    raw_entries: List[Dict[str, Any]] = []
+    if not is_regular_file(ep_file):
+        return targeted_modules, raw_entries
 
-    sha = sha256_of_file(ep_file)
     cp = configparser.ConfigParser()
     try:
         cp.read(ep_file, encoding="utf-8")
     except Exception:
-        return items
-
-    normalized_top = {t.lower().replace("-", "_") for t in top_levels}
-    if dist_name:
-        normalized_top.add(dist_name.lower().replace("-", "_"))
+        return targeted_modules, raw_entries
 
     for section in ("console_scripts", "gui_scripts"):
         if not cp.has_section(section):
@@ -230,34 +298,40 @@ def inspect_entry_points(dist_dir: Path, dist_name: str, dist_version: str, top_
         for name, target in cp.items(section):
             # Target format: module:func or module
             mod_part = target.split(":")[0].strip()
-            top_mod = mod_part.split(".")[0].strip().lower().replace("-", "_")
-            if top_mod and top_mod not in normalized_top:
-                items.append({
-                    "dist": dist_name,
-                    "version": dist_version,
-                    "artifact": "entrypoint",
-                    "path": str(ep_file),
-                    "sha256": sha,
-                    "severity": "MEDIUM",
-                    "reason": f"Entry point '{name} = {target}' targets '{top_mod}' outside package ownership",
-                    "evidence_snippet": f"[{section}] {name} = {target}",
-                })
-    return items
+            if mod_part:
+                targeted_modules.add(mod_part)
+            raw_entries.append({
+                "section": section,
+                "name": name,
+                "target": target,
+                "module": mod_part,
+            })
+    return targeted_modules, raw_entries
 
 
 def inspect_distribution(
     root: Path,
     dist_info: Dict[str, Any],
+    timeout_sec: float = DIST_TIMEOUT_SECONDS,
 ) -> Tuple[List[Dict[str, Any]], Optional[str], List[str]]:
     """Inspect an individual distribution:
-    - Tamper check (RECORD)
-    - File list resolution (RECORD, installed-files.txt, top_level.txt, directory listing)
+    - Checks regular files only (no FIFOs or devices)
+    - Tamper check (RECORD), skipping bin/ and Scripts/, remaining at MEDIUM
     - Entry points outside own package
-    - Per-distribution scan of install-relevant files (max 200)
+    - Scan only install-relevant files:
+      * top-level modules
+      * __init__.py and __main__.py of the package
+      * leftover setup.py
+      * modules targeted by console_scripts / gui_scripts
+    - Runs decide() once per file. Emit HIGH only for strong signals within that single file,
+      reporting that file's path and hash. Other findings downgraded to LOW.
+    - Time limit per distribution (recording coverage error instead of hanging).
     """
     items: List[Dict[str, Any]] = []
     coverage_problem: Optional[str] = None
     errors: List[str] = []
+
+    start_time = time.monotonic()
 
     dist_name = dist_info.get("name") or ""
     dist_version = dist_info.get("version") or ""
@@ -269,65 +343,111 @@ def inspect_distribution(
 
     top_levels = find_top_level_packages(meta_dir)
 
-    # 1. Entry point check
-    items.extend(inspect_entry_points(meta_dir, dist_name, dist_version, top_levels))
+    # 1. Entry point check and targeted modules
+    ep_file = meta_dir / "entry_points.txt"
+    targeted_ep_modules, raw_ep_entries = get_entry_points_modules(ep_file)
 
-    # 2. File list & tamper check
+    if raw_ep_entries:
+        ep_sha, ep_skip = sha256_of_file(ep_file)
+        if ep_skip:
+            errors.append(f"{ep_file}: {ep_skip}")
+        normalized_top = {t.lower().replace("-", "_") for t in top_levels}
+        if dist_name:
+            normalized_top.add(dist_name.lower().replace("-", "_"))
+
+        for ep in raw_ep_entries:
+            mod_part = ep["module"]
+            top_mod = mod_part.split(".")[0].strip().lower().replace("-", "_")
+            if top_mod and top_mod not in normalized_top:
+                items.append({
+                    "dist": dist_name,
+                    "version": dist_version,
+                    "artifact": "entrypoint",
+                    "path": str(ep_file),
+                    "sha256": ep_sha,
+                    "severity": "MEDIUM",
+                    "reason": f"Entry point '{ep['name']} = {ep['target']}' targets '{top_mod}' outside package ownership",
+                    "evidence_snippet": f"[{ep['section']}] {ep['name']} = {ep['target']}",
+                })
+
+    # 2. File list resolution & tamper check
     record_file = meta_dir / "RECORD"
     installed_files_txt = meta_dir / "installed-files.txt"
-    files_to_scan: List[Path] = []
+    all_dist_py_files: List[Path] = []
 
-    if record_file.is_file():
-        # Check hashes in RECORD
+    if is_regular_file(record_file):
         try:
             with record_file.open("r", encoding="utf-8", errors="replace") as rf:
                 reader = csv.reader(rf)
                 for row in reader:
+                    # Timeout check during RECORD parsing
+                    if (time.monotonic() - start_time) > timeout_sec:
+                        errors.append(f"{dist_name}: inspection_timed_out (exceeded {timeout_sec}s)")
+                        return items, coverage_problem, errors
+
                     if not row:
                         continue
                     rel_p = row[0].strip()
                     if not rel_p or rel_p.endswith(".dist-info/RECORD"):
                         continue
-                    
+
+                    # Normalize path separators
+                    normalized_rel = rel_p.replace("\\", "/").strip("/")
+
+                    # Tamper check: skip entries under bin/ and Scripts/
+                    is_bin_script = (
+                        normalized_rel.startswith("bin/")
+                        or normalized_rel.startswith("Scripts/")
+                        or "/bin/" in normalized_rel
+                        or "/Scripts/" in normalized_rel
+                    )
+
                     target_p = (meta_dir.parent / rel_p).resolve()
                     if not target_p.exists():
                         coverage_problem = f"Missing file listed in RECORD: {rel_p}"
                         continue
 
-                    # Check tamper hash if provided
+                    if not is_regular_file(target_p):
+                        errors.append(f"{target_p}: skipped_not_regular_file")
+                        continue
+
                     if len(row) >= 2 and row[1]:
                         expected_hash_entry = row[1].strip()
                         if expected_hash_entry.startswith("sha256="):
-                            exp_sha = expected_hash_entry.split("sha256=")[1].strip()
-                            try:
-                                file_bytes = target_p.read_bytes()
-                                actual_sha = urlsafe_b64_sha256(file_bytes)
-                                if actual_sha != exp_sha:
+                            if not is_bin_script:
+                                exp_sha = expected_hash_entry.split("sha256=")[1].strip()
+                                actual_sha, skip_note = urlsafe_b64_sha256_stream(target_p)
+                                if skip_note:
+                                    errors.append(f"{target_p}: {skip_note}")
+                                elif actual_sha != exp_sha:
+                                    f_sha, _ = sha256_of_file(target_p)
                                     items.append({
                                         "dist": dist_name,
                                         "version": dist_version,
                                         "artifact": "tamper",
                                         "path": str(target_p),
-                                        "sha256": hashlib.sha256(file_bytes).hexdigest().lower(),
+                                        "sha256": f_sha,
                                         "severity": "MEDIUM",
-                                        "reason": "File modified after install (hash mismatch with RECORD)",
+                                        "reason": "File modified after install (hash mismatch with RECORD; non-script regular file)",
                                         "evidence_snippet": f"Expected sha256={exp_sha}, got {actual_sha}",
                                     })
-                            except Exception as e:
-                                errors.append(f"Cannot read {target_p} for tamper check: {e}")
 
                     if target_p.suffix == ".py":
-                        files_to_scan.append(target_p)
+                        all_dist_py_files.append(target_p)
         except Exception as e:
             errors.append(f"Failed to read RECORD for {dist_name}: {e}")
-    elif installed_files_txt.is_file():
+    elif is_regular_file(installed_files_txt):
         try:
             for line in installed_files_txt.read_text(encoding="utf-8", errors="replace").splitlines():
+                if (time.monotonic() - start_time) > timeout_sec:
+                    errors.append(f"{dist_name}: inspection_timed_out (exceeded {timeout_sec}s)")
+                    return items, coverage_problem, errors
+
                 line = line.strip()
                 if line:
                     p = (meta_dir / line).resolve()
-                    if p.is_file() and p.suffix == ".py":
-                        files_to_scan.append(p)
+                    if is_regular_file(p) and p.suffix == ".py":
+                        all_dist_py_files.append(p)
         except Exception:
             pass
     else:
@@ -339,69 +459,108 @@ def inspect_distribution(
             if cand_dir.is_dir():
                 found_any = True
                 for p in cand_dir.rglob("*.py"):
-                    if p.is_file():
-                        files_to_scan.append(p)
-            elif cand_py.is_file():
+                    if is_regular_file(p):
+                        all_dist_py_files.append(p)
+            elif is_regular_file(cand_py):
                 found_any = True
-                files_to_scan.append(cand_py)
+                all_dist_py_files.append(cand_py)
 
         if not found_any:
             coverage_problem = "file_list_unavailable"
 
-    # 3. Per-distribution scan of install-relevant files (max 200)
-    # Install relevant: top-level modules, __init__.py, __main__.py, etc.
+    # 3. Filter to install-relevant files only:
+    # - Top-level modules (parent == root or immediate root file)
+    # - __init__.py and __main__.py of the package
+    # - Leftover setup.py
+    # - Modules that console_scripts and gui_scripts entry points target
+    # Build relative paths for matching targeted entry points
     relevant_files: List[Path] = []
-    for p in files_to_scan:
-        name = p.name
-        if name in ("__init__.py", "__main__.py", "setup.py") or p.parent == root:
-            relevant_files.append(p)
-        elif len(relevant_files) < 200:
+    
+    # Precompute targeted relative file paths (e.g. "pkg/cli.py" for module "pkg.cli")
+    targeted_rel_paths = set()
+    for mod in targeted_ep_modules:
+        mod_rel = mod.replace(".", "/") + ".py"
+        targeted_rel_paths.add(mod_rel.lower())
+        targeted_rel_paths.add(mod.replace(".", "/") + "/__init__.py".lower())
+
+    for p in all_dist_py_files:
+        if not is_regular_file(p):
+            continue
+        p_name = p.name
+        is_relevant = False
+
+        if p_name in ("__init__.py", "__main__.py", "setup.py"):
+            is_relevant = True
+        elif p.parent == root:
+            # Top-level module
+            is_relevant = True
+        else:
+            # Check if this matches a targeted entry point module
+            try:
+                rel_to_root = str(p.relative_to(root)).replace("\\", "/").lower()
+                if rel_to_root in targeted_rel_paths or any(rel_to_root.endswith("/" + target) for target in targeted_rel_paths):
+                    is_relevant = True
+            except Exception:
+                pass
+
+        if is_relevant and p not in relevant_files:
             relevant_files.append(p)
 
-    relevant_files = relevant_files[:200]
-
-    all_dist_findings = []
+    # 4. Per-file AST scan and per-file decide()
     for fpath in relevant_files:
+        if (time.monotonic() - start_time) > timeout_sec:
+            errors.append(f"{dist_name}: inspection_timed_out (exceeded {timeout_sec}s)")
+            break
+
         try:
+            sz = os.path.getsize(fpath)
+            if sz > MAX_PY_SCAN_BYTES:
+                errors.append(f"{fpath}: skipped_py_too_large ({sz} bytes)")
+                continue
+
             code = fpath.read_text(encoding="utf-8", errors="replace")
             f_findings, parse_err = analyze_source(code, path=fpath.name)
-            if f_findings:
-                for f in f_findings:
-                    f["file_obj_path"] = str(fpath)
-                    all_dist_findings.append(f)
-        except Exception:
-            pass
+            if parse_err:
+                errors.append(f"{fpath}: parse_error ({parse_err})")
+                continue
 
-    if all_dist_findings:
-        outcome, strong, review_recommended = decide(all_dist_findings)
-        if strong:
-            for s in strong:
-                # Find finding corresponding to this reason
-                first_f = all_dist_findings[0]
-                p_path = first_f.get("file_obj_path", str(relevant_files[0]))
+            if not f_findings:
+                continue
+
+            # Run decide() strictly on THIS file's findings alone!
+            outcome, strong, review_rec = decide(f_findings)
+            f_sha, skip_note = sha256_of_file(fpath)
+            if skip_note:
+                errors.append(f"{fpath}: {skip_note}")
+
+            if strong:
+                # Strong signal found within a single file -> HIGH
+                for s in strong:
+                    items.append({
+                        "dist": dist_name,
+                        "version": dist_version,
+                        "artifact": "dist_scan",
+                        "path": str(fpath),
+                        "sha256": f_sha,
+                        "severity": "HIGH",
+                        "reason": f"File {fpath.name} contains strong signal {s}",
+                        "evidence_snippet": f"Strong signal triggered: {s}",
+                    })
+            elif review_rec or f_findings:
+                # Any other finding downgraded to LOW
+                first_f = f_findings[0]
                 items.append({
                     "dist": dist_name,
                     "version": dist_version,
                     "artifact": "dist_scan",
-                    "path": p_path,
-                    "sha256": sha256_of_file(Path(p_path)),
-                    "severity": "HIGH",
-                    "reason": f"Distribution contains strong signal {s}",
-                    "evidence_snippet": f"Strong signal triggered: {s}",
+                    "path": str(fpath),
+                    "sha256": f_sha,
+                    "severity": "LOW",
+                    "reason": f"File {fpath.name} findings downgraded to LOW ({first_f.get('indicator')})",
+                    "evidence_snippet": f"Indicator: {first_f.get('indicator')}",
                 })
-        elif review_recommended:
-            first_f = all_dist_findings[0]
-            p_path = first_f.get("file_obj_path", str(relevant_files[0]))
-            items.append({
-                "dist": dist_name,
-                "version": dist_version,
-                "artifact": "dist_scan",
-                "path": p_path,
-                "sha256": sha256_of_file(Path(p_path)),
-                "severity": "LOW",
-                "reason": "Distribution inspection triggered review_recommended",
-                "evidence_snippet": f"Indicators: {first_f.get('indicator')}",
-            })
+        except Exception as e:
+            errors.append(f"Error scanning {fpath}: {e}")
 
     return items, coverage_problem, errors
 
@@ -410,6 +569,7 @@ def run_hunt(
     extra_site_packages: Optional[List[str | Path]] = None,
     db_path: Optional[str | Path] = None,
     include_system_defaults: bool = True,
+    dist_timeout: float = DIST_TIMEOUT_SECONDS,
 ) -> Dict[str, Any]:
     """Execute hunter scan across environment roots."""
     scan_id = f"hunt_{uuid.uuid4().hex[:12]}"
@@ -434,15 +594,21 @@ def run_hunt(
             continue
 
         # 1. .pth files
-        all_raw_items.extend(inspect_pth_files(root_path))
+        pth_items, pth_notes = inspect_pth_files(root_path)
+        all_raw_items.extend(pth_items)
+        if pth_notes:
+            coverage_errors.extend(pth_notes)
 
         # 2. startup hooks
-        all_raw_items.extend(inspect_custom_startup_hooks(root_path))
+        startup_items, startup_notes = inspect_custom_startup_hooks(root_path)
+        all_raw_items.extend(startup_items)
+        if startup_notes:
+            coverage_errors.extend(startup_notes)
 
         # 3. Distributions
         for dist in iter_distributions(root_path):
             total_distributions += 1
-            dist_items, cov_prob, errs = inspect_distribution(root_path, dist)
+            dist_items, cov_prob, errs = inspect_distribution(root_path, dist, timeout_sec=dist_timeout)
             all_raw_items.extend(dist_items)
             if cov_prob:
                 if cov_prob == "file_list_unavailable":

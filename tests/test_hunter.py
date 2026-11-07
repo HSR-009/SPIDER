@@ -1,4 +1,4 @@
-"""Tests for spider/hunter (brief section 5.6).
+"""Tests for spider/hunter (brief section 5.6 and Day 5 corrections).
 
 Planted-artifact tests:
 (a) evil.pth containing import os; os.system("id") -> HIGH
@@ -12,6 +12,14 @@ Assert (a)(b)(c) flagged with correct severity, (d) not, (e) records coverage pr
 Assert second run reports 0 "new".
 Adding allowlist hash removes (a) / sets priority to 0.
 Assert no module from the fake tree is imported (sys.modules unchanged).
+
+Safety & noise tests:
+- Planted FIFO test (skipped on Windows)
+- Large file (>20MB) skipped for hashing with skipped_too_large note
+- Large .py (>1MB) skipped for AST analysis with skipped_py_too_large note
+- Cross-file signal separation: signals in two separate files must NOT combine into a multi-finding strong signal
+- Script in bin/ or Scripts/ modified after install is NOT flagged as tamper
+- Strong signal in sitecustomize.py is still HIGH
 """
 import base64
 import copy
@@ -54,14 +62,13 @@ class TestHunter(unittest.TestCase):
             # (a) evil.pth with executable line
             evil_pth = site_dir / "evil.pth"
             evil_pth.write_text('import os; os.system("id")\n', encoding="utf-8")
-            evil_pth_sha = sha256_of_file(evil_pth)
+            evil_pth_sha, _ = sha256_of_file(evil_pth)
 
             # (b) sitecustomize.py with exec
             site_custom = site_dir / "sitecustomize.py"
             site_custom.write_text('exec("x = 1")\n', encoding="utf-8")
 
             # (c) dist whose entry_points.txt console script points outside own package
-            # e.g. dist name = mypkg, top_level = mypkg, entry point points to otherpkg.x:main
             dist_c = site_dir / "pkg_c-1.0.dist-info"
             dist_c.mkdir()
             (dist_c / "METADATA").write_text("Metadata-Version: 2.1\nName: pkg-c\nVersion: 1.0\n", encoding="utf-8")
@@ -115,7 +122,7 @@ class TestHunter(unittest.TestCase):
             self.assertEqual(pth_items[0]["severity"], "HIGH")
             self.assertTrue(pth_items[0]["new_since_last"])
 
-            # (b) sitecustomize.py should be flagged
+            # (b) sitecustomize.py should be flagged (exec -> strong signal S2/S5 or finding -> HIGH)
             custom_items = [it for it in items1 if it["artifact"] == "startup"]
             self.assertEqual(len(custom_items), 1)
             self.assertIn(custom_items[0]["severity"], ("HIGH", "MEDIUM"))
@@ -135,7 +142,6 @@ class TestHunter(unittest.TestCase):
             self.assertTrue(any("pkg-e" in err or "missing.py" in err for err in cov_errors))
 
             # (f) dist f without RECORD falls back to directory listing (no crash)
-            # apt_pkg has top_level.txt and files on disk
             self.assertNotIn("apt-pkg", res1["coverage"]["dists_without_file_list"])
 
             # Assert all items in run 1 had new_since_last = True
@@ -159,6 +165,149 @@ class TestHunter(unittest.TestCase):
             pth_item3 = next(it for it in items3 if it["artifact"] == "pth")
             self.assertTrue(pth_item3["allowlisted"])
             self.assertEqual(pth_item3["priority"], 0)
+
+    def test_planted_fifo_safety(self):
+        if sys.platform == "win32":
+            self.skipTest("FIFOs (mkfifo) not supported on Windows")
+
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            fifo_path = site_dir / "evil.fifo"
+            os.mkfifo(fifo_path)
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            # Must finish immediately and not hang or open fifo
+            self.assertIsNotNone(res)
+
+    def test_large_file_safety(self):
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            # Create large .pth file (>20MB) sparsely
+            large_pth = site_dir / "huge.pth"
+            with open(large_pth, "wb") as f:
+                f.seek(21 * 1024 * 1024)
+                f.write(b"import os\n")
+
+            # Create large .py file in a distribution (>1MB)
+            dist_l = site_dir / "large_pkg-1.0.dist-info"
+            dist_l.mkdir()
+            (dist_l / "METADATA").write_text("Metadata-Version: 2.1\nName: large-pkg\nVersion: 1.0\n", encoding="utf-8")
+            (dist_l / "top_level.txt").write_text("large_pkg\n", encoding="utf-8")
+            (dist_l / "RECORD").write_text("large_pkg/__init__.py,,0\n", encoding="utf-8")
+            lpkg_dir = site_dir / "large_pkg"
+            lpkg_dir.mkdir()
+            large_py = lpkg_dir / "__init__.py"
+            with open(large_py, "wb") as f:
+                f.seek(2 * 1024 * 1024)
+                f.write(b"print(1)\n")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            cov_errors = res["coverage"]["errors"]
+            # Assert large files triggered coverage notes
+            self.assertTrue(any("skipped_too_large" in e for e in cov_errors))
+            self.assertTrue(any("skipped_py_too_large" in e for e in cov_errors))
+
+    def test_per_file_signal_isolation_and_downgrade(self):
+        """Signals across different files must NOT combine into a multi-finding strong signal.
+        Any non-strong finding must be downgraded to LOW.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist = site_dir / "split_pkg-1.0.dist-info"
+            dist.mkdir()
+            (dist / "METADATA").write_text("Metadata-Version: 2.1\nName: split-pkg\nVersion: 1.0\n", encoding="utf-8")
+            (dist / "top_level.txt").write_text("split_pkg\n", encoding="utf-8")
+            (dist / "RECORD").write_text("split_pkg/__init__.py,,0\nsplit_pkg/__main__.py,,0\n", encoding="utf-8")
+            pkg_dir = site_dir / "split_pkg"
+            pkg_dir.mkdir()
+
+            # File 1 has os.environ (Credential)
+            (pkg_dir / "__init__.py").write_text("import os\nx = os.environ['FOO']\n", encoding="utf-8")
+            # File 2 has requests.post (Network)
+            # In verdict v2, os.environ + requests.post across a package would trigger S4_env_post.
+            # But per-file inspection must NOT combine them!
+            (pkg_dir / "__main__.py").write_text("import requests\nrequests.post('http://example.com')\n", encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            dist_items = [it for it in res["items"] if it.get("dist") == "split-pkg"]
+
+            # Neither file alone has a strong signal (S4 requires BOTH in the same file).
+            # Therefore, NO item should be HIGH!
+            high_items = [it for it in dist_items if it.get("severity") == "HIGH"]
+            self.assertEqual(high_items, [], f"Signals combined across files: {high_items}")
+
+            # Findings in both files must be downgraded to LOW
+            low_items = [it for it in dist_items if it.get("severity") == "LOW"]
+            self.assertEqual(len(low_items), 2)
+            for it in low_items:
+                self.assertIn("downgraded to LOW", it["reason"])
+
+    def test_tamper_skip_bin_and_scripts(self):
+        """Tamper check must skip bin/ and Scripts/ (installer rewrites) and keep rest at MEDIUM."""
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist = site_dir / "tamper_pkg-1.0.dist-info"
+            dist.mkdir()
+            (dist / "METADATA").write_text("Metadata-Version: 2.1\nName: tamper-pkg\nVersion: 1.0\n", encoding="utf-8")
+            (dist / "top_level.txt").write_text("tamper_pkg\n", encoding="utf-8")
+            
+            # Setup files
+            bin_dir = site_dir.parent / "bin"
+            bin_dir.mkdir(parents=True, exist_ok=True)
+            bin_file = bin_dir / "script"
+            bin_file.write_bytes(b"#!/usr/bin/python\nnew code\n")
+
+            data_dir = site_dir / "tamper_pkg"
+            data_dir.mkdir()
+            data_file = data_dir / "config.json"
+            data_file.write_bytes(b"modified config\n")
+
+            # RECORD lists original hashes that don't match current content
+            rec_content = (
+                "../../../bin/script,sha256=fake_hash_bin,10\n"
+                "tamper_pkg/config.json,sha256=fake_hash_data,10\n"
+            )
+            (dist / "RECORD").write_text(rec_content, encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            tamper_items = [it for it in res["items"] if it.get("artifact") == "tamper"]
+
+            # bin/ script must NOT be flagged
+            self.assertFalse(any("bin/script" in it.get("path", "").replace("\\", "/") for it in tamper_items))
+
+            # Non-script regular file modified after install must be flagged at MEDIUM
+            self.assertEqual(len(tamper_items), 1)
+            self.assertEqual(tamper_items[0]["severity"], "MEDIUM")
+            self.assertIn("non-script regular file", tamper_items[0]["reason"])
+
+    def test_sitecustomize_strong_signal_is_high(self):
+        """Strong signal in sitecustomize.py (e.g. exec + base64.b64decode) must be HIGH."""
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            site_custom = site_dir / "sitecustomize.py"
+            # S5_decode_exec: base64.b64decode + exec
+            site_custom.write_text("import base64\nexec(base64.b64decode(b'eA=='))\n", encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            custom_items = [it for it in res["items"] if it["artifact"] == "startup"]
+            self.assertEqual(len(custom_items), 1)
+            self.assertEqual(custom_items[0]["severity"], "HIGH")
+            self.assertIn("strong signals", custom_items[0]["reason"])
 
 
 if __name__ == "__main__":
