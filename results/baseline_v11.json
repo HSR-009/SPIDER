@@ -1,0 +1,1136 @@
+{
+  "dataset_version": "v1.1",
+  "protocol": "5-fold StratifiedGroupKFold on development set plus frozen grouped holdout",
+  "positive_label": 1,
+  "group_column": "group_id",
+  "rows_total": 4948,
+  "groups_total": 2650,
+  "rows_development": 3957,
+  "groups_development": 2119,
+  "rows_frozen_holdout": 991,
+  "groups_frozen_holdout": 531,
+  "development_labels": {
+    "benign": 2327,
+    "malicious": 1630
+  },
+  "holdout_labels": {
+    "benign": 582,
+    "malicious": 409
+  },
+  "experiments": {
+    "behavior_without_size": {
+      "random_forest": {
+        "feature_count": 54,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__setuptools.setup.cmdclass",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__importlib.import_module(dynamic)",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__requests.post",
+          "indicator_present__install_command_override",
+          "indicator_present__subprocess.check_output",
+          "indicator_present__eval",
+          "indicator_present____import__(dynamic)",
+          "indicator_present__socket",
+          "indicator_present__os.system",
+          "indicator_present__compile",
+          "indicator_present__subprocess.check_call",
+          "indicator_present__subprocess.call",
+          "indicator_present__join(chr)",
+          "indicator_present__.env",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__bytes.fromhex",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__custom_build_backend",
+          "indicator_present__getattr.dynamic",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__os.popen",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__requests.request",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.encodestring"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "accuracy": {
+              "mean": 0.8188030749977653,
+              "std": 0.008714507216587439
+            },
+            "precision": {
+              "mean": 0.8588231347890432,
+              "std": 0.03177006653744302
+            },
+            "recall": {
+              "mean": 0.6730061349693252,
+              "std": 0.04848178674878613
+            },
+            "f1": {
+              "mean": 0.7530273389166907,
+              "std": 0.02011889544094995
+            },
+            "pr_auc": {
+              "mean": 0.8539316341991624,
+              "std": 0.019807256593812293
+            },
+            "roc_auc": {
+              "mean": 0.8784326185353706,
+              "std": 0.021949558232044607
+            },
+            "fpr": {
+              "mean": 0.07907609949697725,
+              "std": 0.025316900444232335
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2143,
+            "fp": 184,
+            "fn": 533,
+            "tp": 1097
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "sample_count": 991,
+          "benign_count": 582,
+          "malicious_count": 409,
+          "accuracy": 0.8304742684157417,
+          "precision": 0.8685015290519877,
+          "recall": 0.6943765281173594,
+          "f1": 0.7717391304347826,
+          "pr_auc": 0.8745184684399354,
+          "roc_auc": 0.8988249775245969,
+          "fpr": 0.07388316151202749,
+          "tn": 539,
+          "fp": 43,
+          "fn": 125,
+          "tp": 284
+        },
+        "size_stratified": {
+          "1-5_files": {
+            "threshold": 0.5,
+            "sample_count": 497,
+            "benign_count": 178,
+            "malicious_count": 319,
+            "accuracy": 0.7987927565392354,
+            "precision": 0.9469387755102041,
+            "recall": 0.7272727272727273,
+            "f1": 0.8226950354609929,
+            "pr_auc": 0.9322358687539787,
+            "roc_auc": 0.8965869465675743,
+            "fpr": 0.07303370786516854,
+            "tn": 165,
+            "fp": 13,
+            "fn": 87,
+            "tp": 232
+          },
+          "6-20_files": {
+            "threshold": 0.5,
+            "sample_count": 199,
+            "benign_count": 164,
+            "malicious_count": 35,
+            "accuracy": 0.8994974874371859,
+            "precision": 0.6744186046511628,
+            "recall": 0.8285714285714286,
+            "f1": 0.7435897435897436,
+            "pr_auc": 0.7736748966497298,
+            "roc_auc": 0.9042682926829267,
+            "fpr": 0.08536585365853659,
+            "tn": 150,
+            "fp": 14,
+            "fn": 6,
+            "tp": 29
+          },
+          ">20_files": {
+            "threshold": 0.5,
+            "sample_count": 270,
+            "benign_count": 231,
+            "malicious_count": 39,
+            "accuracy": 0.8814814814814815,
+            "precision": 0.5897435897435898,
+            "recall": 0.5897435897435898,
+            "f1": 0.5897435897435898,
+            "pr_auc": 0.6307506411895955,
+            "roc_auc": 0.8958818958818959,
+            "fpr": 0.06926406926406926,
+            "tn": 215,
+            "fp": 16,
+            "fn": 16,
+            "tp": 23
+          },
+          "0_files": {
+            "threshold": 0.5,
+            "sample_count": 25,
+            "benign_count": 9,
+            "malicious_count": 16,
+            "accuracy": 0.36,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.6956521739130435,
+            "roc_auc": 0.6111111111111112,
+            "fpr": 0.0,
+            "tn": 9,
+            "fp": 0,
+            "fn": 16,
+            "tp": 0
+          },
+          "all_packages": {
+            "threshold": 0.5,
+            "sample_count": 991,
+            "benign_count": 582,
+            "malicious_count": 409,
+            "accuracy": 0.8304742684157417,
+            "precision": 0.8685015290519877,
+            "recall": 0.6943765281173594,
+            "f1": 0.7717391304347826,
+            "pr_auc": 0.8745184684399354,
+            "roc_auc": 0.8988249775245969,
+            "fpr": 0.07388316151202749,
+            "tn": 539,
+            "fp": 43,
+            "fn": 125,
+            "tp": 284
+          }
+        },
+        "model_path": "Person_B\\models\\saved\\random_forest_behavior_without_size_v11.joblib"
+      },
+      "xgboost": {
+        "feature_count": 54,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__setuptools.setup.cmdclass",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__importlib.import_module(dynamic)",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__requests.post",
+          "indicator_present__install_command_override",
+          "indicator_present__subprocess.check_output",
+          "indicator_present__eval",
+          "indicator_present____import__(dynamic)",
+          "indicator_present__socket",
+          "indicator_present__os.system",
+          "indicator_present__compile",
+          "indicator_present__subprocess.check_call",
+          "indicator_present__subprocess.call",
+          "indicator_present__join(chr)",
+          "indicator_present__.env",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__bytes.fromhex",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__custom_build_backend",
+          "indicator_present__getattr.dynamic",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__os.popen",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__requests.request",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.encodestring"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "accuracy": {
+              "mean": 0.8241070630451162,
+              "std": 0.018746918125202256
+            },
+            "precision": {
+              "mean": 0.8530754067675282,
+              "std": 0.035395888742222326
+            },
+            "recall": {
+              "mean": 0.6938650306748466,
+              "std": 0.04329393561810392
+            },
+            "f1": {
+              "mean": 0.7643176755888901,
+              "std": 0.028051838317047887
+            },
+            "pr_auc": {
+              "mean": 0.8628597741368165,
+              "std": 0.02334536210013986
+            },
+            "roc_auc": {
+              "mean": 0.883301166434082,
+              "std": 0.026515172102916904
+            },
+            "fpr": {
+              "mean": 0.08466011352623563,
+              "std": 0.024846456842686798
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2130,
+            "fp": 197,
+            "fn": 499,
+            "tp": 1131
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "sample_count": 991,
+          "benign_count": 582,
+          "malicious_count": 409,
+          "accuracy": 0.8203834510595358,
+          "precision": 0.8575851393188855,
+          "recall": 0.6772616136919315,
+          "f1": 0.7568306010928961,
+          "pr_auc": 0.8468369983892453,
+          "roc_auc": 0.8661453213352491,
+          "fpr": 0.07903780068728522,
+          "tn": 536,
+          "fp": 46,
+          "fn": 132,
+          "tp": 277
+        },
+        "size_stratified": {
+          "1-5_files": {
+            "threshold": 0.5,
+            "sample_count": 497,
+            "benign_count": 178,
+            "malicious_count": 319,
+            "accuracy": 0.8169014084507042,
+            "precision": 0.9488188976377953,
+            "recall": 0.7554858934169278,
+            "f1": 0.8411867364746946,
+            "pr_auc": 0.9347328065791383,
+            "roc_auc": 0.896639780212039,
+            "fpr": 0.07303370786516854,
+            "tn": 165,
+            "fp": 13,
+            "fn": 78,
+            "tp": 241
+          },
+          "6-20_files": {
+            "threshold": 0.5,
+            "sample_count": 199,
+            "benign_count": 164,
+            "malicious_count": 35,
+            "accuracy": 0.8894472361809045,
+            "precision": 0.6326530612244898,
+            "recall": 0.8857142857142857,
+            "f1": 0.7380952380952381,
+            "pr_auc": 0.798856659837605,
+            "roc_auc": 0.9110627177700348,
+            "fpr": 0.10975609756097561,
+            "tn": 146,
+            "fp": 18,
+            "fn": 4,
+            "tp": 31
+          },
+          ">20_files": {
+            "threshold": 0.5,
+            "sample_count": 270,
+            "benign_count": 231,
+            "malicious_count": 39,
+            "accuracy": 0.8185185185185185,
+            "precision": 0.25,
+            "recall": 0.1282051282051282,
+            "f1": 0.1694915254237288,
+            "pr_auc": 0.28182779628698046,
+            "roc_auc": 0.6716616716616717,
+            "fpr": 0.06493506493506493,
+            "tn": 216,
+            "fp": 15,
+            "fn": 34,
+            "tp": 5
+          },
+          "0_files": {
+            "threshold": 0.5,
+            "sample_count": 25,
+            "benign_count": 9,
+            "malicious_count": 16,
+            "accuracy": 0.36,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.6956521739130435,
+            "roc_auc": 0.6111111111111112,
+            "fpr": 0.0,
+            "tn": 9,
+            "fp": 0,
+            "fn": 16,
+            "tp": 0
+          },
+          "all_packages": {
+            "threshold": 0.5,
+            "sample_count": 991,
+            "benign_count": 582,
+            "malicious_count": 409,
+            "accuracy": 0.8203834510595358,
+            "precision": 0.8575851393188855,
+            "recall": 0.6772616136919315,
+            "f1": 0.7568306010928961,
+            "pr_auc": 0.8468369983892453,
+            "roc_auc": 0.8661453213352491,
+            "fpr": 0.07903780068728522,
+            "tn": 536,
+            "fp": 46,
+            "fn": 132,
+            "tp": 277
+          }
+        },
+        "model_path": "Person_B\\models\\saved\\xgboost_behavior_without_size_v11.joblib"
+      }
+    },
+    "behavior_with_size": {
+      "random_forest": {
+        "feature_count": 55,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__setuptools.setup.cmdclass",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__importlib.import_module(dynamic)",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__requests.post",
+          "indicator_present__install_command_override",
+          "indicator_present__subprocess.check_output",
+          "indicator_present__eval",
+          "indicator_present____import__(dynamic)",
+          "indicator_present__socket",
+          "indicator_present__os.system",
+          "indicator_present__compile",
+          "indicator_present__subprocess.check_call",
+          "indicator_present__subprocess.call",
+          "indicator_present__join(chr)",
+          "indicator_present__.env",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__bytes.fromhex",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__custom_build_backend",
+          "indicator_present__getattr.dynamic",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__os.popen",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__requests.request",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.encodestring",
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "accuracy": {
+              "mean": 0.856707083476995,
+              "std": 0.013722457551004942
+            },
+            "precision": {
+              "mean": 0.8495195459138369,
+              "std": 0.016010906632063556
+            },
+            "recall": {
+              "mean": 0.7932515337423311,
+              "std": 0.044536666043881054
+            },
+            "f1": {
+              "mean": 0.8197017980820774,
+              "std": 0.021898532532217716
+            },
+            "pr_auc": {
+              "mean": 0.9131838661219787,
+              "std": 0.013939902148789351
+            },
+            "roc_auc": {
+              "mean": 0.9238329090751056,
+              "std": 0.01845589375688126
+            },
+            "fpr": {
+              "mean": 0.09884258618302645,
+              "std": 0.015436815807546989
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2097,
+            "fp": 230,
+            "fn": 337,
+            "tp": 1293
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "sample_count": 991,
+          "benign_count": 582,
+          "malicious_count": 409,
+          "accuracy": 0.8476286579212916,
+          "precision": 0.8664772727272727,
+          "recall": 0.7457212713936431,
+          "f1": 0.8015768725361366,
+          "pr_auc": 0.906411801740815,
+          "roc_auc": 0.9218129038220788,
+          "fpr": 0.08075601374570447,
+          "tn": 535,
+          "fp": 47,
+          "fn": 104,
+          "tp": 305
+        },
+        "size_stratified": {
+          "1-5_files": {
+            "threshold": 0.5,
+            "sample_count": 497,
+            "benign_count": 178,
+            "malicious_count": 319,
+            "accuracy": 0.8269617706237424,
+            "precision": 0.8606811145510835,
+            "recall": 0.8714733542319749,
+            "f1": 0.8660436137071651,
+            "pr_auc": 0.9475608607795156,
+            "roc_auc": 0.9042918530520235,
+            "fpr": 0.25280898876404495,
+            "tn": 133,
+            "fp": 45,
+            "fn": 41,
+            "tp": 278
+          },
+          "6-20_files": {
+            "threshold": 0.5,
+            "sample_count": 199,
+            "benign_count": 164,
+            "malicious_count": 35,
+            "accuracy": 0.9346733668341709,
+            "precision": 0.9230769230769231,
+            "recall": 0.6857142857142857,
+            "f1": 0.7868852459016393,
+            "pr_auc": 0.8834259127116268,
+            "roc_auc": 0.9554006968641114,
+            "fpr": 0.012195121951219513,
+            "tn": 162,
+            "fp": 2,
+            "fn": 11,
+            "tp": 24
+          },
+          ">20_files": {
+            "threshold": 0.5,
+            "sample_count": 270,
+            "benign_count": 231,
+            "malicious_count": 39,
+            "accuracy": 0.8666666666666667,
+            "precision": 1.0,
+            "recall": 0.07692307692307693,
+            "f1": 0.14285714285714285,
+            "pr_auc": 0.5999327423654646,
+            "roc_auc": 0.9035409035409036,
+            "fpr": 0.0,
+            "tn": 231,
+            "fp": 0,
+            "fn": 36,
+            "tp": 3
+          },
+          "0_files": {
+            "threshold": 0.5,
+            "sample_count": 25,
+            "benign_count": 9,
+            "malicious_count": 16,
+            "accuracy": 0.36,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.6956521739130435,
+            "roc_auc": 0.6111111111111112,
+            "fpr": 0.0,
+            "tn": 9,
+            "fp": 0,
+            "fn": 16,
+            "tp": 0
+          },
+          "all_packages": {
+            "threshold": 0.5,
+            "sample_count": 991,
+            "benign_count": 582,
+            "malicious_count": 409,
+            "accuracy": 0.8476286579212916,
+            "precision": 0.8664772727272727,
+            "recall": 0.7457212713936431,
+            "f1": 0.8015768725361366,
+            "pr_auc": 0.906411801740815,
+            "roc_auc": 0.9218129038220788,
+            "fpr": 0.08075601374570447,
+            "tn": 535,
+            "fp": 47,
+            "fn": 104,
+            "tp": 305
+          }
+        },
+        "model_path": "Person_B\\models\\saved\\random_forest_behavior_with_size_v11.joblib"
+      },
+      "xgboost": {
+        "feature_count": 55,
+        "features": [
+          "category_count__network_activity",
+          "category_present__network_activity",
+          "category_count__credential_data_access",
+          "category_present__credential_data_access",
+          "category_count__command_execution",
+          "category_present__command_execution",
+          "category_count__obfuscation",
+          "category_present__obfuscation",
+          "category_count__install_time_package_execution",
+          "category_present__install_time_package_execution",
+          "category_count__dynamic_code_execution",
+          "category_present__dynamic_code_execution",
+          "category_count__supply_chain_abuse",
+          "category_present__supply_chain_abuse",
+          "indicator_present__setuptools.setup",
+          "indicator_present__os.environ",
+          "indicator_present__subprocess.Popen",
+          "indicator_present__base64.b64decode",
+          "indicator_present__base64.b64encode",
+          "indicator_present__setuptools.setup.cmdclass",
+          "indicator_present__subprocess.run",
+          "indicator_present__requests.get",
+          "indicator_present__exec",
+          "indicator_present__urllib.request.urlopen",
+          "indicator_present__importlib.import_module(dynamic)",
+          "indicator_present__setuptools.command.install",
+          "indicator_present__requests.post",
+          "indicator_present__install_command_override",
+          "indicator_present__subprocess.check_output",
+          "indicator_present__eval",
+          "indicator_present____import__(dynamic)",
+          "indicator_present__socket",
+          "indicator_present__os.system",
+          "indicator_present__compile",
+          "indicator_present__subprocess.check_call",
+          "indicator_present__subprocess.call",
+          "indicator_present__join(chr)",
+          "indicator_present__.env",
+          "indicator_present__base64.urlsafe_b64encode",
+          "indicator_present__bytes.fromhex",
+          "indicator_present__base64.urlsafe_b64decode",
+          "indicator_present__custom_build_backend",
+          "indicator_present__getattr.dynamic",
+          "indicator_present__.ssh/",
+          "indicator_present__.netrc",
+          "indicator_present__base64.encodebytes",
+          "indicator_present__.aws/credentials",
+          "indicator_present__base64.decodebytes",
+          "indicator_present__os.popen",
+          "indicator_present__base64.standard_b64encode",
+          "indicator_present__base64.b32encode",
+          "indicator_present__requests.request",
+          "indicator_present__base64.standard_b64decode",
+          "indicator_present__base64.encodestring",
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "accuracy": {
+              "mean": 0.8524128771916383,
+              "std": 0.005482036426576699
+            },
+            "precision": {
+              "mean": 0.8097820902797869,
+              "std": 0.018479499536472186
+            },
+            "recall": {
+              "mean": 0.839877300613497,
+              "std": 0.0253322979411811
+            },
+            "f1": {
+              "mean": 0.8241400769068532,
+              "std": 0.007010844110806391
+            },
+            "pr_auc": {
+              "mean": 0.9164924327116004,
+              "std": 0.01189064657070613
+            },
+            "roc_auc": {
+              "mean": 0.9269918874239217,
+              "std": 0.01262339107989972
+            },
+            "fpr": {
+              "mean": 0.13881305090221052,
+              "std": 0.019545183340219253
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 2004,
+            "fp": 323,
+            "fn": 261,
+            "tp": 1369
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "sample_count": 991,
+          "benign_count": 582,
+          "malicious_count": 409,
+          "accuracy": 0.8335015136226034,
+          "precision": 0.8034825870646766,
+          "recall": 0.7897310513447433,
+          "f1": 0.7965474722564735,
+          "pr_auc": 0.8825595019387055,
+          "roc_auc": 0.8804413581024879,
+          "fpr": 0.13573883161512026,
+          "tn": 503,
+          "fp": 79,
+          "fn": 86,
+          "tp": 323
+        },
+        "size_stratified": {
+          "1-5_files": {
+            "threshold": 0.5,
+            "sample_count": 497,
+            "benign_count": 178,
+            "malicious_count": 319,
+            "accuracy": 0.8189134808853119,
+            "precision": 0.8037135278514589,
+            "recall": 0.9498432601880877,
+            "f1": 0.8706896551724138,
+            "pr_auc": 0.9471350844876792,
+            "roc_auc": 0.904186185763094,
+            "fpr": 0.4157303370786517,
+            "tn": 104,
+            "fp": 74,
+            "fn": 16,
+            "tp": 303
+          },
+          "6-20_files": {
+            "threshold": 0.5,
+            "sample_count": 199,
+            "benign_count": 164,
+            "malicious_count": 35,
+            "accuracy": 0.8944723618090452,
+            "precision": 0.85,
+            "recall": 0.4857142857142857,
+            "f1": 0.6181818181818182,
+            "pr_auc": 0.8286533584235634,
+            "roc_auc": 0.9425087108013938,
+            "fpr": 0.018292682926829267,
+            "tn": 161,
+            "fp": 3,
+            "fn": 18,
+            "tp": 17
+          },
+          ">20_files": {
+            "threshold": 0.5,
+            "sample_count": 270,
+            "benign_count": 231,
+            "malicious_count": 39,
+            "accuracy": 0.8592592592592593,
+            "precision": 0.6,
+            "recall": 0.07692307692307693,
+            "f1": 0.13636363636363635,
+            "pr_auc": 0.28164177440688676,
+            "roc_auc": 0.5658785658785659,
+            "fpr": 0.008658008658008658,
+            "tn": 229,
+            "fp": 2,
+            "fn": 36,
+            "tp": 3
+          },
+          "0_files": {
+            "threshold": 0.5,
+            "sample_count": 25,
+            "benign_count": 9,
+            "malicious_count": 16,
+            "accuracy": 0.36,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.6956521739130435,
+            "roc_auc": 0.6111111111111112,
+            "fpr": 0.0,
+            "tn": 9,
+            "fp": 0,
+            "fn": 16,
+            "tp": 0
+          },
+          "all_packages": {
+            "threshold": 0.5,
+            "sample_count": 991,
+            "benign_count": 582,
+            "malicious_count": 409,
+            "accuracy": 0.8335015136226034,
+            "precision": 0.8034825870646766,
+            "recall": 0.7897310513447433,
+            "f1": 0.7965474722564735,
+            "pr_auc": 0.8825595019387055,
+            "roc_auc": 0.8804413581024879,
+            "fpr": 0.13573883161512026,
+            "tn": 503,
+            "fp": 79,
+            "fn": 86,
+            "tp": 323
+          }
+        },
+        "model_path": "Person_B\\models\\saved\\xgboost_behavior_with_size_v11.joblib"
+      }
+    },
+    "size_only": {
+      "random_forest": {
+        "feature_count": 1,
+        "features": [
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "accuracy": {
+              "mean": 0.7308585220089645,
+              "std": 0.019038842502339216
+            },
+            "precision": {
+              "mean": 0.6548827910224132,
+              "std": 0.03422714520282882
+            },
+            "recall": {
+              "mean": 0.7435582822085889,
+              "std": 0.04495722935107059
+            },
+            "f1": {
+              "mean": 0.6947991383007486,
+              "std": 0.010277480117876155
+            },
+            "pr_auc": {
+              "mean": 0.7042595039674122,
+              "std": 0.028218465637196134
+            },
+            "roc_auc": {
+              "mean": 0.8059681114096161,
+              "std": 0.020204038674688042
+            },
+            "fpr": {
+              "mean": 0.2780248280954359,
+              "std": 0.059552612374811686
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 1680,
+            "fp": 647,
+            "fn": 418,
+            "tp": 1212
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "sample_count": 991,
+          "benign_count": 582,
+          "malicious_count": 409,
+          "accuracy": 0.7406659939455096,
+          "precision": 0.6637931034482759,
+          "recall": 0.7530562347188264,
+          "f1": 0.7056128293241696,
+          "pr_auc": 0.6464210256959765,
+          "roc_auc": 0.7503570858434367,
+          "fpr": 0.26804123711340205,
+          "tn": 426,
+          "fp": 156,
+          "fn": 101,
+          "tp": 308
+        },
+        "size_stratified": {
+          "1-5_files": {
+            "threshold": 0.5,
+            "sample_count": 497,
+            "benign_count": 178,
+            "malicious_count": 319,
+            "accuracy": 0.670020120724346,
+            "precision": 0.6741573033707865,
+            "recall": 0.9404388714733543,
+            "f1": 0.7853403141361257,
+            "pr_auc": 0.69662659456562,
+            "roc_auc": 0.5980504385192491,
+            "fpr": 0.8146067415730337,
+            "tn": 33,
+            "fp": 145,
+            "fn": 19,
+            "tp": 300
+          },
+          "6-20_files": {
+            "threshold": 0.5,
+            "sample_count": 199,
+            "benign_count": 164,
+            "malicious_count": 35,
+            "accuracy": 0.8391959798994975,
+            "precision": 0.6363636363636364,
+            "recall": 0.2,
+            "f1": 0.30434782608695654,
+            "pr_auc": 0.3380756081132179,
+            "roc_auc": 0.6242160278745644,
+            "fpr": 0.024390243902439025,
+            "tn": 160,
+            "fp": 4,
+            "fn": 28,
+            "tp": 7
+          },
+          ">20_files": {
+            "threshold": 0.5,
+            "sample_count": 270,
+            "benign_count": 231,
+            "malicious_count": 39,
+            "accuracy": 0.8333333333333334,
+            "precision": 0.125,
+            "recall": 0.02564102564102564,
+            "f1": 0.0425531914893617,
+            "pr_auc": 0.13848133406812468,
+            "roc_auc": 0.32733932733932736,
+            "fpr": 0.030303030303030304,
+            "tn": 224,
+            "fp": 7,
+            "fn": 38,
+            "tp": 1
+          },
+          "0_files": {
+            "threshold": 0.5,
+            "sample_count": 25,
+            "benign_count": 9,
+            "malicious_count": 16,
+            "accuracy": 0.36,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.64,
+            "roc_auc": 0.5,
+            "fpr": 0.0,
+            "tn": 9,
+            "fp": 0,
+            "fn": 16,
+            "tp": 0
+          },
+          "all_packages": {
+            "threshold": 0.5,
+            "sample_count": 991,
+            "benign_count": 582,
+            "malicious_count": 409,
+            "accuracy": 0.7406659939455096,
+            "precision": 0.6637931034482759,
+            "recall": 0.7530562347188264,
+            "f1": 0.7056128293241696,
+            "pr_auc": 0.6464210256959765,
+            "roc_auc": 0.7503570858434367,
+            "fpr": 0.26804123711340205,
+            "tn": 426,
+            "fp": 156,
+            "fn": 101,
+            "tp": 308
+          }
+        },
+        "model_path": "Person_B\\models\\saved\\random_forest_size_only_v11.joblib"
+      },
+      "xgboost": {
+        "feature_count": 1,
+        "features": [
+          "n_py_files"
+        ],
+        "cv_5fold": {
+          "mean_std": {
+            "accuracy": {
+              "mean": 0.7402073835702154,
+              "std": 0.012740676955770816
+            },
+            "precision": {
+              "mean": 0.6678719734169828,
+              "std": 0.026796955391817104
+            },
+            "recall": {
+              "mean": 0.7411042944785275,
+              "std": 0.04500952345895622
+            },
+            "f1": {
+              "mean": 0.7013166250279295,
+              "std": 0.011287880622928516
+            },
+            "pr_auc": {
+              "mean": 0.710259945679083,
+              "std": 0.028781089785740066
+            },
+            "roc_auc": {
+              "mean": 0.8081240694135723,
+              "std": 0.018766216541373882
+            },
+            "fpr": {
+              "mean": 0.2604098020213208,
+              "std": 0.04667871902046003
+            }
+          },
+          "confusion_counts_sum": {
+            "tn": 1721,
+            "fp": 606,
+            "fn": 422,
+            "tp": 1208
+          }
+        },
+        "frozen_holdout": {
+          "threshold": 0.5,
+          "sample_count": 991,
+          "benign_count": 582,
+          "malicious_count": 409,
+          "accuracy": 0.7426841574167508,
+          "precision": 0.672645739910314,
+          "recall": 0.7334963325183375,
+          "f1": 0.7017543859649122,
+          "pr_auc": 0.6509117440626337,
+          "roc_auc": 0.7505629353296532,
+          "fpr": 0.2508591065292096,
+          "tn": 436,
+          "fp": 146,
+          "fn": 109,
+          "tp": 300
+        },
+        "size_stratified": {
+          "1-5_files": {
+            "threshold": 0.5,
+            "sample_count": 497,
+            "benign_count": 178,
+            "malicious_count": 319,
+            "accuracy": 0.670020120724346,
+            "precision": 0.6741573033707865,
+            "recall": 0.9404388714733543,
+            "f1": 0.7853403141361257,
+            "pr_auc": 0.69662659456562,
+            "roc_auc": 0.5980504385192491,
+            "fpr": 0.8146067415730337,
+            "tn": 33,
+            "fp": 145,
+            "fn": 19,
+            "tp": 300
+          },
+          "6-20_files": {
+            "threshold": 0.5,
+            "sample_count": 199,
+            "benign_count": 164,
+            "malicious_count": 35,
+            "accuracy": 0.8241206030150754,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.34067720648455435,
+            "roc_auc": 0.6304878048780488,
+            "fpr": 0.0,
+            "tn": 164,
+            "fp": 0,
+            "fn": 35,
+            "tp": 0
+          },
+          ">20_files": {
+            "threshold": 0.5,
+            "sample_count": 270,
+            "benign_count": 231,
+            "malicious_count": 39,
+            "accuracy": 0.8518518518518519,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.1597516777086604,
+            "roc_auc": 0.41491841491841497,
+            "fpr": 0.004329004329004329,
+            "tn": 230,
+            "fp": 1,
+            "fn": 39,
+            "tp": 0
+          },
+          "0_files": {
+            "threshold": 0.5,
+            "sample_count": 25,
+            "benign_count": 9,
+            "malicious_count": 16,
+            "accuracy": 0.36,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "pr_auc": 0.64,
+            "roc_auc": 0.5,
+            "fpr": 0.0,
+            "tn": 9,
+            "fp": 0,
+            "fn": 16,
+            "tp": 0
+          },
+          "all_packages": {
+            "threshold": 0.5,
+            "sample_count": 991,
+            "benign_count": 582,
+            "malicious_count": 409,
+            "accuracy": 0.7426841574167508,
+            "precision": 0.672645739910314,
+            "recall": 0.7334963325183375,
+            "f1": 0.7017543859649122,
+            "pr_auc": 0.6509117440626337,
+            "roc_auc": 0.7505629353296532,
+            "fpr": 0.2508591065292096,
+            "tn": 436,
+            "fp": 146,
+            "fn": 109,
+            "tp": 300
+          }
+        },
+        "model_path": "Person_B\\models\\saved\\xgboost_size_only_v11.joblib"
+      }
+    }
+  }
+}

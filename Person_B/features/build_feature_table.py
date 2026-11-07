@@ -49,19 +49,33 @@ def get_frozen_holdout_ids(records=None):
     return set()
 
 
-def build_feature_table(holdout_ids=None):
+def build_feature_table(holdout_ids=None, dataset_version="v1.1", out_path=None):
     processed = ROOT / "data" / "processed"
-    paths = [processed / "malicious_for_b.jsonl", processed / "benign_for_b.jsonl.gz"]
+    if dataset_version == "v1.1":
+        paths = [processed / "malicious_v11.jsonl", processed / "benign_v11.jsonl.gz"]
+        expected_counts = (2039, 2909)
+    elif dataset_version == "v1":
+        paths = [processed / "malicious_for_b.jsonl", processed / "benign_for_b.jsonl.gz"]
+        expected_counts = (2045, 2908)
+    else:
+        raise ValueError(f"Unknown dataset_version: {dataset_version}")
+
     missing = [str(path) for path in paths if not path.exists()]
     if missing:
         raise FileNotFoundError("Missing dataset export(s): " + ", ".join(missing))
 
     records = []
-    for path, expected_label in zip(paths, (1, 0)):
+    for path, expected_label, expected_count in zip(paths, (1, 0), expected_counts):
+        class_records = []
         for record in read_jsonl(path):
             if int(record.get("label", -1)) != expected_label:
                 raise ValueError(f"Wrong label in {path}: {record.get('package_id')}")
-            records.append(record)
+            class_records.append(record)
+        if len(class_records) != expected_count:
+            raise ValueError(
+                f"Row count mismatch in {path}: expected {expected_count}, got {len(class_records)}"
+            )
+        records.extend(class_records)
 
     if not records:
         raise ValueError("Both JSONL exports are empty.")
@@ -78,6 +92,17 @@ def build_feature_table(holdout_ids=None):
     else:
         holdout_ids = set(str(pid) for pid in holdout_ids)
 
+    # Verify frozen holdout coverage
+    holdout_records = [r for r in records if str(r.get("package_id")) in holdout_ids]
+    if len(holdout_records) != len(holdout_ids):
+        raise ValueError(
+            f"Holdout mismatch: expected {len(holdout_ids)} holdout packages in dataset, found {len(holdout_records)}"
+        )
+    m_holdout = sum(1 for r in holdout_records if int(r.get("label", -1)) == 1)
+    b_holdout = sum(1 for r in holdout_records if int(r.get("label", -1)) == 0)
+    if (m_holdout, b_holdout) != (409, 582):
+        raise ValueError(f"Holdout class mismatch: expected (409, 582), got ({m_holdout}, {b_holdout})")
+
     # Select top-40 indicator vocabulary using development records ONLY
     dev_records = [r for r in records if str(r.get("package_id")) not in holdout_ids]
     vocabulary = top_indicator_vocabulary(dev_records, limit=40)
@@ -86,7 +111,7 @@ def build_feature_table(holdout_ids=None):
         package_name = normalize_package_name(record.get("package_name") or record.get("package"))
         if not package_name:
             raise ValueError(f"Missing package_name for {record.get('package_id')}")
-        group_id = package_name
+        group_id = record.get("group_id") or package_name
         row = {
             "package_id": str(record["package_id"]),
             "package_name": package_name,
@@ -113,15 +138,32 @@ def build_feature_table(holdout_ids=None):
     numeric_columns = feat_cols + DIAGNOSTIC_COLUMNS
     df[numeric_columns] = df[numeric_columns].fillna(0)
 
-    out = processed / "feature_table.csv"
-    df.to_csv(out, index=False)
-    (processed / "top40_indicators.json").write_text(json.dumps(vocabulary, indent=2), encoding="utf-8")
-    print(f"Feature table: {out} | rows={len(df)} | groups={df.group_id.nunique()}")
+    if out_path is not None:
+        out = Path(out_path)
+        df.to_csv(out, index=False)
+    else:
+        if dataset_version == "v1.1":
+            out = processed / "feature_table_v11.csv"
+            df.to_csv(out, index=False)
+            df.to_csv(processed / "feature_table.csv", index=False)
+            (processed / "top40_indicators_v11.json").write_text(
+                json.dumps(vocabulary, indent=2), encoding="utf-8"
+            )
+            (processed / "top40_indicators.json").write_text(
+                json.dumps(vocabulary, indent=2), encoding="utf-8"
+            )
+        else:
+            out = processed / "feature_table_v1.csv"
+            df.to_csv(out, index=False)
+            (processed / "top40_indicators_v1.json").write_text(
+                json.dumps(vocabulary, indent=2), encoding="utf-8"
+            )
+
+    print(f"Feature table ({dataset_version}): {out} | rows={len(df)} | groups={df.group_id.nunique()}")
     print("Labels:", df.label.value_counts().sort_index().to_dict())
     print("Top-indicator vocabulary size:", len(vocabulary))
-    print("NOTE: analyzer_version is null when it is absent from source exports; it is not inferred.")
     return df
 
 
 if __name__ == "__main__":
-    build_feature_table()
+    build_feature_table(dataset_version="v1.1")
