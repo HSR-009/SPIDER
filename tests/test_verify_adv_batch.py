@@ -52,7 +52,8 @@ class TestVerifyAdvBatch(unittest.TestCase):
             samples_dir.mkdir()
 
             sample_code = "import os\nos.system('whoami')\n"
-            (samples_dir / "adv_001.py").write_text(sample_code, encoding="utf-8")
+            sample_file = samples_dir / "adv_001.py"
+            sample_file.write_text(sample_code, encoding="utf-8")
 
             manifest = {
                 "batch_name": "synthetic-test",
@@ -60,6 +61,7 @@ class TestVerifyAdvBatch(unittest.TestCase):
                     {
                         "sample_id": "adv_001",
                         "technique": "T05_delay",
+                        "source_file": "samples/adv_001.py",
                         "baseline_source": sample_code,
                         "generated_code": sample_code,
                     }
@@ -71,27 +73,63 @@ class TestVerifyAdvBatch(unittest.TestCase):
             manifest_file.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
             c_table = {
+                "summary": {
+                    "total_samples": 1,
+                    "overall_counts": {"v1": {"recovered": 1, "different_signal": 0, "missed": 0}},
+                    "miss_rates_asr": {"v1": 0.0},
+                },
                 "per_sample": [
                     {
                         "sample_id": "adv_001",
                         "v1": {"outcome": "recovered"},
                         "v1_1": {"outcome": "recovered"},
                     }
-                ]
+                ],
             }
             c_table_file = tmp_p / "c_table.json"
             c_table_file.write_text(json.dumps(c_table), encoding="utf-8")
 
             out_md = tmp_p / "report.md"
-            rows, summary, hashes = verify_batch(batch_dir, c_table_file, out_md)
+            rows, summary, hashes, verdict_counts, differing = verify_batch(batch_dir, c_table_file, out_md)
 
             self.assertTrue(out_md.exists())
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0]["sample_id"], "adv_001")
             self.assertTrue(rows[0]["agree_v1"])
             self.assertTrue(rows[0]["agree_v11"])
+            self.assertEqual(len(differing), 0)
+            self.assertIn("finding-level evasion rate", out_md.read_text(encoding="utf-8").lower())
+            self.assertIn("## interpretation (to be written by a human)", out_md.read_text(encoding="utf-8").lower())
+
+    def test_differing_sample_detected(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_p = Path(tmpdir)
+            batch_dir = tmp_p / "adv_batch"
+            batch_dir.mkdir()
+            samples_dir = batch_dir / "samples"
+            samples_dir.mkdir()
+
+            (samples_dir / "adv_001.py").write_text("modified = True\n", encoding="utf-8")
+
+            manifest = {
+                "batch_name": "synthetic-test",
+                "entries": [
+                    {
+                        "sample_id": "adv_001",
+                        "technique": "T05_delay",
+                        "source_file": "samples/adv_001.py",
+                        "baseline_source": "x = 1\n",
+                        "generated_code": "original_generated = True\n",
+                    }
+                ],
+                "manifest_hash_sha256": "fake_hash",
+            }
+            (batch_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+            out_md = tmp_p / "report.md"
+            rows, summary, hashes, verdict_counts, differing = verify_batch(batch_dir, tmp_p / "nonexistent.json", out_md)
+            self.assertEqual(differing, ["adv_001"])
 
 
 if __name__ == "__main__":
     unittest.main()
-
