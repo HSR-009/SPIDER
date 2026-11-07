@@ -206,6 +206,14 @@ def hunt_target(
                         print(f"           Evidence: {it.get('evidence_snippet')}")
 
             cov = result.get("coverage", {})
+            counts = cov.get("counts", {})
+            if counts:
+                print("\nCoverage Summary:")
+                print(f"  Skipped too large:        {counts.get('skipped_too_large', 0)}")
+                print(f"  Missing in RECORD:         {counts.get('missing_in_RECORD', 0)}")
+                print(f"  Inspection timed out:      {counts.get('inspection_timed_out', 0)}")
+                print(f"  File list unavailable:     {counts.get('file_list_unavailable', 0)}")
+
             if cov.get("errors"):
                 print(f"\nCoverage Warnings: {len(cov['errors'])} errors")
             if cov.get("dists_without_file_list"):

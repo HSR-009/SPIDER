@@ -253,16 +253,44 @@ def inspect_custom_startup_hooks(root: Path) -> Tuple[List[Dict[str, Any]], List
     return items, coverage_notes
 
 
-def find_top_level_packages(dist_dir: Path) -> Set[str]:
-    """Identify top-level packages owned by distribution from top_level.txt or dist-info name."""
-    top_levels = set()
+def find_top_level_packages(dist_dir: Path, record_file: Optional[Path] = None) -> Set[str]:
+    """Identify top-level packages owned by distribution from:
+    - RECORD (the first path component of each listed file, ignoring '..' and the metadata folder)
+    - top_level.txt if present
+    - the normalised dist name
+    """
+    top_levels: Set[str] = set()
+
+    # From RECORD
+    if record_file and is_regular_file(record_file):
+        try:
+            with record_file.open("r", encoding="utf-8", errors="replace") as rf:
+                reader = csv.reader(rf)
+                for row in reader:
+                    if not row:
+                        continue
+                    rel_p = row[0].strip().replace("\\", "/").strip("/")
+                    if not rel_p or rel_p.startswith("..") or "/.." in rel_p:
+                        continue
+                    parts = rel_p.split("/")
+                    first = parts[0]
+                    # Ignore metadata folders (.dist-info, .egg-info)
+                    if not first.endswith(".dist-info") and not first.endswith(".egg-info"):
+                        if first.endswith(".py"):
+                            first = first[:-3]
+                        if first:
+                            top_levels.add(first.replace("-", "_").lower())
+        except Exception:
+            pass
+
+    # From top_level.txt
     top_txt = dist_dir / "top_level.txt"
     if is_regular_file(top_txt):
         try:
             for line in top_txt.read_text(encoding="utf-8", errors="replace").splitlines():
                 t = line.strip()
                 if t:
-                    top_levels.add(t)
+                    top_levels.add(t.replace("-", "_").lower())
         except Exception:
             pass
 
@@ -341,7 +369,10 @@ def inspect_distribution(
     if not meta_dir or not meta_dir.exists():
         return items, "file_list_unavailable", errors
 
-    top_levels = find_top_level_packages(meta_dir)
+    record_file = meta_dir / "RECORD"
+    installed_files_txt = meta_dir / "installed-files.txt"
+
+    top_levels = find_top_level_packages(meta_dir, record_file=record_file)
 
     # 1. Entry point check and targeted modules
     ep_file = meta_dir / "entry_points.txt"
@@ -370,9 +401,6 @@ def inspect_distribution(
                     "evidence_snippet": f"[{ep['section']}] {ep['name']} = {ep['target']}",
                 })
 
-    # 2. File list resolution & tamper check
-    record_file = meta_dir / "RECORD"
-    installed_files_txt = meta_dir / "installed-files.txt"
     all_dist_py_files: List[Path] = []
 
     if is_regular_file(record_file):
@@ -415,11 +443,23 @@ def inspect_distribution(
                         expected_hash_entry = row[1].strip()
                         if expected_hash_entry.startswith("sha256="):
                             if not is_bin_script:
-                                exp_sha = expected_hash_entry.split("sha256=")[1].strip()
-                                actual_sha, skip_note = urlsafe_b64_sha256_stream(target_p)
+                                exp_digest = expected_hash_entry.split("sha256=")[1].strip()
+                                # Determine digest format: 64-char hex or base64
+                                is_hex = (len(exp_digest) == 64 and all(c in "0123456789abcdefABCDEF" for c in exp_digest))
+                                digest_fmt = "hex" if is_hex else "base64"
+
+                                if is_hex:
+                                    actual_hex, skip_note = sha256_of_file(target_p)
+                                    match = (actual_hex.lower() == exp_digest.lower())
+                                    actual_display = actual_hex
+                                else:
+                                    actual_b64, skip_note = urlsafe_b64_sha256_stream(target_p)
+                                    match = (actual_b64 == exp_digest)
+                                    actual_display = actual_b64
+
                                 if skip_note:
                                     errors.append(f"{target_p}: {skip_note}")
-                                elif actual_sha != exp_sha:
+                                elif not match:
                                     f_sha, _ = sha256_of_file(target_p)
                                     items.append({
                                         "dist": dist_name,
@@ -428,8 +468,9 @@ def inspect_distribution(
                                         "path": str(target_p),
                                         "sha256": f_sha,
                                         "severity": "MEDIUM",
-                                        "reason": "File modified after install (hash mismatch with RECORD; non-script regular file)",
-                                        "evidence_snippet": f"Expected sha256={exp_sha}, got {actual_sha}",
+                                        "digest_format": digest_fmt,
+                                        "reason": f"File modified after install (hash mismatch with RECORD; digest format: {digest_fmt})",
+                                        "evidence_snippet": f"Expected sha256={exp_digest}, got {actual_display}",
                                     })
 
                     if target_p.suffix == ".py":
@@ -655,6 +696,25 @@ def run_hunt(
         ts=created_at,
     )
 
+    # Calculate coverage counts per kind
+    coverage_counts = {
+        "skipped_too_large": 0,
+        "missing_in_RECORD": 0,
+        "inspection_timed_out": 0,
+        "file_list_unavailable": len(coverage_dists_without_file_list),
+    }
+
+    for err in coverage_errors:
+        err_lower = err.lower()
+        if "skipped_too_large" in err_lower or "skipped_py_too_large" in err_lower:
+            coverage_counts["skipped_too_large"] += 1
+        elif "missing file listed in record" in err_lower:
+            coverage_counts["missing_in_RECORD"] += 1
+        elif "inspection_timed_out" in err_lower:
+            coverage_counts["inspection_timed_out"] += 1
+        elif "file_list_unavailable" in err_lower:
+            coverage_counts["file_list_unavailable"] += 1
+
     return {
         "hunt_id": scan_id,
         "created_at": created_at,
@@ -663,6 +723,7 @@ def run_hunt(
         "distributions_count": total_distributions,
         "items": processed_items,
         "coverage": {
+            "counts": coverage_counts,
             "dists_without_file_list": coverage_dists_without_file_list,
             "errors": coverage_errors,
         },

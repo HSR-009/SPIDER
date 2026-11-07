@@ -13,13 +13,15 @@ Assert second run reports 0 "new".
 Adding allowlist hash removes (a) / sets priority to 0.
 Assert no module from the fake tree is imported (sys.modules unchanged).
 
-Safety & noise tests:
+Safety, noise & coverage tests:
 - Planted FIFO test (skipped on Windows)
 - Large file (>20MB) skipped for hashing with skipped_too_large note
 - Large .py (>1MB) skipped for AST analysis with skipped_py_too_large note
 - Cross-file signal separation: signals in two separate files must NOT combine into a multi-finding strong signal
 - Script in bin/ or Scripts/ modified after install is NOT flagged as tamper
 - Strong signal in sitecustomize.py is still HIGH
+- Entry-point ownership from RECORD: foo-tool with RECORD foo/__init__.py and foo.cli:main -> not flagged; otherpkg.x:main -> MEDIUM
+- Tamper check accepting both urlsafe base64 and 64-char hex digests
 """
 import base64
 import copy
@@ -140,6 +142,7 @@ class TestHunter(unittest.TestCase):
             # (e) dist e should record coverage problem (missing file listed in RECORD)
             cov_errors = res1["coverage"]["errors"]
             self.assertTrue(any("pkg-e" in err or "missing.py" in err for err in cov_errors))
+            self.assertEqual(res1["coverage"]["counts"]["missing_in_RECORD"], 1)
 
             # (f) dist f without RECORD falls back to directory listing (no crash)
             self.assertNotIn("apt-pkg", res1["coverage"]["dists_without_file_list"])
@@ -179,7 +182,6 @@ class TestHunter(unittest.TestCase):
             os.mkfifo(fifo_path)
 
             res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
-            # Must finish immediately and not hang or open fifo
             self.assertIsNotNone(res)
 
     def test_large_file_safety(self):
@@ -209,14 +211,12 @@ class TestHunter(unittest.TestCase):
 
             res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
             cov_errors = res["coverage"]["errors"]
-            # Assert large files triggered coverage notes
+            counts = res["coverage"]["counts"]
             self.assertTrue(any("skipped_too_large" in e for e in cov_errors))
             self.assertTrue(any("skipped_py_too_large" in e for e in cov_errors))
+            self.assertGreaterEqual(counts["skipped_too_large"], 2)
 
     def test_per_file_signal_isolation_and_downgrade(self):
-        """Signals across different files must NOT combine into a multi-finding strong signal.
-        Any non-strong finding must be downgraded to LOW.
-        """
         with tempfile.TemporaryDirectory() as td:
             site_dir = Path(td) / "site-packages"
             site_dir.mkdir()
@@ -230,29 +230,21 @@ class TestHunter(unittest.TestCase):
             pkg_dir = site_dir / "split_pkg"
             pkg_dir.mkdir()
 
-            # File 1 has os.environ (Credential)
             (pkg_dir / "__init__.py").write_text("import os\nx = os.environ['FOO']\n", encoding="utf-8")
-            # File 2 has requests.post (Network)
-            # In verdict v2, os.environ + requests.post across a package would trigger S4_env_post.
-            # But per-file inspection must NOT combine them!
             (pkg_dir / "__main__.py").write_text("import requests\nrequests.post('http://example.com')\n", encoding="utf-8")
 
             res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
             dist_items = [it for it in res["items"] if it.get("dist") == "split-pkg"]
 
-            # Neither file alone has a strong signal (S4 requires BOTH in the same file).
-            # Therefore, NO item should be HIGH!
             high_items = [it for it in dist_items if it.get("severity") == "HIGH"]
             self.assertEqual(high_items, [], f"Signals combined across files: {high_items}")
 
-            # Findings in both files must be downgraded to LOW
             low_items = [it for it in dist_items if it.get("severity") == "LOW"]
             self.assertEqual(len(low_items), 2)
             for it in low_items:
                 self.assertIn("downgraded to LOW", it["reason"])
 
     def test_tamper_skip_bin_and_scripts(self):
-        """Tamper check must skip bin/ and Scripts/ (installer rewrites) and keep rest at MEDIUM."""
         with tempfile.TemporaryDirectory() as td:
             site_dir = Path(td) / "site-packages"
             site_dir.mkdir()
@@ -263,7 +255,6 @@ class TestHunter(unittest.TestCase):
             (dist / "METADATA").write_text("Metadata-Version: 2.1\nName: tamper-pkg\nVersion: 1.0\n", encoding="utf-8")
             (dist / "top_level.txt").write_text("tamper_pkg\n", encoding="utf-8")
             
-            # Setup files
             bin_dir = site_dir.parent / "bin"
             bin_dir.mkdir(parents=True, exist_ok=True)
             bin_file = bin_dir / "script"
@@ -274,7 +265,6 @@ class TestHunter(unittest.TestCase):
             data_file = data_dir / "config.json"
             data_file.write_bytes(b"modified config\n")
 
-            # RECORD lists original hashes that don't match current content
             rec_content = (
                 "../../../bin/script,sha256=fake_hash_bin,10\n"
                 "tamper_pkg/config.json,sha256=fake_hash_data,10\n"
@@ -284,23 +274,18 @@ class TestHunter(unittest.TestCase):
             res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
             tamper_items = [it for it in res["items"] if it.get("artifact") == "tamper"]
 
-            # bin/ script must NOT be flagged
             self.assertFalse(any("bin/script" in it.get("path", "").replace("\\", "/") for it in tamper_items))
-
-            # Non-script regular file modified after install must be flagged at MEDIUM
             self.assertEqual(len(tamper_items), 1)
             self.assertEqual(tamper_items[0]["severity"], "MEDIUM")
-            self.assertIn("non-script regular file", tamper_items[0]["reason"])
+            self.assertIn("File modified after install", tamper_items[0]["reason"])
 
     def test_sitecustomize_strong_signal_is_high(self):
-        """Strong signal in sitecustomize.py (e.g. exec + base64.b64decode) must be HIGH."""
         with tempfile.TemporaryDirectory() as td:
             site_dir = Path(td) / "site-packages"
             site_dir.mkdir()
             db_file = Path(td) / "hunter.db"
 
             site_custom = site_dir / "sitecustomize.py"
-            # S5_decode_exec: base64.b64decode + exec
             site_custom.write_text("import base64\nexec(base64.b64decode(b'eA=='))\n", encoding="utf-8")
 
             res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
@@ -308,6 +293,88 @@ class TestHunter(unittest.TestCase):
             self.assertEqual(len(custom_items), 1)
             self.assertEqual(custom_items[0]["severity"], "HIGH")
             self.assertIn("strong signals", custom_items[0]["reason"])
+
+    def test_entry_point_ownership_from_record(self):
+        """dist foo-tool with RECORD foo/__init__.py and entry point foo.cli:main is not flagged.
+        otherpkg.x:main still gets MEDIUM.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist_dir = site_dir / "foo_tool-1.0.dist-info"
+            dist_dir.mkdir()
+            (dist_dir / "METADATA").write_text("Metadata-Version: 2.1\nName: foo-tool\nVersion: 1.0\n", encoding="utf-8")
+            # Notice: NO top_level.txt! Ownership must be derived from RECORD
+            rec_content = (
+                "foo/__init__.py,,0\n"
+                "foo/cli.py,,0\n"
+            )
+            (dist_dir / "RECORD").write_text(rec_content, encoding="utf-8")
+            (dist_dir / "entry_points.txt").write_text(
+                "[console_scripts]\n"
+                "foo = foo.cli:main\n"
+                "other = otherpkg.x:main\n",
+                encoding="utf-8",
+            )
+            foo_pkg = site_dir / "foo"
+            foo_pkg.mkdir()
+            (foo_pkg / "__init__.py").write_text("# init\n", encoding="utf-8")
+            (foo_pkg / "cli.py").write_text("def main(): pass\n", encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            ep_items = [it for it in res["items"] if it.get("dist") == "foo-tool" and it.get("artifact") == "entrypoint"]
+
+            # 'foo = foo.cli:main' must NOT be flagged (owned via RECORD)
+            self.assertFalse(any("foo = foo.cli:main" in it.get("evidence_snippet", "") for it in ep_items))
+
+            # 'other = otherpkg.x:main' must be flagged as MEDIUM
+            other_items = [it for it in ep_items if "otherpkg" in it.get("reason", "")]
+            self.assertEqual(len(other_items), 1)
+            self.assertEqual(other_items[0]["severity"], "MEDIUM")
+
+    def test_tamper_hex_and_base64_digests(self):
+        """Tamper check: RECORD digests may be urlsafe base64 (pip) or 64-char hex (Debian).
+        Matching hex digest gives no item, mismatching hex digest gives MEDIUM with digest_format 'hex'.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            site_dir = Path(td) / "site-packages"
+            site_dir.mkdir()
+            db_file = Path(td) / "hunter.db"
+
+            dist = site_dir / "hex_pkg-1.0.dist-info"
+            dist.mkdir()
+            (dist / "METADATA").write_text("Metadata-Version: 2.1\nName: hex-pkg\nVersion: 1.0\n", encoding="utf-8")
+
+            pkg_dir = site_dir / "hex_pkg"
+            pkg_dir.mkdir()
+
+            f_good = pkg_dir / "good.txt"
+            f_good.write_bytes(b"content_good")
+            good_hex = hashlib.sha256(b"content_good").hexdigest()
+
+            f_bad = pkg_dir / "bad.txt"
+            f_bad.write_bytes(b"content_tampered")
+            bad_hex_orig = hashlib.sha256(b"content_original").hexdigest()
+
+            rec_content = (
+                f"hex_pkg/good.txt,sha256={good_hex},12\n"
+                f"hex_pkg/bad.txt,sha256={bad_hex_orig},16\n"
+            )
+            (dist / "RECORD").write_text(rec_content, encoding="utf-8")
+
+            res = run_hunt(extra_site_packages=[site_dir], db_path=db_file, include_system_defaults=False)
+            tamper_items = [it for it in res["items"] if it.get("dist") == "hex-pkg" and it.get("artifact") == "tamper"]
+
+            # good.txt matches hex digest -> no item
+            self.assertFalse(any("good.txt" in it.get("path", "").replace("\\", "/") for it in tamper_items))
+
+            # bad.txt mismatches hex digest -> MEDIUM item with digest_format == 'hex'
+            bad_items = [it for it in tamper_items if "bad.txt" in it.get("path", "").replace("\\", "/")]
+            self.assertEqual(len(bad_items), 1)
+            self.assertEqual(bad_items[0]["severity"], "MEDIUM")
+            self.assertEqual(bad_items[0]["digest_format"], "hex")
 
 
 if __name__ == "__main__":
