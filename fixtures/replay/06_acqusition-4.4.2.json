@@ -1,0 +1,352 @@
+{
+  "created_at": "2026-11-07T10:48:58Z",
+  "files": [
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/CHANGES.rst",
+      "roles": [],
+      "sha256": "31b764c8d41eeb44bb395bf8c1ff50f282984909f7a796c234e651daedff70dc"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/COPYRIGHT.txt",
+      "roles": [],
+      "sha256": "2d4f82f761b0d0afb567a85b1fa8bf4164c1099e52a2370388972d144ba9cb83"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/LICENSE.txt",
+      "roles": [],
+      "sha256": "3e671db11df687516cc1db5b3d65e4aa383eaca3c20cea3faf53a0f7335d0a3c"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 10,
+      "path": "Acqusition-4.4.2/MANIFEST.in",
+      "roles": [],
+      "sha256": "310e8f1e556fe26ed3cc955f987e90b551d52bfccec03a5a259c4bb7903eaf3d"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/PKG-INFO",
+      "roles": [],
+      "sha256": "27a7eccba12637742d290aa0d75df26818a6e8246b606e23938eed0ba33ed5e9"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/README.rst",
+      "roles": [],
+      "sha256": "50a06b38029f4f2c7b762dcd9b249db1d6bf6c7937c32320a93db675996056eb"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/include/ExtensionClass/ExtensionClass.h",
+      "roles": [],
+      "sha256": "7f3a2182d4b7733d3c65f7ca687a4afa4ebfca2e81613647edea12969898c033"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/include/ExtensionClass/_compat.h",
+      "roles": [],
+      "sha256": "2fa3c810477123572205e4dea693898bc13c950ce9941569ff60b8af3db4a7b1"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 8,
+      "path": "Acqusition-4.4.2/setup.cfg",
+      "roles": [],
+      "sha256": "c92f503b4c86228d0ad653e003ca50c7f42544358e4600a46c7aee8a381345f7"
+    },
+    {
+      "inspected": false,
+      "kind": "python",
+      "lines": 1100,
+      "path": "Acqusition-4.4.2/setup.py",
+      "roles": [],
+      "sha256": "e2c1a35f5715822e75dc8b668008b58995340c2331498561acdcda58f65bad3d"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "a09254828ae3ba21735635f4af1800d7a8c78ba04bb014f8aaf31ea4e7bf3438"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "64ec6a1333c54aba85d222acdb4f7626a30d09d01ef7c0c38fc0b9d7cd720312"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition.egg-info/not-zip-safe",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition.egg-info/requires.txt",
+      "roles": [],
+      "sha256": "0bedf0ce70839c0c35f3e4753b437a5e4f8fee45097f55a553ed6e26557ce35e"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "c5e2302aabf71f4c2cf78953b26834f3bd4a470abe83dcdd673d841439460e53"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition/Acquisition.h",
+      "roles": [],
+      "sha256": "1102ae3be02bbecba445004977a76ef3c0fd3f9dbbd9e2fbcba2764722b11b2e"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acquisition/_Acquisition.c",
+      "roles": [],
+      "sha256": "157c46fd0e1333fc64e11787280f7e085855473d553985daf4cc71c3806525a9"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 953,
+      "path": "Acqusition-4.4.2/src/Acquisition/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "a5008755c2807befc18fd3aa1cb3da9a2976e07998f8bc7e87bf6382c313bc81"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 62,
+      "path": "Acqusition-4.4.2/src/Acquisition/interfaces.py",
+      "roles": [],
+      "sha256": "ca578c90a97444bf227d79c9fd27defe9f2514194831c3f942052fda0d224f54"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 3702,
+      "path": "Acqusition-4.4.2/src/Acquisition/tests.py",
+      "roles": [],
+      "sha256": "8d140a912599f29fa4110a11b2625af24bf22d0d9b95215757c86061c9a05b2e"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acqusition.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "27a7eccba12637742d290aa0d75df26818a6e8246b606e23938eed0ba33ed5e9"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acqusition.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "0bc2c828f81ce275652be0e8615fb82e99c1002e442b930957b2f7b479f9f83f"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acqusition.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acqusition.egg-info/not-zip-safe",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acqusition.egg-info/requires.txt",
+      "roles": [],
+      "sha256": "0bedf0ce70839c0c35f3e4753b437a5e4f8fee45097f55a553ed6e26557ce35e"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "Acqusition-4.4.2/src/Acqusition.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "c5e2302aabf71f4c2cf78953b26834f3bd4a470abe83dcdd673d841439460e53"
+    }
+  ],
+  "findings": [
+    {
+      "category": "credential_access",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "os.environ access detected",
+      "file": "Acqusition-4.4.2/src/Acquisition/__init__.py",
+      "id": "F001",
+      "indicator": "os.environ",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "cred.environ",
+      "severity": "high",
+      "snippet": "os.environ",
+      "span": {
+        "end_col": 37,
+        "end_line": 21,
+        "start_col": 27,
+        "start_line": 21
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "dynamic_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "exec() call detected",
+      "file": "Acqusition-4.4.2/src/Acquisition/__init__.py",
+      "id": "F002",
+      "indicator": "exec",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "dyn.exec",
+      "severity": "high",
+      "snippet": "exec(\"\"\"def _reraise(tp, value, tb=None):",
+      "span": {
+        "end_col": 4,
+        "end_line": 60,
+        "start_col": 4,
+        "start_line": 58
+      },
+      "trigger_phase": "import"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 18,
+    "files_total": 27,
+    "limits_hit": [],
+    "parse_failures": [
+      {
+        "error": "leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers",
+        "path": "Acqusition-4.4.2/setup.py"
+      }
+    ],
+    "python_files": 4,
+    "uninspected": [],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R001",
+      "to": "F002",
+      "type": "co_occurrence"
+    }
+  ],
+  "scan_id": "eb860e5b-a90c-4a0b-b10d-5fa85a63a9f3",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "acqusition-4.4.2.tar.gz",
+      "format": "tar.gz",
+      "sha256": "0a481e40f9deaabd4402dc608dc6cc2177aad5ff84b052785c459f08bba9df1d",
+      "size_bytes": 309210
+    },
+    "hash_verified": null,
+    "kind": "archive",
+    "name": "acqusition",
+    "version": "4.4.2"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe.",
+      "Coverage problem: parse_failure_ratio:0.25"
+    ],
+    "outcome": "unable_to_assess",
+    "reasons": [
+      "parse_failure_ratio:0.25"
+    ]
+  }
+}

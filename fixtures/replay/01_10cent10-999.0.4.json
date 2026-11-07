@@ -1,0 +1,345 @@
+{
+  "created_at": "2026-11-07T10:48:58Z",
+  "files": [
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "10Cent10-999.0.4/10Cent10.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "9d4a17e5e3fa41007d6c3ca3786d16275c07f8fff82b819943c136e1e626dfc7"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "10Cent10-999.0.4/10Cent10.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "d39ef548ea41899accd876b482ce76567effedb213dd6b1fc02fb967144c5e58"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "10Cent10-999.0.4/10Cent10.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "10Cent10-999.0.4/10Cent10.egg-info/not-zip-safe",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "10Cent10-999.0.4/10Cent10.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "10Cent10-999.0.4/PKG-INFO",
+      "roles": [],
+      "sha256": "9d4a17e5e3fa41007d6c3ca3786d16275c07f8fff82b819943c136e1e626dfc7"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 4,
+      "path": "10Cent10-999.0.4/setup.cfg",
+      "roles": [],
+      "sha256": "1c473cbaee8da5fc46e7f0158794af5cea4414c34a3cf3f180c2001f5e38bd3e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 28,
+      "path": "10Cent10-999.0.4/setup.py",
+      "roles": [],
+      "sha256": "957129c09d47807d62369cc538041a31c48402df45433b8c4c506459c0bf2e2c"
+    }
+  ],
+  "findings": [
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "Custom setuptools install command detected",
+      "file": "10Cent10-999.0.4/setup.py",
+      "id": "F001",
+      "indicator": "setuptools.command.install",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.install_import",
+      "severity": "high",
+      "snippet": "from setuptools.command.install import install",
+      "span": {
+        "end_col": 46,
+        "end_line": 2,
+        "start_col": 0,
+        "start_line": 2
+      },
+      "trigger_phase": "install"
+    },
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "CustomInstall",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "install command overrides run()",
+      "file": "10Cent10-999.0.4/setup.py",
+      "id": "F002",
+      "indicator": "install_command_override",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.install_override",
+      "severity": "high",
+      "snippet": "class CustomInstall(install):",
+      "span": {
+        "end_col": 32,
+        "end_line": 17,
+        "start_col": 0,
+        "start_line": 9
+      },
+      "trigger_phase": "install"
+    },
+    {
+      "category": "network_activity",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": "run",
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "socket() call detected",
+      "file": "10Cent10-999.0.4/setup.py",
+      "id": "F003",
+      "indicator": "socket",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "net.socket",
+      "severity": "medium",
+      "snippet": "socket.socket(socket.AF_INET,socket.SOCK_STREAM)",
+      "span": {
+        "end_col": 62,
+        "end_line": 12,
+        "start_col": 14,
+        "start_line": 12
+      },
+      "trigger_phase": "call"
+    },
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setuptools.setup() call detected",
+      "file": "10Cent10-999.0.4/setup.py",
+      "id": "F004",
+      "indicator": "setuptools.setup",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.plain_setup",
+      "severity": "low",
+      "snippet": "setup(name='10Cent10',",
+      "span": {
+        "end_col": 42,
+        "end_line": 26,
+        "start_col": 0,
+        "start_line": 20
+      },
+      "trigger_phase": "install"
+    },
+    {
+      "category": "install_time",
+      "confidence": "medium",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setup(cmdclass=...) overrides build commands",
+      "file": "10Cent10-999.0.4/setup.py",
+      "id": "F005",
+      "indicator": "setuptools.setup.cmdclass",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.cmdclass",
+      "severity": "medium",
+      "snippet": "setup(name='10Cent10',",
+      "span": {
+        "end_col": 42,
+        "end_line": 26,
+        "start_col": 0,
+        "start_line": 20
+      },
+      "trigger_phase": "install"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 8,
+    "files_total": 8,
+    "limits_hit": [],
+    "parse_failures": [],
+    "python_files": 1,
+    "uninspected": [],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R001",
+      "to": "F002",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R002",
+      "to": "F003",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R003",
+      "to": "F004",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R004",
+      "to": "F005",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R005",
+      "to": "F003",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R006",
+      "to": "F004",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R007",
+      "to": "F005",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R008",
+      "to": "F004",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F003",
+      "id": "R009",
+      "to": "F005",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F004",
+      "id": "R010",
+      "to": "F005",
+      "type": "co_occurrence"
+    }
+  ],
+  "scan_id": "4250c456-1bfa-4e16-b8c7-1010c2f79100",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "10cent10-999.0.4.tar.gz",
+      "format": "tar.gz",
+      "sha256": "1a673aa7b5e4d0fa9cf6788db76ea02922e07e10647eb2c4eb02c69f5c9390d6",
+      "size_bytes": 1231
+    },
+    "hash_verified": null,
+    "kind": "archive",
+    "name": "10cent10",
+    "version": "999.0.4"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "outcome": "suspicious",
+    "reasons": [
+      "S1_install_command"
+    ]
+  }
+}
