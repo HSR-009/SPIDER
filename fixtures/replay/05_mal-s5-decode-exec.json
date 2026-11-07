@@ -1,0 +1,137 @@
+{
+  "created_at": "2026-11-07T08:41:10Z",
+  "files": [
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 5,
+      "path": "main.py",
+      "roles": [],
+      "sha256": "60ca05647b430eb9f0b7bf148eb391ce65714f7cc819d53931fa19c6b5fa1064"
+    }
+  ],
+  "findings": [
+    {
+      "category": "obfuscation",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "base64 operation detected",
+      "file": "main.py",
+      "id": "F001",
+      "indicator": "base64.b64decode",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "obf.base64",
+      "severity": "medium",
+      "snippet": "base64.b64decode(blob)",
+      "span": {
+        "end_col": 29,
+        "end_line": 4,
+        "start_col": 7,
+        "start_line": 4
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "dynamic_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "exec() call detected",
+      "file": "main.py",
+      "id": "F002",
+      "indicator": "exec",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "dyn.exec",
+      "severity": "high",
+      "snippet": "exec(code)",
+      "span": {
+        "end_col": 10,
+        "end_line": 5,
+        "start_col": 0,
+        "start_line": 5
+      },
+      "trigger_phase": "import"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 1,
+    "files_total": 1,
+    "limits_hit": [],
+    "parse_failures": [],
+    "python_files": 1,
+    "uninspected": [],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R001",
+      "to": "F002",
+      "type": "co_occurrence"
+    }
+  ],
+  "scan_id": "7f4c7273-98a1-4f16-9884-288ccb694c0c",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "mal-s5-decode-exec-1.0.4.tar.gz",
+      "format": "tar.gz",
+      "sha256": "0768f5e77251ab79f7ab3098b01c15eb1b2b7338369458565058d50020794245",
+      "size_bytes": 100
+    },
+    "hash_verified": true,
+    "kind": "archive",
+    "name": "mal-s5-decode-exec",
+    "version": "1.0.4"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "outcome": "suspicious",
+    "reasons": [
+      "S2_dynamic_exec_plus",
+      "S5_decode_exec"
+    ]
+  }
+}
