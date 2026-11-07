@@ -2,247 +2,295 @@
 """
 Person_A/pipeline/parity_report.py
 ----------------------------------
-Compares indicator detections across analyzer implementations:
+Compares indicator detections across analyzer implementations on real archives:
 1. Frozen v1 AST analyzer (Person_A/ast_analyzer/analyzer_v1_frozen.py)
 2. scan_benign.py rule logic (Person_A/pipeline/scan_benign.py:analyze)
 3. v1.1 engine (spider.engine.scan / analyzer_v1_1.py)
 
-On a sample of 300 benign and 300 malicious packages (seed 42),
-compares indicator sets per package (excluding Parse Error).
-Writes results/parity_v1_vs_v11.md and results/parity_v1_vs_v11.csv.
+On a sample of 300 benign and 300 malicious archives sampled with seed 42,
+extracts into temp dir, runs all three on the SAME file set (excluding kind "doc"),
+and compares indicator sets per package (excluding Parse Error).
+
+Outputs:
+- Percentage of packages where v1 equals scan_benign.
+- Top 10 indicators found by only one side in each direction (counts and examples).
+- Indicators lost by v1.1 vs v1 (must be 0; any discrepancy is classified automatically
+  only as far as data supports: e.g. uninspected/parse_failure, else marked 'unclassified').
+- Writes results/parity_v1_vs_v11.md and results/parity_v1_vs_v11.csv.
+
+Note: Designed to run on Kali where raw archives exist. Exits non-zero with a clear
+message if fewer archives are found than required.
 """
 
 import argparse
 import csv
-import gzip
+import io
 import json
 import os
 import random
-from collections import Counter
+import sys
+import tempfile
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_BENIGN_V1 = ROOT / "data" / "processed" / "benign_for_b.jsonl.gz"
-DEFAULT_BENIGN_V11 = ROOT / "data" / "processed" / "benign_v11.jsonl.gz"
-DEFAULT_MAL_V1 = ROOT / "data" / "processed" / "malicious_for_b.jsonl"
-DEFAULT_MAL_V11 = ROOT / "data" / "processed" / "malicious_v11.jsonl"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from Person_A.ast_analyzer.analyzer_v1_frozen import analyze_file as analyze_v1
+from Person_A.pipeline.scan_benign import analyze as analyze_scan_benign
+from spider.engine.classify import classify
+from spider.engine.extract import safe_extract
+from spider.engine.scan import scan_directory
+from spider_contract.adapter import to_legacy
+
+DEFAULT_BENIGN_RAW = ROOT / "data" / "raw" / "benign" / "archives"
+DEFAULT_MALICIOUS_RAW = ROOT / "data" / "raw" / "malicious" / "pypi"
 DEFAULT_OUT_MD = ROOT / "results" / "parity_v1_vs_v11.md"
 DEFAULT_OUT_CSV = ROOT / "results" / "parity_v1_vs_v11.csv"
+ARCHIVE_EXTS = (".tar.gz", ".tar.bz2", ".tar.xz", ".tgz", ".zip", ".whl")
 
 
-def load_jsonl(path):
-    p = Path(path)
-    if not p.exists():
+def collect_archives(directory):
+    path = Path(directory)
+    if not path.exists():
         return []
-    opener = gzip.open if p.suffix == ".gz" else open
-    rows = []
-    with opener(p, "rt", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                rows.append(json.loads(line))
-    return rows
+    archives = []
+    for root, _, files in os.walk(path):
+        for f in files:
+            lower = f.lower()
+            if any(lower.endswith(ext) for ext in ARCHIVE_EXTS):
+                archives.append(Path(root) / f)
+    return archives
 
 
-def extract_indicators(findings):
-    return {f["indicator"] for f in findings if f.get("category") != "Parse Error"}
+def analyze_extracted_dir(dest_dir):
+    """
+    Extracts all files in dest_dir, filters out kind 'doc' using classify.py,
+    and runs (a) analyzer_v1, (b) scan_benign, and (c) scan_directory (v1.1).
+    """
+    python_files = []
+    dest_path = Path(dest_dir)
+    for root, _, files in os.walk(dest_path):
+        for f in files:
+            full = Path(root) / f
+            rel = str(full.relative_to(dest_path)).replace("\\", "/")
+            kind, _ = classify(rel)
+            if kind == "python":
+                python_files.append((rel, full))
+
+    # 1. Frozen v1
+    v1_findings = []
+    for rel, full in python_files:
+        try:
+            f = analyze_v1(str(full))
+            for item in f:
+                item["file"] = rel
+            v1_findings.extend(f)
+        except Exception:
+            pass
+
+    # 2. scan_benign.py logic
+    sb_findings = []
+    for rel, full in python_files:
+        try:
+            content = full.read_text(encoding="utf-8", errors="replace")
+            f = analyze_scan_benign(content, rel)
+            sb_findings.extend(f)
+        except Exception:
+            pass
+
+    # 3. v1.1 engine
+    v11_rec = scan_directory(dest_dir)
+    v11_legacy = to_legacy(v11_rec)
+
+    v1_inds = {f["indicator"] for f in v1_findings if f.get("category") != "Parse Error"}
+    sb_inds = {f["indicator"] for f in sb_findings if f.get("category") != "Parse Error"}
+    v11_inds = {f["indicator"] for f in v11_legacy if f.get("category") != "Parse Error"}
+
+    return {
+        "python_files": len(python_files),
+        "v1_indicators": v1_inds,
+        "scan_benign_indicators": sb_inds,
+        "v11_indicators": v11_inds,
+        "uninspected": [u["path"] for u in v11_rec.get("inventory", {}).get("uninspected", [])],
+        "parse_failures": [p["path"] for p in v11_rec.get("inventory", {}).get("parse_failures", [])],
+    }
 
 
-def generate_parity_report(
-    benign_v1_path=DEFAULT_BENIGN_V1,
-    benign_v11_path=DEFAULT_BENIGN_V11,
-    mal_v1_path=DEFAULT_MAL_V1,
-    mal_v11_path=DEFAULT_MAL_V11,
-    out_md=DEFAULT_OUT_MD,
-    out_csv=DEFAULT_OUT_CSV,
-    seed=42,
-    sample_size=300,
-):
-    ben_v1 = load_jsonl(benign_v1_path)
-    ben_v11 = load_jsonl(benign_v11_path)
-    mal_v1 = load_jsonl(mal_v1_path)
-    mal_v11 = load_jsonl(mal_v11_path)
+def run_parity_comparison(benign_raw_dir, mal_raw_dir, out_md, out_csv, sample_size=300, seed=42):
+    ben_archives = collect_archives(benign_raw_dir)
+    mal_archives = collect_archives(mal_raw_dir)
 
-    ben_v1_dict = {r["package_id"]: extract_indicators(r.get("findings", [])) for r in ben_v1}
-    ben_v11_dict = {r["package_id"]: extract_indicators(r.get("findings", [])) for r in ben_v11}
-    mal_v1_dict = {r["package_id"]: extract_indicators(r.get("findings", [])) for r in mal_v1}
-    mal_v11_dict = {r["package_id"]: extract_indicators(r.get("findings", [])) for r in mal_v11}
+    print(f"Archives found: {len(ben_archives)} benign, {len(mal_archives)} malicious")
 
-    ben_common = sorted(set(ben_v1_dict.keys()) & set(ben_v11_dict.keys()))
-    mal_common = sorted(set(mal_v1_dict.keys()) & set(mal_v11_dict.keys()))
+    if len(ben_archives) < sample_size or len(mal_archives) < sample_size:
+        sys.exit(
+            f"ERROR: Insufficient raw archives found for parity evaluation!\n"
+            f"  Benign archives found: {len(ben_archives)} (required: {sample_size})\n"
+            f"  Malicious archives found: {len(mal_archives)} (required: {sample_size})\n"
+            f"This script runs on Kali where raw archives exist under --raw-dir."
+        )
 
     rng = random.Random(seed)
-    sampled_ben = rng.sample(ben_common, min(sample_size, len(ben_common))) if ben_common else []
-    sampled_mal = rng.sample(mal_common, min(sample_size, len(mal_common))) if mal_common else []
+    sampled_ben = rng.sample(ben_archives, sample_size)
+    sampled_mal = rng.sample(mal_archives, sample_size)
 
-    # Comparison metrics
-    # 1. Percentage where v1 equals scan_benign (on benign sample)
-    ben_same = sum(1 for pid in sampled_ben if ben_v1_dict[pid] == ben_v11_dict[pid])
-    ben_pct = (ben_same / len(sampled_ben) * 100) if sampled_ben else 0.0
+    results = []
 
-    mal_same = sum(1 for pid in sampled_mal if mal_v1_dict[pid] == mal_v11_dict[pid])
-    mal_pct = (mal_same / len(sampled_mal) * 100) if sampled_mal else 0.0
+    # Process benign
+    for arc in sampled_ben:
+        with tempfile.TemporaryDirectory() as dest:
+            safe_extract(str(arc), dest)
+            res = analyze_extracted_dir(dest)
+            res["archive"] = arc.name
+            res["corpus"] = "benign"
+            results.append(res)
 
-    total_sampled = len(sampled_ben) + len(sampled_mal)
-    total_same = ben_same + mal_same
-    total_pct = (total_same / total_sampled * 100) if total_sampled else 0.0
+    # Process malicious
+    for arc in sampled_mal:
+        with tempfile.TemporaryDirectory() as dest:
+            safe_extract(str(arc), dest)
+            res = analyze_extracted_dir(dest)
+            res["archive"] = arc.name
+            res["corpus"] = "malicious"
+            results.append(res)
 
-    # 2. Top indicators found by only one side in each direction
+    # Statistics
+    ben_results = [r for r in results if r["corpus"] == "benign"]
+    mal_results = [r for r in results if r["corpus"] == "malicious"]
+
+    v1_eq_sb_ben = sum(1 for r in ben_results if r["v1_indicators"] == r["scan_benign_indicators"])
+    pct_v1_eq_sb = (v1_eq_sb_ben / len(ben_results) * 100) if ben_results else 0.0
+
+    # Top indicators found by only one side
     only_v1 = Counter()
-    only_v11 = Counter()
-
-    for pid in sampled_ben:
-        for ind in (ben_v1_dict[pid] - ben_v11_dict[pid]):
+    only_sb = Counter()
+    for r in ben_results:
+        for ind in (r["v1_indicators"] - r["scan_benign_indicators"]):
             only_v1[ind] += 1
-        for ind in (ben_v11_dict[pid] - ben_v1_dict[pid]):
-            only_v11[ind] += 1
+        for ind in (r["scan_benign_indicators"] - r["v1_indicators"]):
+            only_sb[ind] += 1
 
-    for pid in sampled_mal:
-        for ind in (mal_v1_dict[pid] - mal_v11_dict[pid]):
-            only_v1[ind] += 1
-        for ind in (mal_v11_dict[pid] - mal_v1_dict[pid]):
-            only_v11[ind] += 1
+    # Indicators lost by v1.1 vs v1
+    lost_counts = Counter()
+    lost_examples = defaultdict(list)
+    classified_reasons = {}
+
+    for r in results:
+        lost = r["v1_indicators"] - r["v11_indicators"]
+        for ind in lost:
+            lost_counts[ind] += 1
+            if len(lost_examples[ind]) < 3:
+                lost_examples[ind].append(r["archive"])
+
+            # Automatic data-supported classification
+            if r["parse_failures"]:
+                classified_reasons[ind] = "file_parse_failure"
+            elif r["uninspected"]:
+                classified_reasons[ind] = "file_uninspected_limit"
+            else:
+                classified_reasons[ind] = "unclassified"
+
+    # New in v1.1
+    new_counts = Counter()
+    for r in results:
+        for ind in (r["v11_indicators"] - r["v1_indicators"]):
+            new_counts[ind] += 1
 
     # Write CSV
     out_csv = Path(out_csv)
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["package_id", "corpus", "v1_indicator_count", "v11_indicator_count", "identical", "lost_in_v11", "new_in_v11"])
-        for pid in sampled_ben:
-            v1_set = ben_v1_dict[pid]
-            v11_set = ben_v11_dict[pid]
+        writer.writerow(["archive", "corpus", "v1_count", "sb_count", "v11_count", "v1_equals_sb", "lost_in_v11", "new_in_v11"])
+        for r in results:
             writer.writerow([
-                pid,
-                "benign",
-                len(v1_set),
-                len(v11_set),
-                int(v1_set == v11_set),
-                ";".join(sorted(v1_set - v11_set)),
-                ";".join(sorted(v11_set - v1_set)),
-            ])
-        for pid in sampled_mal:
-            v1_set = mal_v1_dict[pid]
-            v11_set = mal_v11_dict[pid]
-            writer.writerow([
-                pid,
-                "malicious",
-                len(v1_set),
-                len(v11_set),
-                int(v1_set == v11_set),
-                ";".join(sorted(v1_set - v11_set)),
-                ";".join(sorted(v11_set - v1_set)),
+                r["archive"],
+                r["corpus"],
+                len(r["v1_indicators"]),
+                len(r["scan_benign_indicators"]),
+                len(r["v11_indicators"]),
+                int(r["v1_indicators"] == r["scan_benign_indicators"]),
+                ";".join(sorted(r["v1_indicators"] - r["v11_indicators"])),
+                ";".join(sorted(r["v11_indicators"] - r["v1_indicators"])),
             ])
 
-    # Write Markdown Report
+    # Write Markdown
     out_md = Path(out_md)
     out_md.parent.mkdir(parents=True, exist_ok=True)
-    report_content = f"""# Parity Report: Analyzer v1 vs Analyzer v1.1
-
-## Overview
-- **Sample Selection**: 300 benign and 300 malicious archives sampled with seed {seed}.
-- **Evaluated Corpora**:
-  - Benign v1 (`data/processed/benign_for_b.jsonl.gz`) vs v1.1 (`data/processed/benign_v11.jsonl.gz`)
-  - Malicious v1 (`data/processed/malicious_for_b.jsonl`) vs v1.1 (`data/processed/malicious_v11.jsonl`)
-- **Total Packages Evaluated**: {total_sampled}
-
-## Parity Rates (Identical Indicator Sets)
-- **Benign Packages (v1 vs v1.1 / scan_benign parity)**: {ben_same} / {len(sampled_ben)} ({ben_pct:.1f}%)
-- **Malicious Packages (v1 vs v1.1 parity)**: {mal_same} / {len(sampled_mal)} ({mal_pct:.1f}%)
-- **Overall Identical Indicator Sets**: {total_same} / {total_sampled} ({total_pct:.1f}%)
-
-## Top 10 Indicators Unique to One Side
-
-### Indicators Emitted by v1 but Absent in v1.1
-| Indicator | Occurrences in Sample | Reason / Justification |
-|---|---:|---|
-"""
+    lines = [
+        "# Parity Report: Analyzer v1 vs scan_benign vs v1.1",
+        "",
+        "## Summary",
+        f"- **Archives Evaluated**: {len(ben_results)} benign, {len(mal_results)} malicious (sampled seed {seed}).",
+        f"- **Percentage of benign packages where v1 equals scan_benign**: {pct_v1_eq_sb:.1f}% ({v1_eq_sb_ben} / {len(ben_results)}).",
+        f"- **Total indicators lost by v1.1 vs v1**: {sum(lost_counts.values())}.",
+        "",
+        "## Top Indicators Found by Only One Side (v1 vs scan_benign)",
+        "",
+        "### In v1 but not scan_benign",
+        "| Indicator | Count |",
+        "|---|---:|",
+    ]
     for ind, count in only_v1.most_common(10):
-        reason = ""
-        if ind == ".env":
-            reason = "Subdirectory / substring noise rule tightened; .env substring matches deprecated in v1.1"
-        elif ind in ("os.environ", "subprocess.Popen", "subprocess.run", "requests.get", "requests.post", "exec", "eval", "socket", "compile"):
-            reason = "Excluded by classify.py from test/doc files (`tests/`, `docs/`, `examples/` not scanned in v1.1)"
-        elif ind == "setuptools.setup":
-            reason = "Renamed or excluded from doc/build artifacts; parsed under build configuration"
-        else:
-            reason = "Refined module-level shadowing or test/doc path exclusion"
-        report_content += f"| `{ind}` | {count} | {reason} |\n"
+        lines.append(f"| `{ind}` | {count} |")
 
-    report_content += """
-### Indicators Emitted by v1.1 but Absent in v1
-| Indicator | Occurrences in Sample | New v1.1 Rule Capability |
-|---|---:|---|
-"""
-    for ind, count in only_v11.most_common(10):
-        cap = ""
-        if "cmdclass" in ind or "install_command" in ind:
-            cap = "Setup command / install hook override detection (`S1_install_command`)"
-        elif "dynamic" in ind or "__import__" in ind or "importlib" in ind:
-            cap = "Dynamic import indirection detection"
-        elif "subprocess" in ind:
-            cap = "Extended subprocess invocation variants (`check_output`, `check_call`, `call`)"
-        elif "urllib" in ind:
-            cap = "Direct urllib network request API detection"
-        elif "fromhex" in ind or "join(chr)" in ind:
-            cap = "Obfuscated bytes/string decoding detection"
-        elif "getattr" in ind:
-            cap = "Targeted dynamic getattr dispatch detection"
-        else:
-            cap = "Hardened AST rule in v1.1"
-        report_content += f"| `{ind}` | {count} | {cap} |\n"
+    lines.extend([
+        "",
+        "### In scan_benign but not v1",
+        "| Indicator | Count |",
+        "|---|---:|",
+    ])
+    for ind, count in only_sb.most_common(10):
+        lines.append(f"| `{ind}` | {count} |")
 
-    report_content += f"""
-## Verification of Lost Indicators
-On identical file inputs (excluding doc/test exclusions by `classify.py`), core AST analyzer equivalence tests demonstrate 0 lost indicators (`old - new - informational == 0` verified in `tests/test_analyzer_v1_1_equivalence.py`). All differences observed above stem from:
-1. Intentional exclusion of `doc` / `test` files by the v1.1 directory scanner.
-2. Removal of noisy `.env` substring matching.
-3. Module-level shadowing precision.
+    lines.extend([
+        "",
+        "## Indicators Lost by v1.1 vs v1",
+        "| Indicator | Lost Count | Data-Supported Classification | Example Archives |",
+        "|---|---:|---|---|",
+    ])
+    if not lost_counts:
+        lines.append("| *(None)* | 0 | Verified 0 lost indicators | N/A |")
+    else:
+        for ind, count in lost_counts.most_common():
+            cls = classified_reasons.get(ind, "unclassified")
+            ex = ", ".join(lost_examples[ind])
+            lines.append(f"| `{ind}` | {count} | {cls} | {ex} |")
 
-Report generated and verified reproducibly with seed {seed}.
-"""
-    with open(out_md, "w", encoding="utf-8") as f:
-        f.write(report_content)
+    lines.extend([
+        "",
+        "## New Indicators Emitted in v1.1",
+        "| Indicator | Count |",
+        "|---|---:|",
+    ])
+    for ind, count in new_counts.most_common(10):
+        lines.append(f"| `{ind}` | {count} |")
 
-    print(f"Parity report generated:")
-    print(f"  Markdown: {out_md}")
-    print(f"  CSV: {out_csv}")
-    print(f"  Benign identical: {ben_same}/{len(sampled_ben)} ({ben_pct:.1f}%)")
-    print(f"  Malicious identical: {mal_same}/{len(sampled_mal)} ({mal_pct:.1f}%)")
-    return {
-        "benign_identical": ben_same,
-        "benign_total": len(sampled_ben),
-        "benign_pct": ben_pct,
-        "malicious_identical": mal_same,
-        "malicious_total": len(sampled_mal),
-        "malicious_pct": mal_pct,
-    }
+    out_md.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Parity report written to: {out_md} and {out_csv}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Parity Report between v1 and v1.1")
-    parser.add_argument("--benign-v1", default=str(DEFAULT_BENIGN_V1))
-    parser.add_argument("--benign-v11", default=str(DEFAULT_BENIGN_V11))
-    parser.add_argument("--mal-v1", default=str(DEFAULT_MAL_V1))
-    parser.add_argument("--mal-v11", default=str(DEFAULT_MAL_V11))
-    parser.add_argument("--out-md", default=str(DEFAULT_OUT_MD))
-    parser.add_argument("--out-csv", default=str(DEFAULT_OUT_CSV))
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--sample-size", type=int, default=300)
+    parser = argparse.ArgumentParser(description="Parity report comparing v1, scan_benign and v1.1 on raw archives (runs on Kali)")
+    parser.add_argument("--benign-raw", default=str(DEFAULT_BENIGN_RAW), help="Path to raw benign archives directory")
+    parser.add_argument("--malicious-raw", default=str(DEFAULT_MALICIOUS_RAW), help="Path to raw malicious archives directory")
+    parser.add_argument("--out-md", default=str(DEFAULT_OUT_MD), help="Path to write parity markdown report")
+    parser.add_argument("--out-csv", default=str(DEFAULT_OUT_CSV), help="Path to write parity csv report")
+    parser.add_argument("--sample-size", type=int, default=300, help="Number of archives to sample per class")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed")
     args = parser.parse_args()
 
-    generate_parity_report(
-        benign_v1_path=args.benign_v1,
-        benign_v11_path=args.benign_v11,
-        mal_v1_path=args.mal_v1,
-        mal_v11_path=args.mal_v11,
+    run_parity_comparison(
+        benign_raw_dir=args.benign_raw,
+        mal_raw_dir=args.malicious_raw,
         out_md=args.out_md,
         out_csv=args.out_csv,
-        seed=args.seed,
         sample_size=args.sample_size,
+        seed=args.seed,
     )
 
 
 if __name__ == "__main__":
     main()
-

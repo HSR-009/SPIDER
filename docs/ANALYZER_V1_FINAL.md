@@ -37,8 +37,4 @@ The initial v1 analyzer has known syntactic blind spots:
 These blind spots are addressed and hardened in `analyzer_v1_1.py` under the v1.1 ruleset.
 
 ## Parity Numbers
-Measured from the 600-package sample (300 benign, 300 malicious, seed 42) in `Person_A/pipeline/parity_report.py`:
-- **Benign Corpora Parity (v1 vs v1.1 / scan_benign parity)**: 121 / 300 (40.3% identical indicator sets).
-- **Malicious Corpora Parity (v1 vs v1.1 parity)**: 174 / 300 (58.0% identical indicator sets).
-- **Overall Identical Indicator Sets**: 295 / 600 (49.2%).
-- **Indicators Lost by v1.1 vs v1 on Analyzed Code**: 0 (`old - new - informational == 0` verified in test suite). Discrepancies between dataset scans are strictly due to `classify.py` excluding test/doc directories and deprecation of loose `.env` substring matching.
+TO FILL
