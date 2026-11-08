@@ -1,0 +1,23 @@
+{
+  "evaluation_name": "SPIDER Day 5 Adversarial Resilience Protocol",
+  "timestamp": "2026-11-08",
+  "adversarial_tag": "adv-batch-v1",
+  "manifest_sha256": "bb7f4fe8676000ef1e2f06e08d8387738e8ee4a3c33ac68ade289ffd8875aaa3",
+  "sample_count": 12,
+  "analyzers": {
+    "v1_baseline": "Person_A/ast_analyzer/analyzer_v1_frozen.py",
+    "v1_1_hardened": "spider.engine.scan.scan_directory (analyzer-v1.1)",
+    "normalizer": "spider.normalize.normalize_source (Person C adapter)"
+  },
+  "models_evaluated": {
+    "random_forest": "Person_B/models/saved/random_forest_behavior_without_size_v11.joblib",
+    "xgboost": "Person_B/models/saved/xgboost_behavior_without_size_v11.joblib"
+  },
+  "training_data_isolation": {
+    "adversarial_data_in_training": false,
+    "adversarial_data_in_calibration": false,
+    "holdout_data_in_training": false,
+    "frozen_holdout_file": "results/frozen_holdout_packages.csv"
+  },
+  "decision_threshold": 0.5
+}

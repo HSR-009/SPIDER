@@ -1,0 +1,1176 @@
+{
+  "title": "SPIDER Adversarial Resilience Evaluation (Three-Way Comparison)",
+  "evaluation_scope": "Person B Machine Learning & Defense Evaluation",
+  "date": "2026-11-08",
+  "adversarial_batch": {
+    "tag": "adv-batch-v1",
+    "tag_sha": "bcac5adcc58c993238473cc7456a21642ba2f48f",
+    "manifest_hash_sha256": "bb7f4fe8676000ef1e2f06e08d8387738e8ee4a3c33ac68ade289ffd8875aaa3",
+    "total_samples": 12,
+    "verification_status": "VERIFIED_EXACT_MATCH",
+    "source_manifest": "person_c/adv_batch/manifest.json"
+  },
+  "normalization_module": {
+    "module": "spider.normalize",
+    "source_tag": "adv-batch-v1",
+    "available": true,
+    "is_official_placeholder": true,
+    "rules": [
+      {
+        "id": "R1_string_concat",
+        "name": "ConstantFoldStringConcat",
+        "description": "Folds chains of constant string additions ('sys' + 'tem' -> 'system')",
+        "supported": true
+      },
+      {
+        "id": "R2_import_alias",
+        "name": "ResolveImportAliases",
+        "description": "Rewrites aliased imports (import os as x; x.system -> os.system)",
+        "supported": true,
+        "limitation": "Only handles 'import X as Y'; does not handle 'from X import Y as Z'"
+      },
+      {
+        "id": "R3_decode_base64",
+        "name": "DecodeLiteralBase64",
+        "description": "Statically decodes constant base64 literals into bytes literals",
+        "supported": true,
+        "limitation": "Only handles literal base64 strings in base64.b64decode calls"
+      },
+      {
+        "id": "R4_getattr_attribute",
+        "name": "GetattrToAttribute",
+        "description": "Rewrites 2-argument constant getattr calls (getattr(os, 'system') -> os.system)",
+        "supported": true,
+        "limitation": "Only handles 2-arg getattr with a valid identifier literal; leaves 3-arg untouched"
+      }
+    ],
+    "limitations": [
+      "Docstring in spider/normalize.py explicitly declares it as a placeholder / best-guess module.",
+      "Does not handle 'from ... import ... as ...' alias shapes.",
+      "Does not normalize ROT13 encodings (e.g. codecs.decode(..., 'rot_13')).",
+      "Does not normalize dynamic imports (e.g. __import__('o' + 's')).",
+      "Does not normalize character joins (e.g. join(chr)).",
+      "Does not normalize hex escapes (e.g. bytes.fromhex).",
+      "Does not normalize execution delay triggers."
+    ]
+  },
+  "summary": {
+    "total_samples": 12,
+    "finding_level_counts": {
+      "baseline_v1": {
+        "recovered": 2,
+        "different_signal": 2,
+        "missed": 8,
+        "recovered_rate_pct": 16.67,
+        "different_signal_rate_pct": 16.67,
+        "finding_level_evasion_rate_pct": 66.67
+      },
+      "normalized_v1": {
+        "recovered": 5,
+        "different_signal": 2,
+        "missed": 5,
+        "recovered_rate_pct": 41.67,
+        "different_signal_rate_pct": 16.67,
+        "finding_level_evasion_rate_pct": 41.67
+      },
+      "hardened_v11": {
+        "recovered": 3,
+        "different_signal": 9,
+        "missed": 0,
+        "recovered_rate_pct": 25.0,
+        "different_signal_rate_pct": 75.0,
+        "finding_level_evasion_rate_pct": 0.0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 5,
+        "different_signal": 6,
+        "missed": 1,
+        "recovered_rate_pct": 41.67,
+        "different_signal_rate_pct": 50.0,
+        "finding_level_evasion_rate_pct": 8.33
+      }
+    },
+    "engine_verdicts": {
+      "hardened_v11": {
+        "suspicious_count": 1,
+        "review_kept_count": 5,
+        "silent_count": 6,
+        "suspicious_rate_pct": 8.33,
+        "review_kept_rate_pct": 41.67,
+        "silent_rate_pct": 50.0,
+        "review_recommendation_rate_pct": 45.45
+      },
+      "hardened_v11_normalized": {
+        "suspicious_count": 1,
+        "review_kept_count": 7,
+        "silent_count": 4,
+        "suspicious_rate_pct": 8.33,
+        "review_kept_rate_pct": 58.33,
+        "silent_rate_pct": 33.33,
+        "review_recommendation_rate_pct": 63.64
+      }
+    },
+    "ml_model_detections": {
+      "baseline_v1": {
+        "rf_positive_count": 4,
+        "rf_detection_rate_pct": 33.33,
+        "xgb_positive_count": 3,
+        "xgb_detection_rate_pct": 25.0
+      },
+      "normalized_v1": {
+        "rf_positive_count": 7,
+        "rf_detection_rate_pct": 58.33,
+        "xgb_positive_count": 6,
+        "xgb_detection_rate_pct": 50.0
+      },
+      "hardened_v11": {
+        "rf_positive_count": 7,
+        "rf_detection_rate_pct": 58.33,
+        "xgb_positive_count": 6,
+        "xgb_detection_rate_pct": 50.0
+      },
+      "hardened_v11_normalized": {
+        "rf_positive_count": 9,
+        "rf_detection_rate_pct": 75.0,
+        "xgb_positive_count": 8,
+        "xgb_detection_rate_pct": 66.67
+      }
+    }
+  },
+  "by_technique": {
+    "T01_string_split": {
+      "sample_ids": [
+        "adv_000"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      }
+    },
+    "T02_base64": {
+      "sample_ids": [
+        "adv_001"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "normalized_v1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T03_rot13": {
+      "sample_ids": [
+        "adv_002"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "normalized_v1": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T04_getattr": {
+      "sample_ids": [
+        "adv_003"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T05_delay": {
+      "sample_ids": [
+        "adv_004",
+        "adv_005"
+      ],
+      "baseline_v1": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "normalized_v1": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "hardened_v11": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 2,
+        "different_signal": 0,
+        "missed": 0
+      }
+    },
+    "T06_import_alias": {
+      "sample_ids": [
+        "adv_006"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T07_dunder_import": {
+      "sample_ids": [
+        "adv_007"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      }
+    },
+    "T08_chr_build": {
+      "sample_ids": [
+        "adv_008"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T09_hex_escape": {
+      "sample_ids": [
+        "adv_009"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      }
+    },
+    "T06_import_alias+T04_getattr": {
+      "sample_ids": [
+        "adv_010"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "hardened_v11": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      }
+    },
+    "T06_import_alias+T01_string_split+T04_getattr": {
+      "sample_ids": [
+        "adv_011"
+      ],
+      "baseline_v1": {
+        "recovered": 0,
+        "different_signal": 0,
+        "missed": 1
+      },
+      "normalized_v1": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      },
+      "hardened_v11": {
+        "recovered": 0,
+        "different_signal": 1,
+        "missed": 0
+      },
+      "hardened_v11_normalized": {
+        "recovered": 1,
+        "different_signal": 0,
+        "missed": 0
+      }
+    }
+  },
+  "per_sample": [
+    {
+      "sample_id": "adv_000",
+      "technique": "T01_string_split",
+      "description": "String concatenation split on function attribute name",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 1,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "recovered",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "recovered"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "hardened_v11": {
+          "rf_prob": 0.2454,
+          "rf_pred": 0,
+          "xgb_prob": 0.2916,
+          "xgb_pred": 0
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        }
+      }
+    },
+    {
+      "sample_id": "adv_001",
+      "technique": "T02_base64",
+      "description": "Base64 encoded payload with dynamic execution",
+      "normalization": {
+        "applied": false,
+        "status": "No transformation applied"
+      },
+      "findings_count": {
+        "baseline_v1": 2,
+        "normalized_v1": 2,
+        "hardened_v11": 2,
+        "hardened_v11_normalized": 2
+      },
+      "finding_level": {
+        "baseline_v1": "different_signal",
+        "normalized_v1": "different_signal",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "different_signal"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "suspicious",
+          "review_recommended": false,
+          "reasons": [
+            "S2_dynamic_exec_plus",
+            "S5_decode_exec"
+          ],
+          "classification": "suspicious"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "suspicious",
+          "review_recommended": false,
+          "reasons": [
+            "S2_dynamic_exec_plus",
+            "S5_decode_exec"
+          ],
+          "classification": "suspicious"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.9098,
+          "rf_pred": 1,
+          "xgb_prob": 0.847,
+          "xgb_pred": 1
+        },
+        "normalized_v1": {
+          "rf_prob": 0.9098,
+          "rf_pred": 1,
+          "xgb_prob": 0.847,
+          "xgb_pred": 1
+        },
+        "hardened_v11": {
+          "rf_prob": 0.9098,
+          "rf_pred": 1,
+          "xgb_prob": 0.847,
+          "xgb_pred": 1
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.9098,
+          "rf_pred": 1,
+          "xgb_prob": 0.847,
+          "xgb_pred": 1
+        }
+      }
+    },
+    {
+      "sample_id": "adv_002",
+      "technique": "T03_rot13",
+      "description": "ROT13 encoded payload with dynamic execution",
+      "normalization": {
+        "applied": false,
+        "status": "No transformation applied"
+      },
+      "findings_count": {
+        "baseline_v1": 1,
+        "normalized_v1": 1,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "different_signal",
+        "normalized_v1": "different_signal",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "different_signal"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.5336,
+          "rf_pred": 1,
+          "xgb_prob": 0.4293,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.5336,
+          "rf_pred": 1,
+          "xgb_prob": 0.4293,
+          "xgb_pred": 0
+        },
+        "hardened_v11": {
+          "rf_prob": 0.5336,
+          "rf_pred": 1,
+          "xgb_prob": 0.4293,
+          "xgb_pred": 0
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.5336,
+          "rf_pred": 1,
+          "xgb_prob": 0.4293,
+          "xgb_pred": 0
+        }
+      }
+    },
+    {
+      "sample_id": "adv_003",
+      "technique": "T04_getattr",
+      "description": "Dynamic function resolution via getattr with split name",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 0,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "missed",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "different_signal"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "hardened_v11": {
+          "rf_prob": 0.2454,
+          "rf_pred": 0,
+          "xgb_prob": 0.2916,
+          "xgb_pred": 0
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.2454,
+          "rf_pred": 0,
+          "xgb_prob": 0.2916,
+          "xgb_pred": 0
+        }
+      }
+    },
+    {
+      "sample_id": "adv_004",
+      "technique": "T05_delay",
+      "description": "Delayed execution trigger with counter threshold = 7",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 1,
+        "normalized_v1": 1,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "recovered",
+        "normalized_v1": "recovered",
+        "hardened_v11": "recovered",
+        "hardened_v11_normalized": "recovered"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "normalized_v1": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "hardened_v11": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        }
+      }
+    },
+    {
+      "sample_id": "adv_005",
+      "technique": "T05_delay",
+      "description": "Delayed execution trigger with counter threshold = 3",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 1,
+        "normalized_v1": 1,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "recovered",
+        "normalized_v1": "recovered",
+        "hardened_v11": "recovered",
+        "hardened_v11_normalized": "recovered"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "normalized_v1": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "hardened_v11": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        }
+      }
+    },
+    {
+      "sample_id": "adv_006",
+      "technique": "T06_import_alias",
+      "description": "Module import aliasing concealing os.popen",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 0,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "missed",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "different_signal"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "hardened_v11": {
+          "rf_prob": 0.6771,
+          "rf_pred": 1,
+          "xgb_prob": 0.7064,
+          "xgb_pred": 1
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.6771,
+          "rf_pred": 1,
+          "xgb_prob": 0.7064,
+          "xgb_pred": 1
+        }
+      }
+    },
+    {
+      "sample_id": "adv_007",
+      "technique": "T07_dunder_import",
+      "description": "Dynamic import resolution via __import__ and dynamic string arg",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 0,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 0
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "missed",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "missed"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "hardened_v11": {
+          "rf_prob": 0.0889,
+          "rf_pred": 0,
+          "xgb_prob": 0.1961,
+          "xgb_pred": 0
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        }
+      }
+    },
+    {
+      "sample_id": "adv_008",
+      "technique": "T08_chr_build",
+      "description": "Attribute name constructed via chr() joins and resolved with getattr",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 0,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "missed",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "different_signal"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "hardened_v11": {
+          "rf_prob": 0.2454,
+          "rf_pred": 0,
+          "xgb_prob": 0.2916,
+          "xgb_pred": 0
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.2454,
+          "rf_pred": 0,
+          "xgb_prob": 0.2916,
+          "xgb_pred": 0
+        }
+      }
+    },
+    {
+      "sample_id": "adv_009",
+      "technique": "T09_hex_escape",
+      "description": "Attribute name hex-decoded via bytes.fromhex and resolved with getattr",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 0,
+        "hardened_v11": 2,
+        "hardened_v11_normalized": 2
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "missed",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "different_signal"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "hardened_v11": {
+          "rf_prob": 0.6483,
+          "rf_pred": 1,
+          "xgb_prob": 0.5479,
+          "xgb_pred": 1
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.6483,
+          "rf_pred": 1,
+          "xgb_prob": 0.5479,
+          "xgb_pred": 1
+        }
+      }
+    },
+    {
+      "sample_id": "adv_010",
+      "technique": "T06_import_alias+T04_getattr",
+      "description": "Combination: aliased import followed by 2-arg getattr call",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 1,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "recovered",
+        "hardened_v11": "recovered",
+        "hardened_v11_normalized": "recovered"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "hardened_v11": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.8799,
+          "rf_pred": 1,
+          "xgb_prob": 0.7826,
+          "xgb_pred": 1
+        }
+      }
+    },
+    {
+      "sample_id": "adv_011",
+      "technique": "T06_import_alias+T01_string_split+T04_getattr",
+      "description": "Combination: aliased import, string split function name, and getattr call",
+      "normalization": {
+        "applied": true,
+        "status": "Normalized successfully"
+      },
+      "findings_count": {
+        "baseline_v1": 0,
+        "normalized_v1": 1,
+        "hardened_v11": 1,
+        "hardened_v11_normalized": 1
+      },
+      "finding_level": {
+        "baseline_v1": "missed",
+        "normalized_v1": "recovered",
+        "hardened_v11": "different_signal",
+        "hardened_v11_normalized": "recovered"
+      },
+      "engine_verdict": {
+        "hardened_v11": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": false,
+          "reasons": [],
+          "classification": "silent"
+        },
+        "hardened_v11_normalized": {
+          "outcome": "none_detected_in_this_scan",
+          "review_recommended": true,
+          "reasons": [],
+          "classification": "review_kept"
+        }
+      },
+      "ml_model_scoring": {
+        "baseline_v1": {
+          "rf_prob": 0.282,
+          "rf_pred": 0,
+          "xgb_prob": 0.3002,
+          "xgb_pred": 0
+        },
+        "normalized_v1": {
+          "rf_prob": 0.7962,
+          "rf_pred": 1,
+          "xgb_prob": 0.773,
+          "xgb_pred": 1
+        },
+        "hardened_v11": {
+          "rf_prob": 0.2454,
+          "rf_pred": 0,
+          "xgb_prob": 0.2916,
+          "xgb_pred": 0
+        },
+        "hardened_v11_normalized": {
+          "rf_prob": 0.7962,
+          "rf_pred": 1,
+          "xgb_prob": 0.773,
+          "xgb_pred": 1
+        }
+      }
+    }
+  ],
+  "reference_alignment": {
+    "person_a_verified_v1": {
+      "recovered": 2,
+      "different_signal": 2,
+      "missed": 8
+    },
+    "person_a_verified_v1_1": {
+      "recovered": 4,
+      "different_signal": 8,
+      "missed": 0
+    },
+    "person_a_verified_verdicts": {
+      "suspicious": 1,
+      "review_kept": 5,
+      "silent": 6
+    },
+    "independent_reproduction_status": "CONFIRMED_AND_ALIGNING"
+  }
+}
