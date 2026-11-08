@@ -48,8 +48,8 @@ def coverage_problems(record: Dict[str, Any]) -> List[str]:
         ratio = len(inv["uninspected"]) / float(len(non_doc))
         if ratio > UNINSPECTED_RATIO_LIMIT:
             problems.append("uninspected_ratio:%.2f" % ratio)
-        if inv["files_inspected"] == 0:
-            problems.append("nothing_inspected")
+    if inv["files_inspected"] == 0:
+        problems.append("nothing_inspected")
     return problems
 
 

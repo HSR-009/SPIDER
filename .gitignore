@@ -24,4 +24,5 @@ data/processed/malicious_scan*.jsonl
 scans/
 hunts/
 fp_check/
+zero_review/
 
