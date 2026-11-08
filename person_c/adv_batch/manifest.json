@@ -1,0 +1,160 @@
+{
+  "batch_name": "adv-batch-v1",
+  "entries": [
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_000\")",
+      "description": "String concatenation split on function attribute name",
+      "generated_code": "import os\ngetattr(os, 'sys' + 't' + 'e' + 'm')(\"echo adv_000\")",
+      "parameters": {
+        "seed": 42,
+        "sensitive_word": "system"
+      },
+      "sample_id": "adv_000",
+      "source_file": "samples/adv_000.py",
+      "technique": "T01_string_split"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_001\")",
+      "description": "Base64 encoded payload with dynamic execution",
+      "generated_code": "import base64\nencoded_data = 'aW1wb3J0IG9zCm9zLnN5c3RlbSgiZWNobyBhZHZfMDAxIik='\ndecoded_code = base64.b64decode(encoded_data)\nexec(decoded_code)",
+      "parameters": {
+        "payload": "import os\nos.system(\"echo adv_001\")"
+      },
+      "sample_id": "adv_001",
+      "source_file": "samples/adv_001.py",
+      "technique": "T02_base64"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_002\")",
+      "description": "ROT13 encoded payload with dynamic execution",
+      "generated_code": "import codecs\nencoded_data = 'vzcbeg bf\\nbf.flfgrz(\"rpub nqi_002\")'\ndecoded_code = codecs.decode(encoded_data, 'rot_13')\nexec(decoded_code)",
+      "parameters": {
+        "payload": "import os\nos.system(\"echo adv_002\")"
+      },
+      "sample_id": "adv_002",
+      "source_file": "samples/adv_002.py",
+      "technique": "T03_rot13"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_003\")",
+      "description": "Dynamic function resolution via getattr with split name",
+      "generated_code": "import os\nfunction_name = 'sy' + 'st' + 'em'\ngetattr(os, function_name)(\"echo adv_003\")",
+      "parameters": {
+        "args": "\"echo adv_003\"",
+        "func_name": "system",
+        "module": "os"
+      },
+      "sample_id": "adv_003",
+      "source_file": "samples/adv_003.py",
+      "technique": "T04_getattr"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_004\")",
+      "description": "Delayed execution trigger with counter threshold = 7",
+      "generated_code": "counter = 0\ncounter += 1\nif counter >= 7:\n    import os\n    os.system(\"echo adv_004\")",
+      "parameters": {
+        "payload": "import os\nos.system(\"echo adv_004\")",
+        "trigger_count": 7
+      },
+      "sample_id": "adv_004",
+      "source_file": "samples/adv_004.py",
+      "technique": "T05_delay"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_005\")",
+      "description": "Delayed execution trigger with counter threshold = 3",
+      "generated_code": "counter = 0\ncounter += 1\nif counter >= 3:\n    import os\n    os.system(\"echo adv_005\")",
+      "parameters": {
+        "payload": "import os\nos.system(\"echo adv_005\")",
+        "trigger_count": 3
+      },
+      "sample_id": "adv_005",
+      "source_file": "samples/adv_005.py",
+      "technique": "T05_delay"
+    },
+    {
+      "baseline_source": "import os\nos.popen(\"echo adv_006\")",
+      "description": "Module import aliasing concealing os.popen",
+      "generated_code": "import os as _sysq\n_sysq.popen(\"echo adv_006\")",
+      "parameters": {
+        "alias": "_sysq",
+        "args": "\"echo adv_006\"",
+        "func_name": "popen",
+        "module": "os"
+      },
+      "sample_id": "adv_006",
+      "source_file": "samples/adv_006.py",
+      "technique": "T06_import_alias"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_007\")",
+      "description": "Dynamic import resolution via __import__ and dynamic string arg",
+      "generated_code": "__import__(\"o\" + \"s\").system(\"echo adv_007\")",
+      "parameters": {
+        "args": "\"echo adv_007\"",
+        "func_name": "system",
+        "module_expr": "\"o\" + \"s\""
+      },
+      "sample_id": "adv_007",
+      "source_file": "samples/adv_007.py",
+      "technique": "T07_dunder_import"
+    },
+    {
+      "baseline_source": "import os\nos.popen(\"echo adv_008\")",
+      "description": "Attribute name constructed via chr() joins and resolved with getattr",
+      "generated_code": "import os\ncmd_fn = ''.join([chr(112), chr(111), chr(112), chr(101), chr(110)])\ngetattr(os, cmd_fn)(\"echo adv_008\")",
+      "parameters": {
+        "args": "\"echo adv_008\"",
+        "word": "popen"
+      },
+      "sample_id": "adv_008",
+      "source_file": "samples/adv_008.py",
+      "technique": "T08_chr_build"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_009\")",
+      "description": "Attribute name hex-decoded via bytes.fromhex and resolved with getattr",
+      "generated_code": "import os\ncmd_fn = bytes.fromhex(\"73797374656d\").decode()\ngetattr(os, cmd_fn)(\"echo adv_009\")",
+      "parameters": {
+        "args": "\"echo adv_009\"",
+        "word": "system"
+      },
+      "sample_id": "adv_009",
+      "source_file": "samples/adv_009.py",
+      "technique": "T09_hex_escape"
+    },
+    {
+      "baseline_source": "import os\nos.system(\"echo adv_010\")",
+      "description": "Combination: aliased import followed by 2-arg getattr call",
+      "generated_code": "import os as sec_os\ngetattr(sec_os, \"system\")(\"echo adv_010\")",
+      "parameters": {
+        "alias": "sec_os",
+        "args": "\"echo adv_010\"",
+        "func_name": "system",
+        "module": "os"
+      },
+      "sample_id": "adv_010",
+      "source_file": "samples/adv_010.py",
+      "technique": "T06_import_alias+T04_getattr"
+    },
+    {
+      "baseline_source": "import subprocess\nsubprocess.run([\"echo\", \"adv_011\"])",
+      "description": "Combination: aliased import, string split function name, and getattr call",
+      "generated_code": "import subprocess as sp\ngetattr(sp, \"r\" + \"un\")([\"echo\", \"adv_011\"])",
+      "parameters": {
+        "alias": "sp",
+        "args": "[\"echo\", \"adv_011\"]",
+        "func_split": "\"r\" + \"un\"",
+        "module": "subprocess"
+      },
+      "sample_id": "adv_011",
+      "source_file": "samples/adv_011.py",
+      "technique": "T06_import_alias+T01_string_split+T04_getattr"
+    }
+  ],
+  "manifest_hash_sha256": "bb7f4fe8676000ef1e2f06e08d8387738e8ee4a3c33ac68ade289ffd8875aaa3",
+  "note": "Official frozen adversarial evaluation batch v1. Used for Person A evasion evaluation and Person B ML retraining.",
+  "real_disguises_used": true,
+  "total_samples": 12,
+  "version": "1.0.0"
+}
