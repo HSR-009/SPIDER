@@ -34,8 +34,9 @@ class TestCLIEdgeCases(unittest.TestCase):
         self.assertEqual(len(scan_records), 1)
         data = json.loads(scan_records[0].read_text(encoding="utf-8"))
         self.assertEqual(data["verdict"]["outcome"], "unable_to_assess")
-        self.assertIn("No inspectable files were found (nothing was analysed)", data["verdict"]["reasons"])
-        self.assertIn("No inspectable files were found (nothing was analysed)", data["verdict"]["limitations"])
+        self.assertIn("nothing_inspected", data["verdict"]["reasons"])
+        from spider_contract.validate import validate_record
+        self.assertEqual(validate_record(data), [])
 
     def test_scan_docs_only_directory(self):
         """Directory containing only docs should return 20 (unable_to_assess)."""
@@ -48,6 +49,13 @@ class TestCLIEdgeCases(unittest.TestCase):
         ret = cli.main(["scan", str(docs_dir), "--out", str(out_dir)])
         self.assertEqual(ret, 20)
         self.assertTrue(out_dir.exists())
+        scan_records = list(out_dir.glob("*.json"))
+        self.assertEqual(len(scan_records), 1)
+        data = json.loads(scan_records[0].read_text(encoding="utf-8"))
+        self.assertEqual(data["verdict"]["outcome"], "unable_to_assess")
+        self.assertIn("nothing_inspected", data["verdict"]["reasons"])
+        from spider_contract.validate import validate_record
+        self.assertEqual(validate_record(data), [])
 
     def test_scan_clean_py_file_directory(self):
         """Directory containing a clean .py file should return 0 (none_detected_in_this_scan)."""

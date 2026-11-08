@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from spider.engine.extract import safe_extract
 from spider.engine.scan import scan_directory
-from spider_contract.validate import validate_record, schema_errors
+from spider_contract.validate import validate_record
 from spider.fetch import fetch_package_archive, FetchError
 from spider.hunter.hunt import run_hunt, sanitize_path
 from spider.hunter.store import HunterStore
@@ -118,22 +118,10 @@ def scan_target(
                 limitations.append(f"Coverage problem: {p}")
             record["verdict"]["limitations"] = limitations
 
-        # If nothing was inspected, verdict must be unable_to_assess
-        inv = record.get("inventory", {})
-        if inv.get("files_inspected", 0) == 0:
-            record["verdict"]["outcome"] = "unable_to_assess"
-            no_inspectable_msg = "No inspectable files were found (nothing was analysed)"
-            if no_inspectable_msg not in record["verdict"]["reasons"]:
-                record["verdict"]["reasons"].append(no_inspectable_msg)
-            if no_inspectable_msg not in record["verdict"]["limitations"]:
-                record["verdict"]["limitations"].append(no_inspectable_msg)
-            errs = schema_errors(record)
-        else:
-            # Validate against contract rules
-            errs = validate_record(record)
-
+        # Validate against schema
+        errs = validate_record(record)
         if errs:
-            sys.stderr.write(f"Validation errors in generated record: {errs}\n")
+            sys.stderr.write(f"Schema validation errors in generated record: {errs}\n")
             return 2
 
         # Write scans/<scan_id>.json
