@@ -129,7 +129,7 @@ def render_verdict_banner(verdict: str, origin: str):
     )
 
 
-def main():
+def render_package_investigation():
     st.title("🕷️ SPIDER — Package Investigation Spike")
     st.caption("Day 6 Spike: AST Static Findings, Exact Code Span Inspection & Provenance")
 
@@ -254,6 +254,26 @@ def main():
 
         code_html.append('</div>')
         st.markdown("".join(code_html), unsafe_allow_html=True)
+
+
+def main():
+    with st.sidebar:
+        st.title("🕷️ SPIDER Security Suite")
+        page = st.radio(
+            "Navigate View:",
+            ["📦 Package Investigation", "🔬 Model Observatory", "🕵️ Hunter-lite"],
+            index=0,
+        )
+        st.divider()
+
+    if page == "📦 Package Investigation":
+        render_package_investigation()
+    elif page == "🔬 Model Observatory":
+        from spider.ui.observatory_page import render as render_observatory
+        render_observatory(st)
+    elif page == "🕵️ Hunter-lite":
+        from spider.ui.hunter_page import render as render_hunter
+        render_hunter(st)
 
 
 if __name__ == "__main__":
