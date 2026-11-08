@@ -122,11 +122,18 @@ def generate_wilson_summary(csv_path: Path, out_path: Path) -> int:
     pct_fp = (n_fp / total_n * 100) if total_n else 0.0
     fam_pct_fp = (fam_fp / total_fam * 100) if total_fam else 0.0
 
+    unclear_clause = f" (plus {n_unclear} unclear)" if n_unclear else ""
+    important_sentence = (
+        f"> On a sample of {total_n} small, obscure PyPI packages, {n_suspicious} were flagged suspicious; "
+        f"after manual review {n_fp} were false positives{unclear_clause} ({pct_fp:.1f}%, 95% CI [{ci_base_lower:.4f}, {ci_base_upper:.4f}]). "
+        f"This evaluates precision on small, obscure PyPI packages and is not the false-positive rate of SPIDER in general."
+    )
+
     lines = [
         "# False-Positive Evaluation Summary",
         "",
         "> [!IMPORTANT]",
-        "> On a sample of 100 small, obscure PyPI packages, X were flagged suspicious; after manual review Y were false positives (Z%, 95% CI [a, b]). This evaluates precision on small, obscure PyPI packages and is not the false-positive rate of SPIDER in general.",
+        important_sentence,
         "",
         "## 1. Package-Level Results",
         "",
@@ -141,9 +148,8 @@ def generate_wilson_summary(csv_path: Path, out_path: Path) -> int:
         f"- **Unclear:** {n_unclear}",
         "",
         "### Wilson 95% Confidence Intervals",
-        f"- **Base Rate (FP only):** [{ci_base_lower:.4f}, {ci_base_upper:.4f}] ({ci_base_lower*100:.1f}% – {ci_base_upper*100:.1f}%)",
-        f"- **Upper Bound (treating unclear as FP):** [{ci_upper_lower:.4f}, {ci_upper_upper:.4f}] ({ci_upper_lower*100:.1f}% – {ci_upper_upper*100:.1f}%)",
-        f"- **Lower Bound (treating unclear as TP):** [{ci_lower_lower:.4f}, {ci_lower_upper:.4f}] ({ci_lower_lower*100:.1f}% – {ci_lower_upper*100:.1f}%)",
+        f"- **FP only (unclear counted as true positives):** [{ci_base_lower:.4f}, {ci_base_upper:.4f}] ({ci_base_lower*100:.1f}% – {ci_base_upper*100:.1f}%)",
+        f"- **FP + unclear (unclear counted as false positives):** [{ci_upper_lower:.4f}, {ci_upper_upper:.4f}] ({ci_upper_lower*100:.1f}% – {ci_upper_upper*100:.1f}%)",
         "",
         "## 2. Family-Level Results",
         "",
@@ -154,9 +160,8 @@ def generate_wilson_summary(csv_path: Path, out_path: Path) -> int:
         f"- **Family Unclear:** {fam_unclear}",
         "",
         "### Family Wilson 95% Confidence Intervals",
-        f"- **Base Rate (FP only):** [{fam_ci_base_lower:.4f}, {fam_ci_base_upper:.4f}] ({fam_ci_base_lower*100:.1f}% – {fam_ci_base_upper*100:.1f}%)",
-        f"- **Upper Bound (treating unclear as FP):** [{fam_ci_upper_lower:.4f}, {fam_ci_upper_upper:.4f}] ({fam_ci_upper_lower*100:.1f}% – {fam_ci_upper_upper*100:.1f}%)",
-        f"- **Lower Bound (treating unclear as TP):** [{fam_ci_lower_lower:.4f}, {fam_ci_lower_upper:.4f}] ({fam_ci_lower_lower*100:.1f}% – {fam_ci_lower_upper*100:.1f}%)",
+        f"- **FP only (unclear counted as true positives):** [{fam_ci_base_lower:.4f}, {fam_ci_base_upper:.4f}] ({fam_ci_base_lower*100:.1f}% – {fam_ci_base_upper*100:.1f}%)",
+        f"- **FP + unclear (unclear counted as false positives):** [{fam_ci_upper_lower:.4f}, {fam_ci_upper_upper:.4f}] ({fam_ci_upper_lower*100:.1f}% – {fam_ci_upper_upper*100:.1f}%)",
         "",
     ]
 

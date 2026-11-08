@@ -27,6 +27,7 @@ if str(ROOT) not in sys.path:
 from spider.engine.extract import safe_extract
 from spider.engine.sanitize import sanitize_snippet
 from spider.engine.scan import scan_directory
+from spider_contract.adapter import to_legacy
 from spider_contract.verdict import coverage_problems
 from spider_contract.verdict_v2 import decide
 
@@ -93,6 +94,36 @@ def scan_single_archive(
         try:
             # 1. Safe extract
             ext_res = safe_extract(archive_path, Path(temp_dir))
+            # Treat any rejected member whose reason starts with "unreadable_archive" as unable_to_assess
+            has_unreadable = any(str(r.get("reason", "")).startswith("unreadable_archive") for r in ext_res.get("rejected", []))
+            if has_unreadable:
+                return {
+                    "name": name,
+                    "version": version,
+                    "family": family,
+                    "py_files": 0,
+                    "verdict": "unable_to_assess",
+                    "strong_signals": "",
+                    "review_recommended": False,
+                    "top_indicators": "",
+                    "coverage_problems": "unreadable_archive",
+                    "triage_label": "",
+                    "triage_note": "",
+                }, None
+        except TimeoutException as e:
+            return {
+                "name": name,
+                "version": version,
+                "family": family,
+                "py_files": 0,
+                "verdict": "unable_to_assess",
+                "strong_signals": "",
+                "review_recommended": False,
+                "top_indicators": "",
+                "coverage_problems": "scan_timeout_60s",
+                "triage_label": "",
+                "triage_note": "",
+            }, None
         except Exception as e:
             return {
                 "name": name,
@@ -111,14 +142,23 @@ def scan_single_archive(
         try:
             # 2. Directory scan with corpus rescan settings
             record = scan_directory(Path(temp_dir), name=name, version=version)
-            record["target"]["hash_verified"] = True
+            # Do not set record["target"]["hash_verified"] = True; the sha256 matches our frozen list, leave None
+            record["target"]["hash_verified"] = None
 
-            # 3. Verdict v2 decision
-            findings = record.get("findings", [])
+            # Wire extraction rejections and limits into record inventory (matching rescan_corpora)
+            for rej in ext_res.get("rejected", []):
+                record["inventory"]["uninspected"].append({"path": rej.get("name", "unknown"), "reason": rej.get("reason", "rejected")})
+            for lim in ext_res.get("limits_hit", []):
+                if lim not in record["inventory"]["limits_hit"]:
+                    record["inventory"]["limits_hit"].append(lim)
+
+            # 3. Verdict v2 decision (matching rescan_corpora)
             cov_probs = coverage_problems(record)
-            outcome, strong, review_rec = decide(findings, cov_probs)
+            findings_legacy = to_legacy(record)
+            outcome, strong, review_rec = decide(findings_legacy, cov_probs)
 
             # Extract non-parse error indicators
+            findings = record.get("findings", [])
             non_parse_findings = [f for f in findings if f.get("category") != "Parse Error"]
             inds = [f.get("indicator") for f in non_parse_findings if f.get("indicator")]
             # Keep top 5 unique indicators preserving order

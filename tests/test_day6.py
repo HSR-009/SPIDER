@@ -84,9 +84,16 @@ class TestDay6(unittest.TestCase):
         self.assertEqual(ret_ok, 0)
         self.assertTrue(out_md.exists())
         content = out_md.read_text(encoding="utf-8")
-        self.assertIn("On a sample of 100 small, obscure PyPI packages", content)
+        self.assertNotIn("X were", content)
+        self.assertNotIn(" Y were ", content)
+        self.assertNotIn("Z%", content)
+        self.assertNotIn("[a, b]", content)
+        self.assertIn("On a sample of 2 small, obscure PyPI packages, 1 were flagged suspicious", content)
+        self.assertIn("after manual review 1 were false positives", content)
         self.assertIn("**Packages Scanned (n):** 2", content)
         self.assertIn("**False Positives (FP):** 1", content)
+        self.assertIn("FP only (unclear counted as true positives)", content)
+        self.assertIn("FP + unclear (unclear counted as false positives)", content)
 
     # --- TASK 1 TESTS: FP Scan with Synthetic Archives ---
     def test_fp_scan_synthetic_corpora(self):
@@ -151,6 +158,71 @@ class TestDay6(unittest.TestCase):
         ex_content = excerpts_md.read_text(encoding="utf-8")
         self.assertIn("demo-susp==1.0", ex_content)
         self.assertIn("CustomInstall", ex_content)
+
+    def test_fp_scan_archive_with_symlink_and_comparison_with_rescan(self):
+        """Test archive with symlink records rejection/coverage problem and matches rescan_corpora logic."""
+        arc_dir = self.temp_dir / "fp_check_symlink"
+        arc_dir.mkdir()
+        tar_path = arc_dir / "pkg-symlink-1.0.tar.gz"
+
+        with tarfile.open(tar_path, "w:gz") as tf:
+            # Symlink member
+            ti_link = tarfile.TarInfo("symlink_member")
+            ti_link.type = tarfile.SYMTYPE
+            ti_link.linkname = "some_target"
+            tf.addfile(ti_link)
+
+            # Normal .py member
+            ti_py = tarfile.TarInfo("clean_module.py")
+            py_data = b"def foo():\n    return 42\n"
+            ti_py.size = len(py_data)
+            tf.addfile(ti_py, io.BytesIO(py_data))
+
+        tar_sha = sha256_of_file(tar_path)
+
+        sel_csv = self.temp_dir / "sel_symlink.csv"
+        with sel_csv.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["name", "version", "rank", "size", "sha256"])
+            writer.writeheader()
+            writer.writerow({"name": "pkg-symlink", "version": "1.0", "rank": "5001", "size": str(tar_path.stat().st_size), "sha256": tar_sha})
+
+        hashes_file = self.temp_dir / "symlink.sha256"
+        hashes_file.write_text(f"{tar_sha}  fp_check/{tar_path.name}\n", encoding="utf-8")
+
+        out_csv = self.temp_dir / "out_symlink.csv"
+        ret = run_fp_scan(
+            sel_path=sel_csv,
+            archives_dir=arc_dir,
+            hashes_path=hashes_file,
+            out_csv_path=out_csv,
+        )
+        self.assertEqual(ret, 0)
+        self.assertTrue(out_csv.exists())
+
+        with out_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+            self.assertEqual(len(rows), 1)
+            row = rows[0]
+            # Symlink rejection in uninspected causes uninspected_ratio coverage problem
+            self.assertIn("uninspected_ratio", row["coverage_problems"])
+            self.assertEqual(row["verdict"], "unable_to_assess")
+
+        # Compare with rescan_corpora's scan logic for the exact same archive
+        from Person_A.pipeline.rescan_corpora import scan_single_archive_task
+        task_args = {
+            "archive_path": str(tar_path),
+            "package_name": "pkg-symlink",
+            "version": "1.0",
+            "label": 0,
+            "source": "benign_pypi",
+            "group_id": "pkg-symlink",
+            "package_id": "pkg-symlink==1.0",
+            "artifact_sha256": tar_sha,
+        }
+        rescan_row = scan_single_archive_task(task_args)
+        # Verdict outcome must equal what rescan_corpora produced
+        self.assertEqual(row["verdict"], rescan_row["verdict_outcome"])
+        self.assertEqual(row["verdict"], "unable_to_assess")
 
     def test_fp_scan_corrupted_hash_refuses(self):
         """Corrupted hash must cause fp_scan to refuse to run with exit code 2."""
