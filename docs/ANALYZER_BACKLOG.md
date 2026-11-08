@@ -3,7 +3,7 @@
 Status tags: **Verified** = measured in this repo (file named); **Reported** = stated by someone, not re-run; **Proposed** = idea only.
 Rules are frozen for the v1 demo (tag `analyzer-v1.1`). Changing a rule means re-running both corpus rescans and recording before/after.
 
-## A. What the zero-finding review says (n = 30, Verified: `results/zero_finding_review.csv`)
+## A. What the zero-finding review says (n = 30, Verified: `results/zero_finding_review_by_A.csv`)
 Sample: 30 malicious-labelled packages with `n_findings == 0` in `data/processed/malicious_v11.jsonl` (140 such rows of 2,039), stratified by archive-size tercile, 10 each, seed 42.
 This is a small stratified sample, so the counts below describe this sample, not the population.
 
