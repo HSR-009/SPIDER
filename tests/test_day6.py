@@ -277,12 +277,24 @@ class TestDay6(unittest.TestCase):
                 "package_id": f"{name}=={ver}",
                 "package_name": name,
                 "version": ver,
-                "label": "malicious",
+                "label": 1,
                 "n_findings": 0,
                 "n_py_files": 2,
                 "n_files_all": 3,
                 "archive_used": str(arc_file),
             })
+
+        # Add a benign package (label=0) with n_findings=0 that MUST be excluded
+        pkgs.append({
+            "package_id": "benign-pkg==1.0",
+            "package_name": "benign-pkg",
+            "version": "1.0",
+            "label": 0,
+            "n_findings": 0,
+            "n_py_files": 2,
+            "n_files_all": 3,
+            "archive_used": str(arc_file),
+        })
 
         table_file = self.temp_dir / "malicious_v11.jsonl"
         with table_file.open("w", encoding="utf-8") as f:
@@ -306,6 +318,8 @@ class TestDay6(unittest.TestCase):
         with out_csv.open("r", encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
             self.assertEqual(len(rows), 6)
+            pkg_ids = [r["package_id"] for r in rows]
+            self.assertNotIn("benign-pkg==1.0", pkg_ids)
             # Check terciles assigned
             terciles = [r["tercile"] for r in rows]
             self.assertIn("low", terciles)

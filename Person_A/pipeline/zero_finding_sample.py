@@ -52,15 +52,22 @@ def artifact_priority(path: Path) -> int:
     return 2
 
 
-def locate_archive(raw_dir: Path, package_name: str, version: str) -> Optional[Path]:
+def locate_archive(raw_dir: Path, package_name: str, version: str, pypi_cache: Optional[Dict[str, Path]] = None) -> Optional[Path]:
     """Locate package archive under raw_dir using standard precedence."""
     pypi_root = raw_dir if (raw_dir / "pypi").exists() is False and raw_dir.name == "pypi" else (raw_dir / "pypi" if (raw_dir / "pypi").exists() else raw_dir)
     ver_dir = pypi_root / package_name / version
     if not ver_dir.exists():
-        # Try finding case-insensitively
-        cand_pkg = [d for d in pypi_root.iterdir() if d.is_dir() and d.name.lower() == package_name.lower()]
-        if cand_pkg:
-            cand_ver = [v for v in cand_pkg[0].iterdir() if v.is_dir() and v.name.lower() == version.lower()]
+        # Try finding case-insensitively using cached pypi map if available
+        pkg_lower = package_name.lower()
+        if pypi_cache is not None:
+            cand_pkg_dir = pypi_cache.get(pkg_lower)
+        else:
+            cand_pkg = [d for d in pypi_root.iterdir() if d.is_dir() and d.name.lower() == pkg_lower]
+            cand_pkg_dir = cand_pkg[0] if cand_pkg else None
+
+        if cand_pkg_dir and cand_pkg_dir.is_dir():
+            ver_lower = version.lower()
+            cand_ver = [v for v in cand_pkg_dir.iterdir() if v.is_dir() and v.name.lower() == ver_lower]
             if cand_ver:
                 ver_dir = cand_ver[0]
 
@@ -82,6 +89,14 @@ def load_zero_finding_candidates(table_path: Path, raw_dir: Path) -> Tuple[List[
     if not table_path.exists():
         return candidates, missing_archives
 
+    pypi_root = raw_dir if (raw_dir / "pypi").exists() is False and raw_dir.name == "pypi" else (raw_dir / "pypi" if (raw_dir / "pypi").exists() else raw_dir)
+    pypi_cache: Optional[Dict[str, Path]] = None
+    if pypi_root.exists() and pypi_root.is_dir():
+        try:
+            pypi_cache = {d.name.lower(): d for d in pypi_root.iterdir() if d.is_dir()}
+        except Exception:
+            pypi_cache = None
+
     with table_path.open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -92,7 +107,9 @@ def load_zero_finding_candidates(table_path: Path, raw_dir: Path) -> Tuple[List[
             except Exception:
                 continue
 
-            if str(row.get("label", "")).lower() != "malicious":
+            # Accept label in (1, "1", "malicious", True) as malicious and nothing else
+            label = row.get("label")
+            if label not in (1, "1", "malicious", True):
                 continue
             if row.get("n_findings", 0) != 0:
                 continue
@@ -109,7 +126,7 @@ def load_zero_finding_candidates(table_path: Path, raw_dir: Path) -> Tuple[List[
                     arc_path = cand
 
             if arc_path is None:
-                arc_path = locate_archive(raw_dir, pkg_name, version)
+                arc_path = locate_archive(raw_dir, pkg_name, version, pypi_cache=pypi_cache)
 
             if arc_path and arc_path.exists():
                 size_bytes = arc_path.stat().st_size
@@ -309,6 +326,14 @@ def run_zero_finding_sampling(
     context_md.write_text("\n".join(context_lines) + "\n", encoding="utf-8")
     print(f"Review CSV written to: {out_csv}")
     print(f"Context Markdown written to: {context_md}")
+
+    if missing:
+        print(f"Candidates without locatable archive: {len(missing)}")
+        for m in missing[:10]:
+            print(f"  {m}")
+    else:
+        print("Candidates without locatable archive: 0")
+
     return 0
 
 
