@@ -17,6 +17,7 @@ This is a small stratified sample, so the counts below describe this sample, not
 | 6 | `api_not_in_ruleset` | 3 | LLM API client modules with hard-coded API keys; no rule covers the client or embedded secrets. | Secret-pattern rule (hard-coded API keys); add common LLM/HTTP client libraries to the network category. |
 
 Verdicts of the 30: 24 `none_detected_in_this_scan`, 6 `unable_to_assess` (Verified, same CSV). Only the 3 `mathepy` packages are plain Python source that a rule could plausibly match.
+Of the 3 `mathepy` packages, each has one file that fails to parse (`vlz_help.py`, line 322): a markdown cheat sheet inside a docstring, not Python 2 code. It is about 5% of the Python files, below the 20% parse-failure ratio, so it does not change the verdict and the package is not reported as unable to assess. The parse failure is recorded in the scan inventory but nothing in the verdict text mentions it.
 
 ## B. Measured limitations worth fixing first
 - **B1. Package-wide S2/S5 combine unrelated files.** In the FP check (Verified: `results/fp_check_v11.csv`), 5 of 6 flagged packages were false positives; 4 of the 5 came from the common `exec(open(...).read(), about)` version-loading idiom in `setup.py` plus a network or base64 call elsewhere. Corpus rates (Verified: `results/rescan_v11_summary.md`): S2 8.1% malicious vs 9.6% benign, but same-file S2 7.1% vs 1.7%. Proposed: require the same file (or same function) for S2/S5, and ignore `exec` of a file read in `setup.py` for version loading. Needs a full rescan and a before/after table.
@@ -31,3 +32,8 @@ Verdicts of the 30: 24 `none_detected_in_this_scan`, 6 `unable_to_assess` (Verif
 - `target.hash_verified` is `null` for collection archives; only real PyPI downloads can set it.
 - Replay fixtures 08 and 09 share an author; use distinct authors.
 - The five `fixture_0N_*` files in `fixtures/records` are Person C's old-schema files and fail validation; move them to `person_c/` and fix the generator.
+
+## D. Reading B's reports
+- results/resilience_table.md, results/fp_check_report.md and results/zero_finding_review.md are Person B's outputs. They were produced by B's scripts and have not been fully re-run by A.
+- Wording such as "failed archive extraction" and any root-cause statements in those reports are Reported, not Verified. Do not quote a root cause from them without checking it against the scan record.
+- Known example: a root cause given for one mathepy parse failure was wrong (see section A).

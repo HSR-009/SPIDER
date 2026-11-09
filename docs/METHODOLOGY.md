@@ -50,6 +50,12 @@ See `docs/ANALYZER_BACKLOG.md` §A. 140 of 2,039 malicious rows have no findings
 ## 9. Limitations
 Static analysis only; no execution or sandbox. Labels are noisy. The benign set is popular packages. The FP sample is 100 packages and singly labelled. The adversarial batch is 12 synthetic samples around one payload type; v1.1 produced a finding for all 12 but only 1 reaches `suspicious` (Verified: `results/adv_batch_verification_by_A.md`). An install-time file over 2 MiB is skipped without a coverage warning (11 malicious archives, backlog B2). Rules are frozen for the demo.
 
+Known coverage blind spots:
+- oversized setup.py/pyproject.toml skipped (11 of 2,039 malicious rows, all none_detected, see B2)
+- a single unparseable file below the 20% ratio does not change the verdict
+- compiled extensions not inspected
+- ROT13 not treated as obfuscation (B5)
+
 ## 10. Reproduction
 Run from the repository root, with `SPIDER_RAW_MAL` and `SPIDER_RAW_BEN` set (data stays on the machine that holds it):
 `python Person_A/pipeline/rescan_corpora.py --kind malicious|benign ...`, `python Person_A/analysis/rescan_summary.py`, `python Person_A/pipeline/parity_report.py`, `python Person_A/pipeline/fp_scan.py` then `python Person_A/analysis/fp_wilson.py`, `python Person_A/pipeline/zero_finding_sample.py`, `python -m unittest discover -s tests`.
