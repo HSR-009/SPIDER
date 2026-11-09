@@ -1,122 +1,92 @@
-# 🕷️ SPIDER
+# SPIDER
 
-**SPIDER** (**S**upply Chain **P**ackages **I**ntelligence for **D**etection, **E**vasion and **R**esilience) is an open-source, evidence-driven local security toolkit designed to detect malicious Python packages on PyPI, hunt for post-installation persistence artifacts, and rigorously stress-test its own detection rules against adversarial evasion techniques.
+Static analysis for Python packages: a local tool that scans a package for suspicious code, checks an installed environment for persistence artifacts, and measures how well its own rules hold up against evasion. It never executes package code.
 
-Unlike black-box classifiers that produce opaque risk scores, SPIDER is built on an **evidence-first** architecture: every alert links directly to concrete source code lines, syntax trees, and indicators. The system emits honest three-way verdicts: `suspicious`, `none detected in this scan`, or `unable to assess` — and never declares a package "safe."
+> **Status: v1 demo.** Rules are frozen (`analyzer-v1.1`). Numbers below come from files in `results/`. Anything not measured is marked *planned*.
 
----
+## What it tells you
 
-## 📁 Repository Structure
+Every scan ends in one of three verdicts. SPIDER never says "safe".
 
-```text
-SPIDER/
-├── Person_A/                 # Core engine, AST analysis, security taxonomy & dataset pipelines
-│   ├── ast_analyzer/         # Static AST analyzer (v1 baseline & v1.1 rules)
-│   ├── analysis/             # Technical gap analyses, prevalence & discrimination reports
-│   ├── pipeline/             # Data ingestion, benign fetcher, provenance & rescan scripts
-│   └── threat_model/         # Attack surface, taxonomy, and threat model specifications
-├── Person_B/                 # Machine learning pipeline, feature engineering & explainability
-│   ├── features/             # AST call ratios, Shannon entropy, and metadata features
-│   ├── models/               # Group-safe splitting, baseline RF/XGBoost, and SHAP explainability
-│   └── results/              # Frozen baseline and resilience evaluation metrics (JSON/Markdown)
-├── person_c/                 # Adversarial evasion laboratory & investigation dashboard
-│   ├── dashboard/            # Streamlit interactive application & HTML mockups
-│   ├── evasion/              # Disguise generators (T01-T05: string split, base64, ROT13, getattr, delay)
-│   └── day3_evidence/        # Empirical evasion experiment results on malicious samples
-├── data/                     # Dataset corpora and test fixtures
-│   ├── processed/            # Canonical JSONL datasets (malicious_for_b, benign_for_b with group_id)
-│   ├── raw/                  # Source manifests (benign manifest.jsonl) and quarantined archives
-│   └── toy_samples/          # Clean, malicious, and edge-case Python scripts for verification
-├── spider_contract/          # Shared evidence schema, models, leakage guards & validators
-├── tests/                    # Automated unittest test suite
-├── requirements.txt          # Python dependencies
-└── roadmap.yaml              # Dynamic roadmap and feature progression (Levels 0–8)
-```
+| Verdict | Meaning | CLI exit code |
+|---|---|---|
+| `suspicious` | Strong combination of signals found; evidence lines are shown | 10 |
+| `none_detected_in_this_scan` | No strong signal in the code that was inspected. Not a safety claim. `review_recommended` may be set | 0 |
+| `unable_to_assess` | Too much of the package could not be inspected (native binaries, parse failures, limits hit) | 20 |
 
----
+Exit code 2 means an error (bad target, network disabled, schema failure).
 
-## ⚡ Quick Start
+## Quick start
 
-### 1. Installation
-
-Ensure Python 3.10+ is installed (tested on Python 3.13):
+Python 3.10+.
 
 ```bash
-# Clone the repository
 git clone https://github.com/HSR-009/SPIDER.git
 cd SPIDER
-
-# Create and activate virtual environment
 python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-# .venv\Scripts\activate   # Windows
-
-# Install dependencies
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
 
-### 2. Run Automated Tests
-
-Run the official test suite to verify analyzer behavior, schema contracts, and leakage guards:
-
-```bash
 python -m unittest discover -s tests
+
+# Scan a directory, an archive (.tar.gz/.zip/.whl) or a PyPI release (needs network)
+python -m spider scan fixtures/src/demo-installhook     # expect: suspicious (exit 10)
+python -m spider scan fixtures/src/demo-httpclient      # expect: none detected (exit 0)
+python -m spider scan some_package==1.0.0 --json
+
+# Look through installed environments for persistence artifacts
+python -m spider hunt
+python -m spider hunt --site-packages /path/to/site-packages --json
 ```
 
-### 3. Validate Dataset Contracts
+Scan records are written to `scans/<scan_id>.json` and validate against the `scan_record` v0.1 schema in `spider_contract/`.
 
-Validate dataset integrity, PEP 503 `group_id` normalization, and required provenance fields:
+## What is in the repo
 
-```bash
-python -m spider_contract.dataset_check
-```
+| Area | Where | State |
+|---|---|---|
+| Scan engine: safe archive extraction, AST rules, verdict policy | `spider/engine/`, `spider_contract/` | Built, tested |
+| CLI (`scan`, `hunt`) | `spider/cli.py` | Built, tested |
+| Hunter: `.pth` files, `sitecustomize`, entry points, `RECORD` tamper checks | `spider/hunter/` | Built, tested on planted cases; one real-environment run, see `results/hunter_kali_notes.md` |
+| Resilience Lab: disguise generators and an adversarial batch of 12 samples | `person_c/`, `spider/normalize.py` | Built; normalization still being tidied |
+| ML baseline and resilience evaluation | `Person_B/`, `docs/ML_METHODOLOGY.md`, `results/resilience_table.md` | Built; read the methodology caveats before quoting any number |
+| Investigation UI | `spider/ui/` | Prototype |
+| Live PyPI monitoring, dependency resolution, secret scanning, LLM-agent payloads | | *Planned*, see `docs/ANALYZER_BACKLOG.md` |
 
-### 4. Run the Static Analyzer (File & Directory Scanning)
+## Measured results
 
-Analyze a single file or scan an entire package directory using Person A's AST analyzer:
+Corpora: 2,039 malicious-labelled and 2,909 benign packages, scanned with analyzer v1.1 (`results/rescan_v11_summary.md`).
 
-```python
-from Person_A.ast_analyzer.analyzer import analyze_file, scan_directory
+| | Malicious | Benign |
+|---|---|---|
+| Flagged `suspicious` | 32.6% | 12.0% |
+| `unable_to_assess` | 2.1% | 6.3% |
+| Median `.py` files per package | 2 | 12 |
 
-# 1. Analyze single file (includes col_offset, end_lineno, snippet, and stable rule_id)
-findings = analyze_file("data/toy_samples/malicious/encoded_exec.py")
-for finding in findings:
-    print(f"[{finding['severity']}] {finding['category']} :: {finding['indicator']} (Line {finding['line']}:{finding['col_offset']})")
+These are signal rates, not accuracy. Two things limit how far to trust them:
 
-# 2. Scan whole package directory (returns structured verdict and file inventory)
-scan_result = scan_directory("data/toy_samples/clean")
-print(f"Verdict: {scan_result['verdict']} (Review Recommended: {scan_result['review_recommended']})")
-print(f"Inspected files: {len(scan_result['inventory']['inspected_files'])}")
-print(f"Uninspected native files (.so/.dll/.pyd): {len(scan_result['inventory']['uninspected_files'])}")
-```
+- **Size confound.** Package size alone separates the classes (size-only AUC about 0.79). Malicious packages are much smaller.
+- **Label noise.** In a 30-package review of malicious-labelled packages with zero findings, 5 were placeholders or harmless PoCs, and 6 were empty name-squat stubs (`results/zero_finding_review_by_A.csv`). Small sample; it describes that sample, not the corpus.
 
-### 5. Launch the Investigation Dashboard
+**False positives.** On 100 small, obscure PyPI packages, 6 were flagged; manual review found 5 false positives and 1 unclear (5.0%, Wilson 95% CI 2.2% to 11.2%). That is precision on small obscure packages, not a general false-positive rate (`results/fp_check_summary.md`).
 
-Run the Streamlit investigation interface:
+**Evasion.** Of 12 adversarial samples, 1 reached `suspicious` (base64), 5 kept only the review flag and 6 were silent. The plain baseline is itself only `none_detected` with review under verdict v2, so this batch shows evasion of the review flag, not of a `suspicious` verdict. ROT13 is not treated as obfuscation. Source: `results/adv_batch_verification_by_A.md`.
 
-```bash
-streamlit run person_c/dashboard/app.py
-```
+## Known limitations
 
----
+- Package-wide combination rules S2 and S5 join unrelated files. They fire on 9.6% and 6.1% of benign packages versus 8.1% and 4.6% of malicious, so they carry little signal. Four of the five false positives above came from the common `exec(open(...).read())` version-loading idiom in `setup.py`.
+- A root `setup.py` or `pyproject.toml` over 2 MiB is skipped. 11 malicious-labelled packages hit this and all got `none_detected_in_this_scan`.
+- One unparseable Python file does not change the verdict unless unparseable files exceed 20% of the Python files. Python 2 sources and non-Python text in `.py` files fail to parse.
+- Compiled extensions (`.so`, `.pyd`) are not inspected.
+- Prose aimed at AI agents (for example MCP tool descriptions) is not analysed.
+- Static analysis only. Nothing is executed, so behaviour that depends on runtime state is out of reach.
 
-## 🛡️ Core Security Categories & Honest V1 Policies
+Full list with status tags: `docs/ANALYZER_BACKLOG.md`. Threat model: `docs/THREAT_MODEL.md`. Method: `docs/METHODOLOGY.md`.
 
-SPIDER detects indicators across six primary behavioral categories (plus explicit status categories for unparsable code and uninspected native binaries):
+## Reproducing the numbers
 
-1. **Command Execution** (`HIGH`): `os.system`, `subprocess.run`, `subprocess.Popen`
-2. **Dynamic Code Execution** (`HIGH`): `eval`, `exec`, `compile`, dynamic `getattr` resolution
-3. **Credential / Data Access** (`HIGH`): `os.environ`, `.aws/credentials`, `.ssh/`, `.netrc`, `.env`
-4. **Network Activity** (`MEDIUM`): `socket`, `requests.get/post`, `urllib.request.urlopen`
-5. **Obfuscation** (`MEDIUM`): `base64` decoders, dynamic string reconstructions
-6. **Install-Time Execution** (`HIGH` for custom hooks / `LOW` for standard setup): Custom `setuptools.command.install`, `cmdclass` hooks. Standard `setuptools.setup()` calls are calibrated to `LOW` severity to prevent false positives across benign packages.
-7. **Parse Error** (`MEDIUM` status): Tracks `SyntaxError` and unparsable files as explicit coverage gaps, never as malicious behavior.
-8. **Uninspected Native Artifacts**: Non-Python compiled binaries (`.so`, `.dll`, `.dylib`, `.pyd`) cannot be parsed by AST and are honestly logged under `inventory.uninspected_files`. If a package contains only uninspected binaries without Python code, the scan verdict is honestly set to `unable_to_assess`.
+The datasets live under `data/processed/` and the rescan scripts under `Person_A/pipeline/`. See `docs/METHODOLOGY.md` for the order to run them and the seeds used. Frozen versions are tagged `analyzer-v1`, `analyzer-v1.1` and `adv-batch-v1`.
 
----
+## Team
 
-## 🔬 Research & Anti-Leakage Discipline
-
-- **Group-Safe Splitting**: Cross-validation and test splits are strictly grouped by package name (`group_id`), ensuring versions of the same package never leak across splits.
-- **Leakage Guards**: Banned feature columns (`label`, `source`, `in_index`, `index_annotated`, `package_id`) are programmatically blocked via `assert_no_leaky_columns`.
-- **Size-Bias Control**: Evaluation explicitly reports size-only baselines and evaluates performance across package-size buckets to prevent models from taking shortcuts based on package file counts.
+Three students: A (engine, contract, Hunter, rescans), B (ML and resilience evaluation), C (evasion lab and UI).

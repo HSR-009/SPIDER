@@ -7,6 +7,7 @@ from spider_contract.dataset import (
     BANNED_FEATURE_COLUMNS,
 )
 from spider_contract.models import ScanRecord, Finding
+from spider_contract.verdict import coverage_problems
 
 class TestContract(unittest.TestCase):
     def test_make_group_id_pep503(self):
@@ -70,6 +71,42 @@ class TestContract(unittest.TestCase):
         self.assertEqual(d["verdict"], "suspicious")
         self.assertEqual(len(d["findings"]), 1)
         self.assertEqual(d["findings"][0]["rule_id"], "RULE_CMD_OS_SYSTEM")
+
+    def test_coverage_problems_nothing_inspected(self):
+        # Record with no files at all
+        empty_record = {
+            "inventory": {
+                "coverage_known": True,
+                "limits_hit": [],
+                "python_files": 0,
+                "parse_failures": [],
+                "uninspected": [],
+                "files_inspected": 0,
+            },
+            "target": {"hash_verified": None},
+            "files": [],
+        }
+        problems_empty = coverage_problems(empty_record)
+        self.assertIn("nothing_inspected", problems_empty)
+
+        # Record with only doc files
+        docs_only_record = {
+            "inventory": {
+                "coverage_known": True,
+                "limits_hit": [],
+                "python_files": 0,
+                "parse_failures": [],
+                "uninspected": [],
+                "files_inspected": 0,
+            },
+            "target": {"hash_verified": None},
+            "files": [
+                {"path": "README.md", "kind": "doc", "inspected": False},
+                {"path": "LICENSE", "kind": "doc", "inspected": False},
+            ],
+        }
+        problems_docs = coverage_problems(docs_only_record)
+        self.assertIn("nothing_inspected", problems_docs)
 
 if __name__ == "__main__":
     unittest.main()

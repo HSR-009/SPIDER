@@ -1,0 +1,454 @@
+{
+  "created_at": "2026-11-07T10:48:58Z",
+  "files": [
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/PKG-INFO",
+      "roles": [],
+      "sha256": "54957c1ffcd0af91f07f6a9b6c2a99df79a67c090ae1b7d0e1b49e4df6189018"
+    },
+    {
+      "inspected": true,
+      "kind": "build_config",
+      "lines": 4,
+      "path": "aaaazzzzaz-2.26/setup.cfg",
+      "roles": [],
+      "sha256": "a29823dd9fbb34b0b00c45fe5823d7c25a3133805e072cad4920cf76dee85bfa"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 20,
+      "path": "aaaazzzzaz-2.26/setup.py",
+      "roles": [],
+      "sha256": "33ed4b81b3ae94b26bbca74744eee68b53856a8e1ecc84581e013a13361c91fb"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/src/Aaaazzzzaz.egg-info/PKG-INFO",
+      "roles": [],
+      "sha256": "54957c1ffcd0af91f07f6a9b6c2a99df79a67c090ae1b7d0e1b49e4df6189018"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/src/Aaaazzzzaz.egg-info/SOURCES.txt",
+      "roles": [],
+      "sha256": "d37d7c9e3b0470345c7cd9abe98709bd94ef76c91e86cd4b22d31aecbf7639fa"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/src/Aaaazzzzaz.egg-info/dependency_links.txt",
+      "roles": [],
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "inspected": true,
+      "kind": "metadata",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/src/Aaaazzzzaz.egg-info/top_level.txt",
+      "roles": [],
+      "sha256": "1e23a4c7f2358ff165fec5f6ad5cd22aa0bd74ab88a59a848c04e1a289b528c0"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 0,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 0,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/agent/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 165,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/agent/critic.py",
+      "roles": [],
+      "sha256": "2981ceab96e149114cfe5f51601bf9f0f56ee5607fe154e37a872f28f948dc0a"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 242,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/agent/executor.py",
+      "roles": [],
+      "sha256": "94748b2f735fefbdbfb2538a322942e1a4b58de4ed9fa4a001b070fbfdcac402"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 192,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/agent/planner.py",
+      "roles": [],
+      "sha256": "1f739e595e51a33d062340a81e59a7b81f105d800f7a4359f1532f206d317197"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 139,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/agent/rag.py",
+      "roles": [],
+      "sha256": "c788ead0c3015b3aa5f4356857b5e9ed30ab0bc2be55aa236b5dd76be6c5d823"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 191,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/cli.py",
+      "roles": [],
+      "sha256": "fb6c1d3ea7055c323d2f26cf3f52e7af2381aea679790ef69496bc1221f07ade"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 0,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/memory/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 187,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/memory/long_term.py",
+      "roles": [],
+      "sha256": "afd3dc18f29b7ac76a67ea149ff0e71154bf2cfa47faaaea5bfbedb0ca051d49"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 59,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/memory/migrations.py",
+      "roles": [],
+      "sha256": "2de874b3e6c0bba540b1a7942d786b0dc80c91392dad8a5575fc9b4ef13f453e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 196,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/memory/short_term.py",
+      "roles": [],
+      "sha256": "f5928dd8c9fb7eac2ebeda04896224f34aeea7fc667768197eac2c7abb873417"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 11,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/orchestration/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "06892882199cdd16200e9f9eed2c17c8836a72e24a35f50bcbef60f0a4767212"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 194,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/orchestration/coordinator.py",
+      "roles": [],
+      "sha256": "4db2a43ad5998c8abf22cf940d724324346d8c8d9df36c859fcd01a3b04f8985"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 98,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/orchestration/event_bus.py",
+      "roles": [],
+      "sha256": "ce64da23434b2efa7ce82eac8af9437892388e2aacba3a97851190f28a84da3e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 12,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/tools/__init__.py",
+      "roles": [
+        "package_init"
+      ],
+      "sha256": "de1abab943eb5a8bf9c6d8d771b322a8c2a748d9a0adaae4d826bf065f75e2fd"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 64,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/tools/analysis.py",
+      "roles": [],
+      "sha256": "488d9dda9b76de507cd9fb1cbb211c9d5e98c0965310f83fe044fcb77303649e"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 93,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/tools/base.py",
+      "roles": [],
+      "sha256": "5c2502279f377fc7c1b57bf2cd308a57a5c9a82ece7b7a9a39ae2240e4c9bdc8"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 224,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/tools/database.py",
+      "roles": [],
+      "sha256": "91a8f36e7129b4e50e20f29ae40c6224923f747cea40604dd0e4d28f2af3bfbd"
+    },
+    {
+      "inspected": true,
+      "kind": "python",
+      "lines": 60,
+      "path": "aaaazzzzaz-2.26/src/TestPGAgent/tools/web_search.py",
+      "roles": [],
+      "sha256": "3654b7af702f6315ddbc815b7c511e226230ebb5cacd491aec65479bb719d492"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_critic.py",
+      "roles": [],
+      "sha256": "89d67ad8e393ea51229ab8ff89c490d47d0840f77bbd6c1a71b7bf9485305ffa"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_event_bus.py",
+      "roles": [],
+      "sha256": "fd0cdc359fb1668b1877a050e15eca3f19651c29439a15f5553089f338e61f7f"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_executor.py",
+      "roles": [],
+      "sha256": "805854212dae86947c6806b2cdcf4bf3f95771c1f004465660da94d6912ad57b"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_memory.py",
+      "roles": [],
+      "sha256": "9ebbbe307714a037d8b46b37fd382b4dcb7e7eca97583456eb2d85607acee7c8"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_planner.py",
+      "roles": [],
+      "sha256": "4551bb97fec9a32bdfd4488c350a9b397937802d69f0e620bac399fc7ee804f4"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_rag.py",
+      "roles": [],
+      "sha256": "aaa5b371b3af2af6130d38fac0558ab6124b8f64486b5669a00f11d7dc384184"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_sql_security.py",
+      "roles": [],
+      "sha256": "bbbed10880a0990d5a23edff5aa75cb8b32df9cdd2a0d4dc3aadb79d60d8c3af"
+    },
+    {
+      "inspected": false,
+      "kind": "doc",
+      "lines": null,
+      "path": "aaaazzzzaz-2.26/tests/test_tools.py",
+      "roles": [],
+      "sha256": "4c4da4be5e5b7c51586837ccea046bfca97c3f3c8ee8591bbfb14caef3cec4d2"
+    }
+  ],
+  "findings": [
+    {
+      "category": "install_time",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "setuptools.setup() call detected",
+      "file": "aaaazzzzaz-2.26/setup.py",
+      "id": "F001",
+      "indicator": "setuptools.setup",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "inst.plain_setup",
+      "severity": "low",
+      "snippet": "setuptools.setup(",
+      "span": {
+        "end_col": 1,
+        "end_line": 18,
+        "start_col": 0,
+        "start_line": 4
+      },
+      "trigger_phase": "install"
+    },
+    {
+      "category": "dynamic_execution",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "exec() call detected",
+      "file": "aaaazzzzaz-2.26/setup.py",
+      "id": "F002",
+      "indicator": "exec",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "dyn.exec",
+      "severity": "high",
+      "snippet": "exec(base64.b64decode(\"<redacted-blob>\"))",
+      "span": {
+        "end_col": 102,
+        "end_line": 20,
+        "start_col": 0,
+        "start_line": 20
+      },
+      "trigger_phase": "import"
+    },
+    {
+      "category": "obfuscation",
+      "confidence": "high",
+      "context": {
+        "after_normalization": false,
+        "enclosing_function": null,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "explanation": "base64 operation detected",
+      "file": "aaaazzzzaz-2.26/setup.py",
+      "id": "F003",
+      "indicator": "base64.b64decode",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ],
+      "rule_id": "obf.base64",
+      "severity": "medium",
+      "snippet": "base64.b64decode(\"<redacted-blob>\")",
+      "span": {
+        "end_col": 101,
+        "end_line": 20,
+        "start_col": 5,
+        "start_line": 20
+      },
+      "trigger_phase": "import"
+    }
+  ],
+  "inventory": {
+    "coverage_known": true,
+    "files_inspected": 26,
+    "files_total": 34,
+    "limits_hit": [],
+    "parse_failures": [],
+    "python_files": 20,
+    "uninspected": [],
+    "vendored_paths": []
+  },
+  "model_assessment": {
+    "calibrated": false,
+    "illustrative": false,
+    "label": null,
+    "model_name": null,
+    "model_version": null,
+    "note": null,
+    "score": null,
+    "status": "not_run",
+    "top_features": []
+  },
+  "record_origin": "replay",
+  "relations": [
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R001",
+      "to": "F002",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F001",
+      "id": "R002",
+      "to": "F003",
+      "type": "co_occurrence"
+    },
+    {
+      "basis": "co-occur in same file",
+      "confidence": "medium",
+      "from": "F002",
+      "id": "R003",
+      "to": "F003",
+      "type": "co_occurrence"
+    }
+  ],
+  "scan_id": "1cb88d27-721d-45ea-b3ac-688ca0b83329",
+  "schema_version": "0.1",
+  "target": {
+    "artifact": {
+      "filename": "aaaazzzzaz-2.26.tar.gz",
+      "format": "tar.gz",
+      "sha256": "87143ccafb4112efa1a95bac1576021516bb1c8d6801370a2636296d9b22af3d",
+      "size_bytes": 108199
+    },
+    "hash_verified": null,
+    "kind": "archive",
+    "name": "aaaazzzzaz",
+    "version": "2.26"
+  },
+  "timings_ms": {
+    "acquire": null,
+    "analyze": null,
+    "extract": null,
+    "features": null,
+    "model": null
+  },
+  "tool": {
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1",
+    "spider_version": "0.1.0-dev"
+  },
+  "verdict": {
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "outcome": "suspicious",
+    "reasons": [
+      "S2_dynamic_exec_plus",
+      "S5_decode_exec"
+    ]
+  }
+}

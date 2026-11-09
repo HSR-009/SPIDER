@@ -13,6 +13,8 @@ from spider.engine.extract import safe_extract
 from spider.engine.scan import scan_directory
 from spider_contract.validate import validate_record
 from spider.fetch import fetch_package_archive, FetchError
+from spider.hunter.hunt import run_hunt, sanitize_path
+from spider.hunter.store import HunterStore
 
 STATIC_ANALYSIS_DISCLAIMER = "Static analysis only: 'none detected in this scan' does not mean the package is safe."
 ARCHIVE_EXTENSIONS = (".tar.gz", ".tgz", ".tar.bz2", ".tar.xz", ".tar", ".zip", ".whl")
@@ -149,6 +151,87 @@ def scan_target(
             shutil.rmtree(temp_dir_to_clean, ignore_errors=True)
 
 
+def hunt_target(
+    *,
+    site_packages: Optional[List[str]] = None,
+    json_output: bool = False,
+    allow_sha256: Optional[str] = None,
+    allow_note: Optional[str] = None,
+    db_path: Optional[str] = None,
+) -> int:
+    try:
+        # Check non-existent custom site-packages directory (clean error message)
+        if site_packages:
+            for sp in site_packages:
+                if not Path(sp).exists():
+                    sys.stderr.write(f"Error: Specified site-packages directory does not exist: {sp}\n")
+                    return 2
+
+        store = HunterStore(db_path=db_path)
+
+        if allow_sha256:
+            store.add_allow(allow_sha256, note=allow_note or "")
+            if not json_output:
+                print(f"Allowlisted sha256 {allow_sha256.lower()}")
+
+        result = run_hunt(
+            extra_site_packages=site_packages,
+            db_path=db_path,
+            include_system_defaults=True if not site_packages else False,
+        )
+
+        items = result.get("items", [])
+        visible_items = [it for it in items if not it.get("allowlisted")]
+
+        if json_output:
+            # Deepcopy or sanitize paths with ~ for sharing
+            clean_res = json.loads(json.dumps(result))
+            for it in clean_res.get("items", []):
+                if it.get("path"):
+                    it["path"] = sanitize_path(it["path"])
+            clean_res["roots"] = [sanitize_path(r) for r in clean_res.get("roots", [])]
+            print(json.dumps(clean_res, indent=2))
+        else:
+            print(f"=== SPIDER Hunter Scan Report [{result.get('hunt_id')}] ===")
+            print(f"Time: {result.get('created_at')}")
+            print(f"Environments inspected: {len(result.get('roots', []))} roots ({result.get('distributions_count', 0)} distributions)")
+            print(f"Items found: {len(visible_items)} active (hidden allowlisted: {len(items) - len(visible_items)})")
+            
+            if visible_items:
+                print("\nFlagged Artifacts:")
+                for it in visible_items[:15]:
+                    print(f"  [{it.get('severity', '').upper():6}] (priority: {it.get('priority', 0)}) {it.get('artifact')}: {it.get('reason')}")
+                    print(f"           Path: {sanitize_path(it.get('path', ''))}")
+                    if it.get("evidence_snippet"):
+                        print(f"           Evidence: {it.get('evidence_snippet')}")
+
+            cov = result.get("coverage", {})
+            counts = cov.get("counts", {})
+            if counts:
+                print("\nCoverage Summary:")
+                print(f"  Skipped too large:            {counts.get('skipped_too_large', 0)}")
+                print(f"  Missing in RECORD:             {counts.get('missing_in_RECORD', 0)}")
+                print(f"  Inspection timed out:          {counts.get('inspection_timed_out', 0)}")
+                print(f"  File list unavailable:         {counts.get('file_list_unavailable', 0)}")
+                if counts.get('entrypoint_ownership_unknown'):
+                    print(f"  Entrypoint ownership unknown:  {counts.get('entrypoint_ownership_unknown', 0)}")
+
+            if cov.get("errors"):
+                print(f"\nCoverage Warnings: {len(cov['errors'])} errors")
+            if cov.get("dists_without_file_list"):
+                print(f"Distributions without file list: {len(cov['dists_without_file_list'])}")
+
+            for lim in result.get("limitations", []):
+                print(f"\n{lim}")
+
+        # Exit code 0 if no HIGH items (among non-allowlisted), 10 otherwise
+        has_high = any(it.get("severity") == "HIGH" for it in visible_items)
+        return 10 if has_high else 0
+    except Exception as e:
+        sys.stderr.write(f"Unexpected hunter error: {e}\n")
+        return 2
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="spider", description="SPIDER Package Security Scanner")
     subparsers = parser.add_subparsers(dest="subcommand")
@@ -159,6 +242,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     scan_parser.add_argument("--out", default="scans", help="Output directory for scan records (default: scans/)")
     scan_parser.add_argument("--no-network", action="store_true", help="Disable network operations")
 
+    hunt_parser = subparsers.add_parser("hunt", help="Scan installed environments for persistence artifacts")
+    hunt_parser.add_argument("--site-packages", action="append", help="Extra site-packages directory to scan")
+    hunt_parser.add_argument("--json", action="store_true", help="Output JSON hunt result")
+    hunt_parser.add_argument("--allow", help="Allowlist a sha256 hash")
+    hunt_parser.add_argument("--note", help="Note for allowlisted sha256")
+    hunt_parser.add_argument("--db", help="Path to SQLite hunter database")
+
     args = parser.parse_args(argv)
 
     if args.subcommand == "scan":
@@ -167,6 +257,14 @@ def main(argv: Optional[List[str]] = None) -> int:
             out_dir=Path(args.out),
             json_output=args.json,
             no_network=args.no_network,
+        )
+    elif args.subcommand == "hunt":
+        return hunt_target(
+            site_packages=args.site_packages,
+            json_output=args.json,
+            allow_sha256=args.allow,
+            allow_note=args.note,
+            db_path=args.db,
         )
     else:
         parser.print_help()

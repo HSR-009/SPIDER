@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import uuid
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any, Dict, List, Optional, Set
@@ -263,7 +264,9 @@ def scan_directory(
                             })
                             continue
 
-                        f_list, p_err = analyze_source(src, rel)
+                        with warnings.catch_warnings():
+                            warnings.filterwarnings("ignore", category=SyntaxWarning)
+                            f_list, p_err = analyze_source(src, rel)
                         if p_err:
                             parse_failures.append({"path": rel, "error": p_err.get("error", "syntax error")})
                             files_entries.append({
