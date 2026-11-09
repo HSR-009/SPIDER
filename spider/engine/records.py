@@ -8,7 +8,8 @@ def build_finding(
     raw_finding: Dict[str, Any],
     relpath: str,
     trigger_phase_val: str,
-    in_vendored: bool
+    in_vendored: bool,
+    after_normalization: bool = False,
 ) -> Dict[str, Any]:
     cat = normalize_category(raw_finding["category"])
     rule_id = raw_finding.get("rule_id", "unknown")
@@ -39,7 +40,7 @@ def build_finding(
         "trigger_phase": trigger_phase_val,
         "context": {
             "enclosing_function": raw_finding.get("enclosing_function"),
-            "after_normalization": False,
+            "after_normalization": after_normalization,
             "in_vendored_path": in_vendored,
         },
         "evidence_class": "static_indicator",

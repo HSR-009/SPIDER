@@ -66,6 +66,32 @@ def run_analyzer_v11(source_code: str, filename: str = "<source>") -> List[Dict[
     return findings or []
 
 
+def union_findings(
+    raw_findings: List[Dict[str, Any]],
+    normalized_findings: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Union of a raw scan and a scan of the normalized source.
+
+    Normalization must never drop a finding the raw scan already had.
+    A finding already present in the raw list is kept as-is; normalized-only
+    findings are appended. Identity is (category, indicator, file, line).
+    """
+    merged: List[Dict[str, Any]] = []
+    seen = set()
+    for finding in list(raw_findings) + list(normalized_findings):
+        key = (
+            finding.get("category"),
+            finding.get("indicator"),
+            finding.get("file"),
+            finding.get("line"),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(finding)
+    return merged
+
+
 def classify_outcome(baseline_findings: List[Dict[str, Any]], candidate_findings: List[Dict[str, Any]]) -> str:
     """Classifies outcome as recovered, different_signal, or missed."""
     if not candidate_findings:
@@ -108,8 +134,11 @@ def build_evaluation_table(manifest_path: Path) -> Dict[str, Any]:
         # Run analyzers on generated code
         f_v1 = run_analyzer_v1(generated_code)
         f_v11 = run_analyzer_v11(generated_code, sample_id)
-        f_v1_norm = run_analyzer_v1(norm_code)
-        f_v11_norm = run_analyzer_v11(norm_code, sample_id)
+        # v1 + normalize and v1.1 + normalize report the union. A rewrite that
+        # drops a literal (for example base64.b64decode -> bytes) must not
+        # erase the finding the raw scan already produced.
+        f_v1_norm = union_findings(f_v1, run_analyzer_v1(norm_code))
+        f_v11_norm = union_findings(f_v11, run_analyzer_v11(norm_code, sample_id))
 
         # Outomes
         out_v1 = classify_outcome(b_findings_v1, f_v1)
@@ -248,7 +277,10 @@ def generate_markdown_report(report_data: Dict[str, Any]) -> str:
     md.append("---")
     md.append("")
     md.append("## 4. Key Security Findings")
-    md.append("- **Direct AST Bypasses in v1:** `getattr(os, ...)` and `__import__` reliably blind baseline `v1` (ASR = 50.0%).")
+    md.append(
+        "- **Direct AST Bypasses in v1:** `getattr(os, ...)` and `__import__` reliably blind baseline "
+        f"`v1` (ASR = {asr['v1']}%)."
+    )
     md.append("- **Rule Hardening in v1.1:** `v1.1` successfully catches obfuscation indicators (`obf.fromhex`, `obf.chr_join`, `base64`), lowering pure miss rates and converting evasions to `different_signal`.")
     md.append("- **Defense Recovery via Normalization:** Adding deterministic AST normalization (`spider/normalize.py`) folds string concatenations, resolves import aliases, and converts 2-arg `getattr` into standard attribute calls, recovering original call signatures before rules fire.")
     md.append("")

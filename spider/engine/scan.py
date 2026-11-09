@@ -20,6 +20,7 @@ from spider_contract.hashing import sha256_bytes, sha256_file
 from spider_contract.verdict import coverage_problems, derive_verdict
 from spider_contract.adapter import normalize_category
 from Person_A.ast_analyzer.analyzer_v1_1 import analyze_source
+from spider.normalize import normalize_source
 from spider.engine.limits import Limits
 from spider.engine.classify import classify, EXCLUDE_DIRS, VENDORED_DIRS
 from spider.engine.phase import trigger_phase
@@ -49,6 +50,7 @@ def scan_directory(
     analyzer_version: str = "analyzer-v1.1",
     ruleset_version: str = "rules-v1.1",
     spider_version: str = "0.1.0-dev",
+    normalize: bool = False,
 ) -> Dict[str, Any]:
     if limits is None:
         limits = Limits()
@@ -264,9 +266,24 @@ def scan_directory(
                             })
                             continue
 
+                        analysis_src = src
+                        after_normalization = False
+
+                        if normalize:
+                            try:
+                                normalized_src = normalize_source(src)
+                                if isinstance(normalized_src, str) and normalized_src != src:
+                                    analysis_src = normalized_src
+                                    after_normalization = True
+                            except Exception as err:
+                                warnings.warn(
+                                    f"Normalization failed for {rel}; analyzing original source: {err}",
+                                    RuntimeWarning,
+                                )
+
                         with warnings.catch_warnings():
                             warnings.filterwarnings("ignore", category=SyntaxWarning)
-                            f_list, p_err = analyze_source(src, rel)
+                            f_list, p_err = analyze_source(analysis_src, rel)
                         if p_err:
                             parse_failures.append({"path": rel, "error": p_err.get("error", "syntax error")})
                             files_entries.append({
@@ -292,6 +309,7 @@ def scan_directory(
                                     "file": rel,
                                     "roles": roles,
                                     "in_vendored": "vendored" in roles,
+                                    "after_normalization": after_normalization,
                                 })
                         continue
 
@@ -336,7 +354,7 @@ def scan_directory(
     for idx, item in enumerate(raw_findings, start=1):
         fid = f"F{idx:03d}"
         t_phase = trigger_phase(item["raw"], item["roles"])
-        f_entry = build_finding(fid, item["raw"], item["file"], t_phase, item["in_vendored"])
+        f_entry = build_finding(fid, item["raw"], item["file"], t_phase, item["in_vendored"], after_normalization=item.get("after_normalization", False))
         findings.append(f_entry)
         raw_map[fid] = item["raw"]
 

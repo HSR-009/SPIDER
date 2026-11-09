@@ -1,12 +1,7 @@
 """
 test_normalize.py
 ------------------
-One test per normalization rule, plus a composition test.
-
-⚠️ PLACEHOLDER NOTE: import path assumes `spider/normalize.py` is
-importable as `spider.normalize` from the repo root - verify this matches
-the real project structure (may need a conftest.py or sys.path adjustment
-depending on how the real test suite is set up).
+One test per normalization rule, plus scope, recursion, and finding-union tests.
 """
 
 import ast
@@ -16,13 +11,8 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from spider.normalize import (
-    normalize_source,
-    ConstantFoldStringConcat,
-    ResolveImportAliases,
-    DecodeLiteralBase64,
-    GetattrToAttribute,
-)
+from spider.normalize import normalize_source
+from person_c.evasion_table import union_findings
 
 
 class TestConstantFoldStringConcat(unittest.TestCase):
@@ -102,6 +92,87 @@ class TestGetattrToAttribute(unittest.TestCase):
         source = 'getattr(os, "not-a-valid-name")'
         result = normalize_source(source)
         self.assertIn("getattr", result)
+
+
+class TestAliasScope(unittest.TestCase):
+    def test_function_local_alias_does_not_leak(self):
+        source = (
+            "import json as x\n"
+            "\n"
+            "def local():\n"
+            "    import os as x\n"
+            "    x.system('ls')\n"
+            "\n"
+            "def other():\n"
+            "    return x.loads('{}')\n"
+        )
+        result = normalize_source(source)
+        self.assertIn("os.system", result)
+        self.assertIn("json.loads", result)
+        self.assertNotIn("os.loads", result)
+        self.assertNotIn("json.system", result)
+
+    def test_unrelated_function_keeps_its_own_name(self):
+        source = (
+            "def local():\n"
+            "    import os as x\n"
+            "    x.system('ls')\n"
+            "\n"
+            "def other():\n"
+            "    x = 1\n"
+            "    return x\n"
+        )
+        result = normalize_source(source)
+        self.assertIn("os.system", result)
+        tree = ast.parse(result)
+        other = tree.body[1]
+        self.assertEqual(other.name, "other")
+        assign = other.body[0]
+        self.assertIsInstance(assign.targets[0], ast.Name)
+        self.assertEqual(assign.targets[0].id, "x")
+        self.assertIsInstance(other.body[1].value, ast.Name)
+        self.assertEqual(other.body[1].value.id, "x")
+
+
+class TestRecursionGuard(unittest.TestCase):
+    def test_deeply_nested_concat_returns_original_source(self):
+        source = "x = " + " + ".join(['"a"'] * 2000)
+        self.assertEqual(normalize_source(source), source)
+
+
+class TestFindingUnion(unittest.TestCase):
+    def test_normalized_scan_cannot_drop_a_raw_finding(self):
+        raw = [
+            {
+                "category": "Obfuscation",
+                "indicator": "base64.b64decode",
+                "file": "sample.py",
+                "line": 2,
+            }
+        ]
+        normalized = [
+            {
+                "category": "Command Execution",
+                "indicator": "os.system",
+                "file": "sample.py",
+                "line": 4,
+            }
+        ]
+        merged = union_findings(raw, normalized)
+        signatures = {(item["category"], item["indicator"]) for item in merged}
+        self.assertIn(("Obfuscation", "base64.b64decode"), signatures)
+        self.assertIn(("Command Execution", "os.system"), signatures)
+
+    def test_duplicate_identity_is_kept_once(self):
+        finding = {
+            "category": "Command Execution",
+            "indicator": "os.system",
+            "file": "sample.py",
+            "line": 1,
+        }
+        merged = union_findings([finding], [dict(finding)])
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0]["indicator"], "os.system")
 
 
 class TestComposition(unittest.TestCase):
