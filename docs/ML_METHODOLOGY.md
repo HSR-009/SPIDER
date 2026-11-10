@@ -32,7 +32,7 @@ SPIDER’s Machine Learning component bridges static AST (Abstract Syntax Tree) 
 2. **Behavioral-Feature Classification:** The production feature set excludes `n_py_files` as a direct input. This does not establish that all package-size confounding is removed; category counts and indicator presence may still correlate with package size.
 3. **Defense-in-Depth Triage:** Seamlessly integrating AST rules, ML probability scoring, normalization transformations, and peer-group context.
 
-The resulting production models achieve **0.878 CV ROC-AUC** and **0.865 Holdout ROC-AUC** on pure behavioral signals without relying on size bias, while demonstrating resilience against adversarial evasions and a 100-package curated obscure-PyPI evaluation in which 6 engine suspicious flags were raised; Person A's manual review classified 5 as false positives and 1 as unclear.
+The resulting production models achieve **0.878 CV ROC-AUC** and **0.865 Holdout ROC-AUC** on a feature set that excludes `n_py_files` as a direct input; residual size correlation has not been ruled out, while demonstrating resilience against adversarial evasions and a 100-package curated obscure-PyPI evaluation in which 6 engine suspicious flags were raised; Person A's manual review classified 5 as false positives and 1 as unclear.
 
 ---
 
@@ -153,7 +153,7 @@ Two complementary ensemble architectures are trained across all experiments:
    - Excels at capturing non-linear combinations of sparse indicator flags without overfitting.
 2. **XGBoost Classifier:**
    - `n_estimators=250`, `max_depth=6`, `learning_rate=0.05`, `scale_pos_weight=1.427`, `random_state=42`.
-   - Gradient boosted trees optimizing weighted log-loss for calibrated probability outputs.
+   - Gradient boosted trees optimizing weighted log-loss; probability calibration is not established by this report.
 
 ---
 
