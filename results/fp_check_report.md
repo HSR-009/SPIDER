@@ -20,7 +20,7 @@ A critical objective of Day 6 is evaluating false-positive behavior on real-worl
 | **Packages with ≥1 AST Finding** | 72 (72%) | Contains dual-use packaging/runtime indicators |
 | **Engine Suspicious Verdicts** | **6** (6.0%) | Dual-use packages triggering strong high-severity AST rules |
 | **Engine Review-Recommended** | 27 (27.0%) | Flagged for security triage due to dual-use hooks |
-| **Engine None-Detected (Silent)** | 92 (92.0%) | Clear static baseline |
+| **Engine `none_detected_in_this_scan`** | 92 (92.0%) | Includes review-recommended cases; not all are silent. Separately, 2 packages were `unable_to_assess`. |
 | **Random Forest FPR (P≥0.5)** | 13% (13/100) | Moderate FP rate at uncalibrated 0.5 threshold |
 | **Random Forest FPR (P≥0.8)** | 2% (2/100) | Low FP rate at high-confidence operational threshold |
 | **XGBoost FPR (P≥0.5)** | 11% (11/100) | Model baseline without size confound |
@@ -78,7 +78,7 @@ Because Person B's production model (`behavior_without_size`) does not use file 
 | Maximum | 0.8597 | 0.9360 |
 
 > [!IMPORTANT]
-> **Operational Threshold Recommendation:** At the default, uncalibrated threshold of $P \ge 0.5$, the Random Forest flags 13% of obscure packages. When tuned to a high-confidence operational threshold of $P \ge 0.8$, the false-positive rate drops to **2%**, perfectly separating routine packaging hooks from multi-category attack behaviors.
+> **Operational Threshold Recommendation:** At the default, uncalibrated threshold of $P \ge 0.5$, the Random Forest flags 13% of obscure packages. At $P \ge 0.8$, the RF flagged 2 of 100 packages and XGBoost flagged 1 of 100. These are observed rates on this curated sample, not calibrated probabilities or evidence of perfect separation.
 
 ---
 
@@ -118,7 +118,7 @@ Below is the complete triage record for packages flagged by either the AST engin
 
 ## 5. Methodological Conclusions & Production Guidance
 
-1. **Engine Suspicious Rate Remains Low (6%):** The Verdict v2 ruleset produced only 6 `suspicious` verdicts across 100 obscure packages, isolated to packages combining dynamic execution and subprocess calls.
+1. **Engine Suspicious Flags (6/100):** Person A's manual review classified 5 of the 6 suspicious packages as false positives, 1 as unclear, and 0 as confirmed true positives. A's verified `fp_check_v11.csv` and `ANALYZER_BACKLOG.md` report that 4 of the 5 false positives involved `exec(open(...).read())` version loading in `setup.py` plus a network or base64 call elsewhere; this was not a subprocess-based root cause.
 2. **Triage Tiering Functions as Intended:** Packages containing build hooks (such as custom `cmdclass` or subprocess compilation probes) were accurately routed to `review_recommended`, preserving security vigilance without declaring malicious verdicts.
 3. **Dual-Use Indicators are Pervasive:** Over 50% of obscure packages legitimately execute subprocesses or decode assets. AST indicators alone cannot prove malice without behavioral intent or external peer context.
-4. **Deployment Threshold Guidance:** For automated blocking, use Engine `suspicious` verdict OR ML score $P \ge 0.80$. For human review routing, use $P \in [0.50, 0.80)$ or `review_recommended: true`.
+4. **Review Guidance:** Route `suspicious`, `review_recommended`, and `unable_to_assess` cases to human review. Do not automatically block based on `suspicious` or automatically allow installation based on `none_detected_in_this_scan`. The ML scores here are uncalibrated and are not validated as automatic decision thresholds.
