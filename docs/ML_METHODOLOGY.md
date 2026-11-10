@@ -1,7 +1,7 @@
 # SPIDER — Machine Learning Methodology & Evaluation Whitepaper
 
 **Author:** Person B (Machine Learning Lead)  
-**Project:** SPIDER (Supply-chain Package Inspection, Detection & Extraction Engine)  
+**Project:** SPIDER (Supply Chain Packages Intelligence for Detection, Evasion and Resilience)  
 **Date:** 2026-11-08  
 **Repository Branch:** `feat/person-b-ml`  
 **Dataset Version:** v1.1 Rescan (`malicious_v11.jsonl`, `benign_v11.jsonl.gz`)  
@@ -28,11 +28,11 @@
 ## 1. Executive Summary
 
 SPIDER’s Machine Learning component bridges static AST (Abstract Syntax Tree) rule analysis and operational supply-chain triage. Rather than attempting to replace human review or rule-based detection, Person B's ML system provides:
-1. **Calibrated Risk Scoring:** Aggregating 54 static behavioral indicators into unified package-level probabilities.
-2. **Confound-Free Behavioral Classification:** Explicitly isolating code behavior from package size artifacts (`n_py_files`) to avoid spurious classification shortcuts.
+1. **Model Risk Scores:** Aggregating 54 static behavioral indicators into package-level model scores. The probabilities reported here are not established as calibrated.
+2. **Behavioral-Feature Classification:** The production feature set excludes `n_py_files` as a direct input. This does not establish that all package-size confounding is removed; category counts and indicator presence may still correlate with package size.
 3. **Defense-in-Depth Triage:** Seamlessly integrating AST rules, ML probability scoring, normalization transformations, and peer-group context.
 
-The resulting production models achieve **0.878 CV ROC-AUC** and **0.865 Holdout ROC-AUC** on pure behavioral signals without relying on size bias, while demonstrating resilience against adversarial evasions and zero false alarms on high-severity thresholds in obscure PyPI packages.
+The resulting production models achieve **0.878 CV ROC-AUC** and **0.865 Holdout ROC-AUC** on a feature set that excludes `n_py_files` as a direct input; residual size correlation has not been ruled out, while demonstrating resilience against adversarial evasions and a 100-package curated obscure-PyPI evaluation in which 6 engine suspicious flags were raised; Person A's manual review classified 5 as false positives and 1 as unclear.
 
 ---
 
@@ -115,7 +115,7 @@ The holdout was generated once prior to Day 4 model development and was **never 
 ## 5. The Package-Size Confound & Ablation Experiments
 
 ### 5.1 The Confound Phenomenon
-In public package repositories, benign packages (often established libraries) contain on average **42.8 `.py` files**, whereas malicious packages (often rapid-fire typosquats or single-stage droppers) contain on average **2.1 `.py` files**.
+In the v1.1 rescan, the median analyzed `.py` file count was 12 for benign packages and 2 for malicious packages (`results/rescan_v11_summary.md`). The previously reported means (42.8 and 2.1) are not supported by that verified summary.
 
 $$\mathbb{E}[\text{files} \mid \text{Benign}] \approx 42.8 \gg \mathbb{E}[\text{files} \mid \text{Malicious}] \approx 2.1$$
 
@@ -126,7 +126,7 @@ To expose and eliminate this confound, Person B established three parallel featu
 
 | Experiment | Features Used | Dimension | Purpose |
 |---|---|---:|---|
-| **`behavior_without_size`** *(Production)* | 14 category metrics + 40 indicator flags | 54 | Pure behavioral classification; invariant to file count |
+| **`behavior_without_size`** *(Production)* | 14 category metrics + 40 indicator flags | 54 | Excludes `n_py_files` as a direct input; other features may still correlate with package size |
 | **`behavior_with_size`** | 54 behavioral features + `n_py_files` | 55 | Combined model demonstrating marginal size gain |
 | **`size_only`** *(Benchmark)* | Only `n_py_files` | 1 | Negative control illustrating pure size bias |
 
@@ -141,7 +141,7 @@ To expose and eliminate this confound, Person B established three parallel featu
 | **Recall** | **0.6650** | 0.8680 | 0.8851 |
 | **False Positive Rate** | **7.39%** (43/582) | 5.67% (33/582) | 7.90% (46/582) |
 
-**Conclusion:** Although `size_only` achieves 0.9497 ROC-AUC, it possesses **zero behavioral awareness**. In deployment, `behavior_without_size` is the official model because its decisions are grounded exclusively in verified AST actions.
+**Conclusion:** `behavior_without_size` excludes `n_py_files` as a direct feature, but is not demonstrated to be confound-free. The reported size-only holdout AUC is 0.9497. The v1.1 corpus-level `n_py_files` AUC of 0.2094 (approximately 0.79 when direction is inverted) is a different measurement; the gap has not been reproduced and reconciled.
 
 ---
 
@@ -153,7 +153,7 @@ Two complementary ensemble architectures are trained across all experiments:
    - Excels at capturing non-linear combinations of sparse indicator flags without overfitting.
 2. **XGBoost Classifier:**
    - `n_estimators=250`, `max_depth=6`, `learning_rate=0.05`, `scale_pos_weight=1.427`, `random_state=42`.
-   - Gradient boosted trees optimizing weighted log-loss for calibrated probability outputs.
+   - Gradient boosted trees optimizing weighted log-loss; probability calibration is not established by this report.
 
 ---
 
@@ -182,7 +182,7 @@ On Day 5, Person B evaluated the official frozen adversarial batch (**`adv-batch
 |---|---:|---:|---:|---:|---:|---:|
 | **A. Baseline (AST v1)** | 2 (16.67%) | 2 (16.67%) | **8** | **66.67%** | 4/12 (33.33%) | 3/12 (25.0%) |
 | **B. Normalized (v1 + Norm)** | 5 (41.67%) | 2 (16.67%) | **5** | **41.67%** | 7/12 (58.33%) | 6/12 (50.0%) |
-| **C. Hardened (AST v1.1)** | 3 (25.00%) | 9 (75.00%) | **0** | **0.00%** | 7/12 (58.33%) | 6/12 (50.0%) |
+| **C. Hardened (AST v1.1)** | 4 (33.33%) | 8 (66.67%) | **0** | **0.00%** | 7/12 (58.33%) | 6/12 (50.0%) |
 | **D. Hardened + Normalized** | 5 (41.67%) | 6 (50.00%) | **1** | **8.33%** | **9/12 (75.00%)** | **8/12 (66.67%)** |
 
 ### 8.3 Finding-Level vs Verdict-Level Separation
@@ -202,7 +202,7 @@ The Machine Learning model plays a critical compensating role: because the RF mo
 On Day 6, Person B evaluated 100 obscure PyPI packages from Person A's curated low-download corpus (`results/fp_check_selection.csv` and `results/fp_check_archives.sha256`):
 - **Archive Verification:** 100/100 archives verified against expected SHA-256 checksums (0 mismatches).
 - **Safe Extraction:** 100/100 extracted via `spider.engine.extract.safe_extract` (0 path traversals, 0 zip bomb limits hit).
-- **Engine Suspicious Rate:** **6.0%** (6/100). Only 6 packages triggered high-severity strong AST signals (typically combining dynamic code evaluation with external subprocess invocations).
+- **Engine Suspicious Rate:** **6.0%** (6/100). Only 6 packages triggered high-severity strong AST signals (see Person A's verified review: 4 of the 5 false positives involved `exec(open(...).read())` version loading in `setup.py` plus a network or base64 call elsewhere; this was not a subprocess-based root cause).
 - **Engine Review Rate:** **27.0%** (27/100) routed to review triage due to routine packaging hooks (`setup.py cmdclass`, compiler capability checks).
 - **Machine Learning False Positive Rate:**
   - At uncalibrated $P \ge 0.50$: Random Forest = 13%, XGBoost = 11%.
@@ -263,9 +263,6 @@ To support Person C's Capability Web and anomaly detection, Person B generated `
 
 ### 12.2 Production Triage Policy Recommendation
 For SOC and CI/CD supply-chain gatekeeping:
-1. **Automated Block:** Assign immediate malicious block if:
-   $$\text{Verdict} == \text{'suspicious'} \quad \lor \quad P_{\text{RF}}(\text{malicious}) \ge 0.80$$
-2. **Security Triage Queue:** Route package to human security review if:
-   $$\text{Verdict} == \text{'review\_recommended'} \quad \lor \quad P_{\text{RF}}(\text{malicious}) \in [0.50, 0.80) \quad \lor \quad N_{\text{parse\_errors}} > 0$$
-3. **Passed:** Allow package installation only if:
-   $$\text{Verdict} == \text{'none\_detected\_in\_this\_scan'} \quad \land \quad P_{\text{RF}}(\text{malicious}) < 0.50 \quad \land \quad N_{\text{py\_files}} > 0$$
+1. **Human review:** Route `suspicious`, `review_recommended`, and `unable_to_assess` cases to a human security reviewer. On the curated 100-package sample, 5 of 6 `suspicious` flags were false positives and 1 was unclear; this sample does not support automatic blocking.
+2. **Prioritization signals:** Use model scores, parse/coverage problems, and package context to prioritize human review. The reported model thresholds are uncalibrated and are not validated as automatic policy gates.
+3. **No safe/allow conclusion:** `none_detected_in_this_scan` means no configured signal was detected in this scan. It does not establish that a package is safe or authorize installation.
