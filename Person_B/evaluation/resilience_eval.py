@@ -168,9 +168,9 @@ def run_resilience_evaluation() -> Dict[str, Any]:
         verd_review_v11 = verd_v11.get("review_recommended", False)
         verd_cat_v11 = classify_verdict_level(verd_outcome_v11, verd_review_v11)
 
-        # Pipeline D: Hardened v1.1 + Normalized
+        # Pipeline D: Hardened v1.1 + Normalized (evaluated against v1.1 baseline findings)
         cand_v11_norm, verd_v11_norm = analyze_with_v11(norm_adv_src)
-        out_v11_norm = classify_finding_outcome(base_findings_v1, cand_v11_norm)
+        out_v11_norm = classify_finding_outcome(base_findings_v11, cand_v11_norm)
         verd_outcome_v11_norm = verd_v11_norm.get("outcome", "none_detected_in_this_scan")
         verd_review_v11_norm = verd_v11_norm.get("review_recommended", False)
         verd_cat_v11_norm = classify_verdict_level(verd_outcome_v11_norm, verd_review_v11_norm)

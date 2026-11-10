@@ -156,6 +156,14 @@ class PersonBDay5Day6Tests(unittest.TestCase):
         outcome = classify_finding_outcome(base_findings, adv_findings)
         self.assertEqual(outcome, "recovered", "adv_006 must classify as recovered from source analysis")
 
+        # adv_006 normalized analysis (Pipeline D)
+        from Person_B.evaluation.normalization_adapter import normalize_code
+
+        norm_code_6, _, _ = normalize_code(e6["generated_code"])
+        adv_norm_findings, _ = analyze_with_v11(norm_code_6)
+        outcome_norm = classify_finding_outcome(base_findings, adv_norm_findings)
+        self.assertEqual(outcome_norm, "recovered", "adv_006 under v1.1 + normalization must classify as recovered")
+
         # Verify hardened v1.1 aggregate across all 12 entries
         recovered_count = 0
         diff_signal_count = 0

@@ -17,7 +17,7 @@
 | **A. Baseline (AST v1)** | 2 (16.67%) | 2 (16.67%) | **8** | **66.67%** | 4/12 (33.33%) | 3/12 (25.0%) |
 | **B. Normalized (v1 + Normalize) [Reported]** | 5 (41.67%) | 2 (16.67%) | **5** | **41.67%** | 7/12 (58.33%) | 6/12 (50.0%) |
 | **C. Hardened (AST v1.1)** | 4 (33.33%) | 8 (66.67%) | **0** | **0.0%** | 7/12 (58.33%) | 6/12 (50.0%) |
-| **D. Hardened + Normalized [Reported]** | 5 (41.67%) | 6 (50.0%) | **1** | **8.33%** | 9/12 (75.0%) | 8/12 (66.67%) |
+| **D. Hardened + Normalized [Reported]** | 6 (50.0%) | 5 (41.67%) | **1** | **8.33%** | 9/12 (75.0%) | 8/12 (66.67%) |
 
 > [!IMPORTANT]
 > **Finding-Level vs Package-Level Distinction:** Finding-level evasion rate measures whether the exact baseline indicator or an auxiliary finding fired; it is a feature-level syntactic metric, **not a package detection rate**. As established in Person A's verification, emitting `different_signal` does not imply detection by the engine verdict.
