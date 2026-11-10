@@ -9,12 +9,15 @@
 
 ## 1. Overall Three-Way Comparison Table (Denominator: 12 Samples)
 
-| Detection Pipeline | Recovered (Exact Match) | Different Signal | Missed (Evaded) | Finding-Level Evasion Rate | RF Detection Rate (P≥0.5) | XGB Detection Rate (P≥0.5) |
+> [!NOTE]
+> Pipelines B and D (incorporating Person C's `spider.normalize` adapter) and the machine learning detection rates (Random Forest and XGBoost) are Reported/Experimental figures by Person B and were not independently verified by Person A (`results/adv_batch_verification_by_A.md`). The frozen `adv-batch-v1` dataset was never used for training or tuning.
+
+| Detection Pipeline | Recovered (Exact Match) | Different Signal | Missed (Evaded) | Finding-Level Evasion Rate | RF Detection Rate (P≥0.5) [Reported] | XGB Detection Rate (P≥0.5) [Reported] |
 |---|---:|---:|---:|---:|---:|---:|
 | **A. Baseline (AST v1)** | 2 (16.67%) | 2 (16.67%) | **8** | **66.67%** | 4/12 (33.33%) | 3/12 (25.0%) |
-| **B. Normalized (v1 + Normalize)** | 5 (41.67%) | 2 (16.67%) | **5** | **41.67%** | 7/12 (58.33%) | 6/12 (50.0%) |
+| **B. Normalized (v1 + Normalize) [Reported]** | 5 (41.67%) | 2 (16.67%) | **5** | **41.67%** | 7/12 (58.33%) | 6/12 (50.0%) |
 | **C. Hardened (AST v1.1)** | 4 (33.33%) | 8 (66.67%) | **0** | **0.0%** | 7/12 (58.33%) | 6/12 (50.0%) |
-| **D. Hardened + Normalized** | 5 (41.67%) | 6 (50.0%) | **1** | **8.33%** | 9/12 (75.0%) | 8/12 (66.67%) |
+| **D. Hardened + Normalized [Reported]** | 5 (41.67%) | 6 (50.0%) | **1** | **8.33%** | 9/12 (75.0%) | 8/12 (66.67%) |
 
 > [!IMPORTANT]
 > **Finding-Level vs Package-Level Distinction:** Finding-level evasion rate measures whether the exact baseline indicator or an auxiliary finding fired; it is a feature-level syntactic metric, **not a package detection rate**. As established in Person A's verification, emitting `different_signal` does not imply detection by the engine verdict.
@@ -23,8 +26,8 @@
 
 | Pipeline | Suspicious (Strong Signal) | Review-Kept (`review_recommended: true`) | Silent (`none_detected`, No Review) | Review Recommendation Rate |
 |---|---:|---:|---:|---:|
-| **Hardened v1.1** | 1 (8.33%) | 5 (41.67%) | 6 (50.0%) | **45.45%** (5/11 non-suspicious) |
-| **Hardened v1.1 + Normalize** | 1 (8.33%) | 7 (58.33%) | 4 (33.33%) | **63.64%** (7/11 non-suspicious) |
+| **Hardened v1.1 (Verified)** | 1 (8.33%) | 5 (41.67%) | 6 (50.0%) | **45.45%** (5/11 non-suspicious) |
+| **Hardened v1.1 + Normalize [Reported]** | 1 (8.33%) | 7 (58.33%) | 4 (33.33%) | **63.64%** (7/11 non-suspicious) |
 
 ### Verdict Observations:
 - Only **1 of 12 samples** (`adv_001`, Base64 dynamic execution) triggers a `suspicious` verdict under Verdict v2 (via strong signals `S2_dynamic_exec_plus` and `S5_decode_exec`).

@@ -9,15 +9,23 @@
 
 ## 1. Executive Summary & Failure Mode Distribution
 
-In malware detection, the most dangerous false negatives are **zero-finding malicious packages** — packages known to be malicious that pass through static AST analysis completely undetected ($N_{\text{findings}} = 0$). This preliminary triage examines 30 package-version rows, not 30 independent package families. Package-specific root-cause explanations below were not independently verified against source evidence by Person A; treat them as **Reported**, not confirmed root causes, unless a source line or scan record is cited. Person A's separate v1.1 stratified review is documented in `docs/ANALYZER_BACKLOG.md` and `results/zero_finding_review_by_A.csv`.
+In malware detection, the most dangerous false negatives are **zero-finding malicious packages** — packages known to be malicious that pass through static AST analysis completely undetected ($N_{\text{findings}} = 0$).
 
-| Triage Category | Reviewed Samples | Primary Root Cause | Required Defense Tier |
-|---|---:|---|---|
-| **`parse_failed`** | 10 (100% of corpus) | SyntaxError on Python 2 grammar, non-UTF-8 encodings (GBK, latin-1), and malformed source bytes | Static AST Rule Enhancement |
-| **`no_python_source`** | 6 packages | Zero `.py` files present; malicious payload compiled into native binary (.so/.pyd) or shell scripts | Static Binary / File Type Inspection |
-| **`no_risky_keywords`** | 7 packages | Phishing/SEO spam lures, dependency confusion stubs, and typosquat reservations with no runtime code | Peer Group / Capability Web Context |
-| **`risky_keywords_unflagged`** | 7 packages | Keywords present (`getattr`, `subprocess`, `urllib`) but concealed via string formatting or polyglots | Static AST Rule + Dynamic Sandboxing |
-| **Total** | **30 packages** | Comprehensive architectural post-mortem | Multi-Tier Defense Matrix |
+> [!IMPORTANT]
+> **Dataset & Denominator Clarification:**
+> - This preliminary triage reviewed **30 package-version rows** from an earlier 166-row triage export (`data/processed/zero_finding_triage.csv`).
+> - This 166-row export is distinct from the final v1.1 rescan count of **140 zero-finding malicious packages** (among 2,039 packages in `data/processed/malicious_v11.jsonl`).
+> - The 30 rows represent package-version entries (e.g. multiple versions of `d0rk3r`, `mathepy`, and `mybiubiubiu`), **not 30 independent package families**.
+> - The statement `parse_failed: 10 (100% of corpus)` was an erroneous shorthand: it represented all 10 `parse_failed` rows present in that earlier 166-row triage export (10/166 = 6.02% of that export; 10/30 = 33.33% of the reviewed sample), **not 100% of the corpus**. Across the entire v1.1 malicious rescan of 2,039 packages, `parse_failure_ratio` occurred in only 14 packages (0.69%, `results/rescan_v11_summary.md`).
+> - Package-specific root-cause explanations below were preliminary and not all verified against source evidence. They are explicitly labeled **Reported / Provisional** unless confirmed by source lines or scan records in the repository. Person A's separate v1.1 stratified review is documented in `docs/ANALYZER_BACKLOG.md` and `results/zero_finding_review_by_A.csv`.
+
+| Triage Category | Reviewed Samples | Share of 30 Rows | Share of 166 Export | Primary Root Cause (Reported / Provisional) | Required Defense Tier |
+|---|---:|---:|---:|---|---|
+| **`parse_failed`** | 10 rows | 33.3% (10/30) | 6.0% (10/166; 100% of category) | SyntaxError on Python 2 syntax (octal literal, print statement), non-UTF-8 bytes, and docstring formatting | Static AST Rule Enhancement |
+| **`no_python_source`** | 6 rows | 20.0% (6/30) | 33.3% (6/18) | Zero `.py` files present; malicious payload compiled into native binary (.so/.pyd) or shell scripts | Static Binary / File Type Inspection |
+| **`no_risky_keywords`** | 7 rows | 23.3% (7/30) | 8.1% (7/86) | Phishing/SEO spam lures, dependency confusion stubs, and typosquat reservations with no runtime code | Peer Group / Capability Web Context |
+| **`risky_keywords_unflagged`** | 7 rows | 23.3% (7/30) | 13.5% (7/52) | Keywords present (`getattr`, `subprocess`, `urllib`) but concealed via string formatting or polyglots | Static AST Rule + Dynamic Sandboxing |
+| **Total** | **30 rows** | **100.0%** | **18.1%** (30/166) | Architectural post-mortem across preliminary triage sample | Multi-Tier Defense Matrix |
 
 ---
 
@@ -25,24 +33,24 @@ In malware detection, the most dangerous false negatives are **zero-finding mali
 
 ### 1. Parse Failures (SyntaxErrors & Character Encoding Breakages)
 
-**Sample Count:** 10 packages
+**Sample Count:** 10 package-version rows (100% of parse_failed category in 166-row export)
 
 | Package ID | Files | Risky Keywords | Root Cause Why Missed | Proposed Analyzer Improvement | Defense Tier |
 |---|---:|---|---|---|---|
-| `apidev-coop@1.2.26` | 234 | `getattr __import__ importlib base64 socket requests open(` | Invalid non-UTF-8 bytes and trailing NUL characters in obfuscated bundled script triggered SyntaxError / UnicodeDecodeError in ast.parse. | Add multi-encoding fallback decoder (latin-1, utf-8 with replace) and tokenize-based error recovery before ast.parse. | `Static AST Rule Enhancement` |
-| `bzip@0.98` | 2 | `open(` | Legacy Python 2 print statement and `except Exception, e:` comma syntax causes Python 3 AST parser to reject the file as invalid syntax. | Incorporate Python 2-to-3 AST translation shim (e.g. `lib2to3` or `py_compile` compatibility mode) for legacy syntax. | `Static AST Rule Enhancement` |
-| `coloriv@3.2` | 8 | `getattr requests open(` | Mixed encoding headers and unterminated triple-quoted multiline strings in nested module caused parse failure. | Parse files per-module rather than halting entire package; report partial AST findings for modules that parse cleanly. | `Static AST Rule Enhancement` |
-| `mathepy@2.2.0` | 44 | `eval( socket open(` | **Reported; contradicted by verified source inspection:** Person A found `vlz_help.py` line 322 fails because an inner triple-quoted markdown cheat sheet closes a docstring early. This affects about 1 of 22 `.py` files (~5%), below the 20% parse-failure ratio; parsing is per file, not per package. | Keep the file-level parse diagnostic; do not infer a package-wide Python 2 failure. | `Static AST Rule Enhancement` |
-| `mathepy@2.5.0` | 44 | `eval( socket open(` | **Reported, not verified:** The cited repository evidence does not establish Python 2 syntax in `setup.py` or a package-wide parser halt. | Verify exact file and line against the scan inventory before assigning a root cause. | `Static AST Rule Enhancement` |
-| `mathepy@3.5.0` | 42 | `eval( socket open(` | **Reported, not verified:** The cited repository evidence does not establish Python 2 syntax or a package-wide AST halt. | Verify exact file and line against the scan inventory before assigning a root cause. | `Static AST Rule Enhancement` |
-| `mathepy@4.5.0` | 42 | `eval( socket open(` | **Reported, not verified:** The cited repository evidence does not establish Python 2 syntax or a package-wide AST halt. | Verify exact file and line against the scan inventory before assigning a root cause. | `Static AST Rule Enhancement` |
-| `mybiubiubiu@0.1.0` | 4 | `subprocess open(` | Non-ASCII Chinese comments encoded in GBK / GB2312 without PEP 263 `# -*- coding: gbk -*-` declaration caused UTF-8 decode crash. | Implement chardet / charset-normalizer heuristic encoding detection for source files. | `Static AST Rule Enhancement` |
-| `mybiubiubiu@0.1.1` | 4 | `subprocess open(` | GBK encoding crash during source read prevents AST visitor from inspecting subprocess calls. | Read source with `errors='surrogateescape'` or `errors='replace'` prior to parsing. | `Static AST Rule Enhancement` |
-| `mybiubiubiu@0.1.4` | 3 | `subprocess open(` | Encoding crash in setup.py prevents detection of malicious subprocess command in install hook. | Sanitize byte stream before AST parse to preserve syntax structure. | `Static AST Rule Enhancement` |
+| `apidev-coop@1.2.26` | 234 | `getattr __import__ importlib base64 socket requests open(` | **Reported / Provisional:** Invalid non-UTF-8 bytes and trailing NUL characters in obfuscated bundled script triggered SyntaxError / UnicodeDecodeError in ast.parse (unverified against source lines). | Add multi-encoding fallback decoder (latin-1, utf-8 with replace) and tokenize-based error recovery before ast.parse. | `Static AST Rule Enhancement` |
+| `bzip@0.98` | 2 | `open(` | **Verified (scan record & Person A):** `bzip-0.98/setup.py` failed `ast.parse` with `SyntaxError: leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers` (Python 2 octal literal syntax). Carried call-home payload in `setup.py`. Verdict was `unable_to_assess` (`parse_failure_ratio:0.50`), not silent. | Incorporate Python 2-to-3 AST translation shim (e.g. `lib2to3` or `py_compile` compatibility mode) for legacy syntax. | `Static AST Rule Enhancement` |
+| `coloriv@3.2` | 8 | `getattr requests open(` | **Reported / Provisional:** Mixed encoding headers and unterminated triple-quoted multiline strings in nested module caused parse failure (unverified against source lines). | Parse files per-module rather than halting entire package; report partial AST findings for modules that parse cleanly. | `Static AST Rule Enhancement` |
+| `mathepy@2.2.0` | 44 | `eval( socket open(` | **Verified (Person A):** Contradicted earlier claim of Python 2 syntax in setup.py. `vlz_help.py` line 322 fails because an inner triple-quoted markdown cheat sheet closes a docstring early. This affects ~1 of 22 `.py` files (~5%), below the 20% `unable_to_assess` threshold; verdict was `none_detected_in_this_scan`. Real miss reason was `api_not_in_ruleset` (hard-coded API keys). | Keep the file-level parse diagnostic; do not infer a package-wide Python 2 failure. Add API key / secret pattern rules. | `Static AST Rule Enhancement` |
+| `mathepy@2.5.0` | 44 | `eval( socket open(` | **Verified (Person A):** Same family/structure as 2.2.0; does not have Python 2 syntax in `setup.py`. Miss reason was `api_not_in_ruleset`. | Verify exact file and line against the scan inventory before assigning a root cause. | `Static AST Rule Enhancement` |
+| `mathepy@3.5.0` | 42 | `eval( socket open(` | **Reported / Provisional:** Same family as 2.2.0; repository evidence does not establish Python 2 syntax or a package-wide AST halt. Miss reason is missing API client rules. | Verify exact file and line against the scan inventory before assigning a root cause. | `Static AST Rule Enhancement` |
+| `mathepy@4.5.0` | 42 | `eval( socket open(` | **Verified (Person A):** Same family as 2.2.0; docstring cheat sheet parse failure in documentation helper; miss reason was `api_not_in_ruleset`. | Verify exact file and line against the scan inventory before assigning a root cause. | `Static AST Rule Enhancement` |
+| `mybiubiubiu@0.1.0` | 4 | `subprocess open(` | **Verified (scan record):** `mybiubiubiu-0.1.0/setup.py` failed `ast.parse` with `SyntaxError: Missing parentheses in call to 'print'. Did you mean print(...)?"` (Python 2 print statement), refuting the previous GBK encoding crash conjecture. Verdict was `unable_to_assess` (`parse_failure_ratio:1.00`), not silent. | Implement Python 2-compatible parsing shim or fallback token scanner for files failing AST parse. | `Static AST Rule Enhancement` |
+| `mybiubiubiu@0.1.1` | 4 | `subprocess open(` | **Verified (scan record):** `mybiubiubiu-0.1.1/setup.py` failed `ast.parse` with `SyntaxError: Missing parentheses in call to 'print'. Did you mean print(...)?"` (Python 2 print statement), refuting the previous GBK encoding crash conjecture. Verdict was `unable_to_assess` (`parse_failure_ratio:1.00`), not silent. | Implement Python 2-compatible parsing shim or fallback token scanner for files failing AST parse. | `Static AST Rule Enhancement` |
+| `mybiubiubiu@0.1.4` | 3 | `subprocess open(` | **Verified (scan record & Person A):** `mybiubiubiu-0.1.4/setup.py` collects host/IP info during install; failed `ast.parse` with `SyntaxError: Missing parentheses in call to 'print'. Did you mean print(...)?"` (Python 2 print statement). Verdict was `unable_to_assess` (`parse_failure_ratio:1.00`), not silent. | Implement Python 2-compatible parsing shim or fallback token scanner for files failing AST parse. | `Static AST Rule Enhancement` |
 
 ### 2. No Python Source (Native Binaries, Data Droppers & Polyglots)
 
-**Sample Count:** 6 packages
+**Sample Count:** 6 package-version rows
 
 | Package ID | Files | Risky Keywords | Root Cause Why Missed | Proposed Analyzer Improvement | Defense Tier |
 |---|---:|---|---|---|---|
@@ -55,7 +63,7 @@ In malware detection, the most dangerous false negatives are **zero-finding mali
 
 ### 3. No Risky Keywords (Typosquats, Dependency Confusion & Social Engineering)
 
-**Sample Count:** 7 packages
+**Sample Count:** 7 package-version rows
 
 | Package ID | Files | Risky Keywords | Root Cause Why Missed | Proposed Analyzer Improvement | Defense Tier |
 |---|---:|---|---|---|---|
@@ -69,7 +77,7 @@ In malware detection, the most dangerous false negatives are **zero-finding mali
 
 ### 4. Risky Keywords Present But Unflagged (AST Evasion & Dynamic Resolution)
 
-**Sample Count:** 7 packages
+**Sample Count:** 7 package-version rows
 
 | Package ID | Files | Risky Keywords | Root Cause Why Missed | Proposed Analyzer Improvement | Defense Tier |
 |---|---:|---|---|---|---|
