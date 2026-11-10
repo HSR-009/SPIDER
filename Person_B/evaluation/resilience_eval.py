@@ -161,16 +161,16 @@ def run_resilience_evaluation() -> Dict[str, Any]:
         cand_v1_norm = analyze_with_v1(norm_adv_src)
         out_v1_norm = classify_finding_outcome(base_findings_v1, cand_v1_norm)
 
-        # Pipeline C: Hardened v1.1
+        # Pipeline C: Hardened v1.1 (evaluated against v1.1 baseline findings, matching Person A protocol)
         cand_v11, verd_v11 = analyze_with_v11(adv_src)
-        out_v11 = classify_finding_outcome(base_findings_v1, cand_v11)
+        out_v11 = classify_finding_outcome(base_findings_v11, cand_v11)
         verd_outcome_v11 = verd_v11.get("outcome", "none_detected_in_this_scan")
         verd_review_v11 = verd_v11.get("review_recommended", False)
         verd_cat_v11 = classify_verdict_level(verd_outcome_v11, verd_review_v11)
 
-        # Pipeline D: Hardened v1.1 + Normalized
+        # Pipeline D: Hardened v1.1 + Normalized (evaluated against v1.1 baseline findings)
         cand_v11_norm, verd_v11_norm = analyze_with_v11(norm_adv_src)
-        out_v11_norm = classify_finding_outcome(base_findings_v1, cand_v11_norm)
+        out_v11_norm = classify_finding_outcome(base_findings_v11, cand_v11_norm)
         verd_outcome_v11_norm = verd_v11_norm.get("outcome", "none_detected_in_this_scan")
         verd_review_v11_norm = verd_v11_norm.get("review_recommended", False)
         verd_cat_v11_norm = classify_verdict_level(verd_outcome_v11_norm, verd_review_v11_norm)
@@ -362,12 +362,15 @@ def build_resilience_markdown(payload: Dict[str, Any]) -> None:
         "",
         "## 1. Overall Three-Way Comparison Table (Denominator: 12 Samples)",
         "",
-        "| Detection Pipeline | Recovered (Exact Match) | Different Signal | Missed (Evaded) | Finding-Level Evasion Rate | RF Detection Rate (P≥0.5) | XGB Detection Rate (P≥0.5) |",
+        "> [!NOTE]",
+        "> Pipelines B and D (incorporating Person C's `spider.normalize` adapter) and the machine learning detection rates (Random Forest and XGBoost) are Reported/Experimental figures by Person B and were not independently verified by Person A (`results/adv_batch_verification_by_A.md`). The frozen `adv-batch-v1` dataset was never used for training or tuning.",
+        "",
+        "| Detection Pipeline | Recovered (Exact Match) | Different Signal | Missed (Evaded) | Finding-Level Evasion Rate | RF Detection Rate (P≥0.5) [Reported] | XGB Detection Rate (P≥0.5) [Reported] |",
         "|---|---:|---:|---:|---:|---:|---:|",
         f"| **A. Baseline (AST v1)** | {fl['baseline_v1']['recovered']} ({fl['baseline_v1']['recovered_rate_pct']}%) | {fl['baseline_v1']['different_signal']} ({fl['baseline_v1']['different_signal_rate_pct']}%) | **{fl['baseline_v1']['missed']}** | **{fl['baseline_v1']['finding_level_evasion_rate_pct']}%** | {ml['baseline_v1']['rf_positive_count']}/12 ({ml['baseline_v1']['rf_detection_rate_pct']}%) | {ml['baseline_v1']['xgb_positive_count']}/12 ({ml['baseline_v1']['xgb_detection_rate_pct']}%) |",
-        f"| **B. Normalized (v1 + Normalize)** | {fl['normalized_v1']['recovered']} ({fl['normalized_v1']['recovered_rate_pct']}%) | {fl['normalized_v1']['different_signal']} ({fl['normalized_v1']['different_signal_rate_pct']}%) | **{fl['normalized_v1']['missed']}** | **{fl['normalized_v1']['finding_level_evasion_rate_pct']}%** | {ml['normalized_v1']['rf_positive_count']}/12 ({ml['normalized_v1']['rf_detection_rate_pct']}%) | {ml['normalized_v1']['xgb_positive_count']}/12 ({ml['normalized_v1']['xgb_detection_rate_pct']}%) |",
+        f"| **B. Normalized (v1 + Normalize) [Reported]** | {fl['normalized_v1']['recovered']} ({fl['normalized_v1']['recovered_rate_pct']}%) | {fl['normalized_v1']['different_signal']} ({fl['normalized_v1']['different_signal_rate_pct']}%) | **{fl['normalized_v1']['missed']}** | **{fl['normalized_v1']['finding_level_evasion_rate_pct']}%** | {ml['normalized_v1']['rf_positive_count']}/12 ({ml['normalized_v1']['rf_detection_rate_pct']}%) | {ml['normalized_v1']['xgb_positive_count']}/12 ({ml['normalized_v1']['xgb_detection_rate_pct']}%) |",
         f"| **C. Hardened (AST v1.1)** | {fl['hardened_v11']['recovered']} ({fl['hardened_v11']['recovered_rate_pct']}%) | {fl['hardened_v11']['different_signal']} ({fl['hardened_v11']['different_signal_rate_pct']}%) | **{fl['hardened_v11']['missed']}** | **{fl['hardened_v11']['finding_level_evasion_rate_pct']}%** | {ml['hardened_v11']['rf_positive_count']}/12 ({ml['hardened_v11']['rf_detection_rate_pct']}%) | {ml['hardened_v11']['xgb_positive_count']}/12 ({ml['hardened_v11']['xgb_detection_rate_pct']}%) |",
-        f"| **D. Hardened + Normalized** | {fl['hardened_v11_normalized']['recovered']} ({fl['hardened_v11_normalized']['recovered_rate_pct']}%) | {fl['hardened_v11_normalized']['different_signal']} ({fl['hardened_v11_normalized']['different_signal_rate_pct']}%) | **{fl['hardened_v11_normalized']['missed']}** | **{fl['hardened_v11_normalized']['finding_level_evasion_rate_pct']}%** | {ml['hardened_v11_normalized']['rf_positive_count']}/12 ({ml['hardened_v11_normalized']['rf_detection_rate_pct']}%) | {ml['hardened_v11_normalized']['xgb_positive_count']}/12 ({ml['hardened_v11_normalized']['xgb_detection_rate_pct']}%) |",
+        f"| **D. Hardened + Normalized [Reported]** | {fl['hardened_v11_normalized']['recovered']} ({fl['hardened_v11_normalized']['recovered_rate_pct']}%) | {fl['hardened_v11_normalized']['different_signal']} ({fl['hardened_v11_normalized']['different_signal_rate_pct']}%) | **{fl['hardened_v11_normalized']['missed']}** | **{fl['hardened_v11_normalized']['finding_level_evasion_rate_pct']}%** | {ml['hardened_v11_normalized']['rf_positive_count']}/12 ({ml['hardened_v11_normalized']['rf_detection_rate_pct']}%) | {ml['hardened_v11_normalized']['xgb_positive_count']}/12 ({ml['hardened_v11_normalized']['xgb_detection_rate_pct']}%) |",
         "",
         "> [!IMPORTANT]",
         "> **Finding-Level vs Package-Level Distinction:** Finding-level evasion rate measures whether the exact baseline indicator or an auxiliary finding fired; it is a feature-level syntactic metric, **not a package detection rate**. As established in Person A's verification, emitting `different_signal` does not imply detection by the engine verdict.",
@@ -376,8 +379,8 @@ def build_resilience_markdown(payload: Dict[str, Any]) -> None:
         "",
         "| Pipeline | Suspicious (Strong Signal) | Review-Kept (`review_recommended: true`) | Silent (`none_detected`, No Review) | Review Recommendation Rate |",
         "|---|---:|---:|---:|---:|",
-        f"| **Hardened v1.1** | {vd['hardened_v11']['suspicious_count']} ({vd['hardened_v11']['suspicious_rate_pct']}%) | {vd['hardened_v11']['review_kept_count']} ({vd['hardened_v11']['review_kept_rate_pct']}%) | {vd['hardened_v11']['silent_count']} ({vd['hardened_v11']['silent_rate_pct']}%) | **{vd['hardened_v11']['review_recommendation_rate_pct']}%** (5/11 non-suspicious) |",
-        f"| **Hardened v1.1 + Normalize** | {vd['hardened_v11_normalized']['suspicious_count']} ({vd['hardened_v11_normalized']['suspicious_rate_pct']}%) | {vd['hardened_v11_normalized']['review_kept_count']} ({vd['hardened_v11_normalized']['review_kept_rate_pct']}%) | {vd['hardened_v11_normalized']['silent_count']} ({vd['hardened_v11_normalized']['silent_rate_pct']}%) | **{vd['hardened_v11_normalized']['review_recommendation_rate_pct']}%** (5/11 non-suspicious) |",
+        f"| **Hardened v1.1 (Verified)** | {vd['hardened_v11']['suspicious_count']} ({vd['hardened_v11']['suspicious_rate_pct']}%) | {vd['hardened_v11']['review_kept_count']} ({vd['hardened_v11']['review_kept_rate_pct']}%) | {vd['hardened_v11']['silent_count']} ({vd['hardened_v11']['silent_rate_pct']}%) | **{vd['hardened_v11']['review_recommendation_rate_pct']}%** (5/11 non-suspicious) |",
+        f"| **Hardened v1.1 + Normalize [Reported]** | {vd['hardened_v11_normalized']['suspicious_count']} ({vd['hardened_v11_normalized']['suspicious_rate_pct']}%) | {vd['hardened_v11_normalized']['review_kept_count']} ({vd['hardened_v11_normalized']['review_kept_rate_pct']}%) | {vd['hardened_v11_normalized']['silent_count']} ({vd['hardened_v11_normalized']['silent_rate_pct']}%) | **{vd['hardened_v11_normalized']['review_recommendation_rate_pct']}%** (7/11 non-suspicious) |",
         "",
         "### Verdict Observations:",
         "- Only **1 of 12 samples** (`adv_001`, Base64 dynamic execution) triggers a `suspicious` verdict under Verdict v2 (via strong signals `S2_dynamic_exec_plus` and `S5_decode_exec`).",
@@ -408,7 +411,7 @@ def build_resilience_markdown(payload: Dict[str, Any]) -> None:
         "",
         "## 5. Machine Learning Evaluation on Adversarial Batch",
         "",
-        "Person B's production models (`behavior_without_size`, trained on v1.1 dev set without size confound) were evaluated on the adversarial batch:",
+        "Person B's production models (`behavior_without_size`, trained on the v1.1 dev set without `n_py_files` as a direct feature) were evaluated on the adversarial batch. Residual size correlation is not ruled out. Person A's verification did not independently verify the normalization columns or RF/XGBoost detection rates below; treat them as reported experimental results:",
         "- **Random Forest:** Detects **7 of 12 samples** (58.33%) under Hardened v1.1 features, rising to **9 of 12 samples** (75.00%) under Hardened v1.1 + Normalization ($P(\\text{malicious}) \\ge 0.5$). It captures auxiliary behavioral patterns (`Dynamic Code Execution`, `Obfuscation`) even when the primary command execution indicator was obfuscated.",
         "- **XGBoost:** Detects **6 of 12 samples** (50.00%) under Hardened v1.1 features, rising to **8 of 12 samples** (66.67%) under Hardened v1.1 + Normalization.",
         "- **Integrity Guard:** The frozen adversarial batch was **never used for model training, tuning, threshold selection, or isotonic probability calibration**.",
