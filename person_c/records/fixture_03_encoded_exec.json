@@ -1,0 +1,137 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "c0ab06f2-5927-5dd8-b219-42ac0cd5dee6",
+  "created_at": "2026-11-09T00:00:00Z",
+  "record_origin": "analyzer",
+  "tool": {
+    "spider_version": "0.1.0-dev",
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "fixture_03_encoded_exec",
+    "version": "0.2.1",
+    "artifact": {
+      "filename": null,
+      "sha256": "e7e1016b3df581871287db08467222e4e16c30f32bf74f4034a77c552c3e0c4b",
+      "size_bytes": 78,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 1,
+    "python_files": 1,
+    "files_inspected": 1,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "encoded_exec.py",
+      "kind": "python",
+      "sha256": "e4b5fe6045cca7fc06aa7c957c7825575e5651010712a4517eca393751919616",
+      "lines": 4,
+      "inspected": true,
+      "roles": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "obf.base64",
+      "category": "obfuscation",
+      "indicator": "base64.b64decode",
+      "severity": "medium",
+      "confidence": "high",
+      "file": "encoded_exec.py",
+      "span": {
+        "start_line": 3,
+        "start_col": 7,
+        "end_line": 3,
+        "end_col": 47
+      },
+      "snippet": "base64.b64decode(\"cHJpbnQoJ0hlbGxvJyk=\")",
+      "explanation": "base64 operation detected",
+      "trigger_phase": "import",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    },
+    {
+      "id": "F002",
+      "rule_id": "dyn.exec",
+      "category": "dynamic_execution",
+      "indicator": "exec",
+      "severity": "high",
+      "confidence": "high",
+      "file": "encoded_exec.py",
+      "span": {
+        "start_line": 4,
+        "start_col": 0,
+        "end_line": 4,
+        "end_col": 10
+      },
+      "snippet": "exec(code)",
+      "explanation": "exec() call detected",
+      "trigger_phase": "import",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "R001",
+      "from": "F001",
+      "to": "F002",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    }
+  ],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": null
+  },
+  "verdict": {
+    "outcome": "suspicious",
+    "reasons": [
+      "S2_dynamic_exec_plus",
+      "S5_decode_exec"
+    ],
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ]
+  },
+  "timings_ms": {
+    "acquire": null,
+    "extract": null,
+    "analyze": null,
+    "features": null,
+    "model": null
+  }
+}

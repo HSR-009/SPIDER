@@ -1,0 +1,99 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "eb399484-b548-51a3-8a2a-274d3d72492b",
+  "created_at": "2026-11-09T00:00:00Z",
+  "record_origin": "analyzer",
+  "tool": {
+    "spider_version": "0.1.0-dev",
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "fixture_02_subprocess_run",
+    "version": "1.0.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "d613a6055be46595426f9d147b2ab0a555395fa64979bdef080c96fd92644188",
+      "size_bytes": 49,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 1,
+    "python_files": 1,
+    "files_inspected": 1,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "subprocess_call.py",
+      "kind": "python",
+      "sha256": "cbc06410926431b0d12c1b47c51536c34374f59cadde36935397d58c7676ea67",
+      "lines": 3,
+      "inspected": true,
+      "roles": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "cmd.subprocess_run",
+      "category": "command_execution",
+      "indicator": "subprocess.run",
+      "severity": "high",
+      "confidence": "high",
+      "file": "subprocess_call.py",
+      "span": {
+        "start_line": 3,
+        "start_col": 0,
+        "end_line": 3,
+        "end_col": 26
+      },
+      "snippet": "subprocess.run([\"whoami\"])",
+      "explanation": "subprocess.run() call detected",
+      "trigger_phase": "import",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    }
+  ],
+  "relations": [],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": null
+  },
+  "verdict": {
+    "outcome": "none_detected_in_this_scan",
+    "reasons": [],
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "review_recommended": true
+  },
+  "timings_ms": {
+    "acquire": null,
+    "extract": null,
+    "analyze": null,
+    "features": null,
+    "model": null
+  }
+}

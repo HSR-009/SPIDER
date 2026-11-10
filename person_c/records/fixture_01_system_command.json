@@ -1,0 +1,99 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "fb4644e0-1b9b-5a83-a758-a657837340c7",
+  "created_at": "2026-11-09T00:00:00Z",
+  "record_origin": "analyzer",
+  "tool": {
+    "spider_version": "0.1.0-dev",
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "fixture_01_system_command",
+    "version": "0.1.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "61e46273e1aadd029ed23cfcecc61e95f5307e9ca1220b7c64f6ef04f77e4b80",
+      "size_bytes": 34,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 1,
+    "python_files": 1,
+    "files_inspected": 1,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "system_command.py",
+      "kind": "python",
+      "sha256": "0badb25d67c26a81a295eaf3fe86809cd24bbea226cc8a48d1bfbf06ace7673b",
+      "lines": 3,
+      "inspected": true,
+      "roles": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "cmd.os_system",
+      "category": "command_execution",
+      "indicator": "os.system",
+      "severity": "high",
+      "confidence": "high",
+      "file": "system_command.py",
+      "span": {
+        "start_line": 3,
+        "start_col": 0,
+        "end_line": 3,
+        "end_col": 19
+      },
+      "snippet": "os.system(\"whoami\")",
+      "explanation": "os.system() call detected",
+      "trigger_phase": "import",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    }
+  ],
+  "relations": [],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": null
+  },
+  "verdict": {
+    "outcome": "none_detected_in_this_scan",
+    "reasons": [],
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ],
+    "review_recommended": true
+  },
+  "timings_ms": {
+    "acquire": null,
+    "extract": null,
+    "analyze": null,
+    "features": null,
+    "model": null
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "1fdefc58-3c06-5189-95ca-8dc3adc8fea4",
+  "created_at": "2026-11-09T00:00:00Z",
+  "record_origin": "analyzer",
+  "tool": {
+    "spider_version": "0.1.0-dev",
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "fixture_05_clean_math",
+    "version": "1.1.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "934e578f8ef0aad5eca909af449c55ed01922d8433130d80c32148d96ba16133",
+      "size_bytes": 90,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 1,
+    "python_files": 1,
+    "files_inspected": 1,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "calculator.py",
+      "kind": "python",
+      "sha256": "111d07a8fbb34d3272284840221a0fa31664426419f6ec3051f353cace98ffab",
+      "lines": 5,
+      "inspected": true,
+      "roles": []
+    }
+  ],
+  "findings": [],
+  "relations": [],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": null
+  },
+  "verdict": {
+    "outcome": "none_detected_in_this_scan",
+    "reasons": [],
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ]
+  },
+  "timings_ms": {
+    "acquire": null,
+    "extract": null,
+    "analyze": null,
+    "features": null,
+    "model": null
+  }
+}
