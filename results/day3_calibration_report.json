@@ -2,162 +2,174 @@
   "experiment": "behavior_without_size",
   "model": "random_forest",
   "feature_count": 54,
-  "dev_rows": 3962,
+  "dev_rows": 3957,
   "holdout_rows": 991,
   "calibration": {
     "method": "isotonic_regression_on_oof_probabilities",
     "cv_folds": 5,
-    "oof_roc_auc_uncalibrated": 0.874794,
-    "oof_roc_auc_calibrated": 0.88019,
-    "brier_score_uncalibrated": 0.135739,
-    "brier_score_calibrated": 0.129239
+    "oof_roc_auc_uncalibrated": 0.875861,
+    "oof_roc_auc_calibrated": 0.882855,
+    "brier_score_uncalibrated": 0.133343,
+    "brier_score_calibrated": 0.12659
   },
   "abstention": {
     "max_allowed_rate": 0.2,
-    "selected_delta": 0.09,
-    "abstention_zone_low": 0.41,
-    "abstention_zone_high": 0.59,
-    "delta": 0.09,
-    "abstention_rate": 0.02801615345784958,
-    "f1_on_kept": 0.7528629479128186,
-    "n_kept": 3851,
+    "selected_delta": 0.13,
+    "abstention_zone_low": 0.37,
+    "abstention_zone_high": 0.63,
+    "delta": 0.13,
+    "abstention_rate": 0.07050796057619413,
+    "f1_on_kept": 0.77431906614786,
+    "n_kept": 3678,
     "threshold_search_candidates": [
       {
         "delta": 0.05,
-        "abstention_rate": 0.0,
-        "f1_on_kept": 0.7519944502254596,
-        "n_kept": 3962
+        "abstention_rate": 0.0090978013646702,
+        "f1_on_kept": 0.7617021276595745,
+        "n_kept": 3921
       },
       {
         "delta": 0.060000000000000005,
-        "abstention_rate": 0.0,
-        "f1_on_kept": 0.7519944502254596,
-        "n_kept": 3962
+        "abstention_rate": 0.0090978013646702,
+        "f1_on_kept": 0.7617021276595745,
+        "n_kept": 3921
       },
       {
         "delta": 0.07,
-        "abstention_rate": 0.0,
-        "f1_on_kept": 0.7519944502254596,
-        "n_kept": 3962
+        "abstention_rate": 0.0090978013646702,
+        "f1_on_kept": 0.7617021276595745,
+        "n_kept": 3921
       },
       {
         "delta": 0.08,
-        "abstention_rate": 0.0,
-        "f1_on_kept": 0.7519944502254596,
-        "n_kept": 3962
+        "abstention_rate": 0.0090978013646702,
+        "f1_on_kept": 0.7617021276595745,
+        "n_kept": 3921
       },
       {
         "delta": 0.09,
-        "abstention_rate": 0.02801615345784958,
-        "f1_on_kept": 0.7528629479128186,
-        "n_kept": 3851
+        "abstention_rate": 0.0090978013646702,
+        "f1_on_kept": 0.7617021276595745,
+        "n_kept": 3921
       },
       {
         "delta": 0.1,
-        "abstention_rate": 0.02801615345784958,
-        "f1_on_kept": 0.7528629479128186,
-        "n_kept": 3851
+        "abstention_rate": 0.0090978013646702,
+        "f1_on_kept": 0.7617021276595745,
+        "n_kept": 3921
       },
       {
         "delta": 0.11,
-        "abstention_rate": 0.02801615345784958,
-        "f1_on_kept": 0.7528629479128186,
-        "n_kept": 3851
+        "abstention_rate": 0.0090978013646702,
+        "f1_on_kept": 0.7617021276595745,
+        "n_kept": 3921
       },
       {
         "delta": 0.12000000000000001,
-        "abstention_rate": 0.02801615345784958,
-        "f1_on_kept": 0.7528629479128186,
-        "n_kept": 3851
+        "abstention_rate": 0.038665655799848375,
+        "f1_on_kept": 0.774054054054054,
+        "n_kept": 3804
       },
       {
         "delta": 0.13,
-        "abstention_rate": 0.02801615345784958,
-        "f1_on_kept": 0.7528629479128186,
-        "n_kept": 3851
+        "abstention_rate": 0.07050796057619413,
+        "f1_on_kept": 0.77431906614786,
+        "n_kept": 3678
+      },
+      {
+        "delta": 0.14,
+        "abstention_rate": 0.07050796057619413,
+        "f1_on_kept": 0.77431906614786,
+        "n_kept": 3678
+      },
+      {
+        "delta": 0.15000000000000002,
+        "abstention_rate": 0.07404599444023252,
+        "f1_on_kept": 0.7742442088731841,
+        "n_kept": 3664
       }
     ]
   },
   "global_top20_importances": [
     {
-      "feature": "category_count__credential_data_access",
-      "importance": 0.100277
-    },
-    {
-      "feature": "indicator_present__setuptools.command.install",
-      "importance": 0.087352
-    },
-    {
       "feature": "category_count__network_activity",
-      "importance": 0.081492
-    },
-    {
-      "feature": "indicator_present__urllib.request.urlopen",
-      "importance": 0.061261
+      "importance": 0.070623
     },
     {
       "feature": "category_count__command_execution",
-      "importance": 0.060458
+      "importance": 0.066767
     },
     {
-      "feature": "category_present__credential_data_access",
-      "importance": 0.049709
+      "feature": "category_count__credential_data_access",
+      "importance": 0.059774
     },
     {
       "feature": "category_present__network_activity",
-      "importance": 0.048186
-    },
-    {
-      "feature": "indicator_present__os.environ",
-      "importance": 0.04628
+      "importance": 0.057772
     },
     {
       "feature": "category_count__install_time_package_execution",
-      "importance": 0.043411
+      "importance": 0.05641
     },
     {
       "feature": "category_count__dynamic_code_execution",
-      "importance": 0.037572
+      "importance": 0.053309
+    },
+    {
+      "feature": "indicator_present__setuptools.command.install",
+      "importance": 0.049896
     },
     {
       "feature": "indicator_present__requests.post",
-      "importance": 0.03749
+      "importance": 0.036144
     },
     {
       "feature": "category_count__obfuscation",
-      "importance": 0.037158
+      "importance": 0.035066
     },
     {
       "feature": "category_present__command_execution",
-      "importance": 0.033388
+      "importance": 0.034871
     },
     {
-      "feature": "indicator_present__base64.b64encode",
-      "importance": 0.024658
+      "feature": "indicator_present__install_command_override",
+      "importance": 0.033914
+    },
+    {
+      "feature": "indicator_present__os.environ",
+      "importance": 0.031565
     },
     {
       "feature": "indicator_present__subprocess.Popen",
-      "importance": 0.024229
+      "importance": 0.03062
     },
     {
       "feature": "category_present__dynamic_code_execution",
-      "importance": 0.021656
+      "importance": 0.028519
     },
     {
-      "feature": "indicator_present__socket",
-      "importance": 0.021439
+      "feature": "category_present__credential_data_access",
+      "importance": 0.02622
+    },
+    {
+      "feature": "indicator_present__importlib.import_module(dynamic)",
+      "importance": 0.022679
     },
     {
       "feature": "indicator_present__requests.get",
-      "importance": 0.020121
+      "importance": 0.020522
     },
     {
-      "feature": "indicator_present__base64.b64decode",
-      "importance": 0.017654
+      "feature": "indicator_present__base64.b64encode",
+      "importance": 0.02033
     },
     {
-      "feature": "category_present__install_time_package_execution",
-      "importance": 0.016417
+      "feature": "indicator_present__.env",
+      "importance": 0.019867
+    },
+    {
+      "feature": "indicator_present__urllib.request.urlopen",
+      "importance": 0.017928
     }
   ],
   "leakage_note": "Calibration and abstention threshold were fitted exclusively on development-set OOF probabilities. The frozen holdout (results/frozen_holdout_packages.csv) was not used for fitting, calibration, or threshold selection."

@@ -74,11 +74,11 @@
         "finding_level_evasion_rate_pct": 41.67
       },
       "hardened_v11": {
-        "recovered": 3,
-        "different_signal": 9,
+        "recovered": 4,
+        "different_signal": 8,
         "missed": 0,
-        "recovered_rate_pct": 25.0,
-        "different_signal_rate_pct": 75.0,
+        "recovered_rate_pct": 33.33,
+        "different_signal_rate_pct": 66.67,
         "finding_level_evasion_rate_pct": 0.0
       },
       "hardened_v11_normalized": {
@@ -279,8 +279,8 @@
         "missed": 1
       },
       "hardened_v11": {
-        "recovered": 0,
-        "different_signal": 1,
+        "recovered": 1,
+        "different_signal": 0,
         "missed": 0
       },
       "hardened_v11_normalized": {
@@ -805,7 +805,7 @@
       "finding_level": {
         "baseline_v1": "missed",
         "normalized_v1": "missed",
-        "hardened_v11": "different_signal",
+        "hardened_v11": "recovered",
         "hardened_v11_normalized": "different_signal"
       },
       "engine_verdict": {

@@ -110,8 +110,10 @@ def render(st: Any = None) -> None:
             with kpi_cols[3]:
                 rf_det = ml_summary.get("hardened_v11", {}).get("rf_detection_rate_pct", 0)
                 st.metric("ML Model (RF) Detection", f"{rf_det}%", delta=f"{ml_summary.get('hardened_v11', {}).get('rf_positive_count', 0)}/12 captured")
+                st.caption("Reported / Experimental — Person B results; not independently verified by Person A.")
 
             st.markdown("### Overall Finding-Level Comparison Table")
+            st.caption("⚠️ **Notice:** Normalization pipelines (B, D) and ML model detection rates are: *Reported / Experimental — Person B results; not independently verified by Person A.*")
             comparison_rows = [
                 {
                     "Pipeline": "A. Baseline (AST v1)",
@@ -119,17 +121,17 @@ def render(st: Any = None) -> None:
                     "Different Signal": findings.get("baseline_v1", {}).get("different_signal", 0),
                     "Missed (Evaded)": findings.get("baseline_v1", {}).get("missed", 0),
                     "Finding Evasion Rate": f"{findings.get('baseline_v1', {}).get('finding_level_evasion_rate_pct', 0)}%",
-                    "RF Det (P≥0.5)": f"{ml_summary.get('baseline_v1', {}).get('rf_positive_count', 0)}/12",
-                    "XGB Det (P≥0.5)": f"{ml_summary.get('baseline_v1', {}).get('xgb_positive_count', 0)}/12",
+                    "RF Det (P≥0.5) [Reported]": f"{ml_summary.get('baseline_v1', {}).get('rf_positive_count', 0)}/12",
+                    "XGB Det (P≥0.5) [Reported]": f"{ml_summary.get('baseline_v1', {}).get('xgb_positive_count', 0)}/12",
                 },
                 {
-                    "Pipeline": "B. Normalized (v1 + Normalize)",
+                    "Pipeline": "B. Normalized (v1 + Normalize) [Reported]",
                     "Recovered (Exact)": findings.get("normalized_v1", {}).get("recovered", 0),
                     "Different Signal": findings.get("normalized_v1", {}).get("different_signal", 0),
                     "Missed (Evaded)": findings.get("normalized_v1", {}).get("missed", 0),
                     "Finding Evasion Rate": f"{findings.get('normalized_v1', {}).get('finding_level_evasion_rate_pct', 0)}%",
-                    "RF Det (P≥0.5)": f"{ml_summary.get('normalized_v1', {}).get('rf_positive_count', 0)}/12",
-                    "XGB Det (P≥0.5)": f"{ml_summary.get('normalized_v1', {}).get('xgb_positive_count', 0)}/12",
+                    "RF Det (P≥0.5) [Reported]": f"{ml_summary.get('normalized_v1', {}).get('rf_positive_count', 0)}/12",
+                    "XGB Det (P≥0.5) [Reported]": f"{ml_summary.get('normalized_v1', {}).get('xgb_positive_count', 0)}/12",
                 },
                 {
                     "Pipeline": "C. Hardened (AST v1.1)",
@@ -137,17 +139,17 @@ def render(st: Any = None) -> None:
                     "Different Signal": findings.get("hardened_v11", {}).get("different_signal", 0),
                     "Missed (Evaded)": findings.get("hardened_v11", {}).get("missed", 0),
                     "Finding Evasion Rate": f"{findings.get('hardened_v11', {}).get('finding_level_evasion_rate_pct', 0)}%",
-                    "RF Det (P≥0.5)": f"{ml_summary.get('hardened_v11', {}).get('rf_positive_count', 0)}/12",
-                    "XGB Det (P≥0.5)": f"{ml_summary.get('hardened_v11', {}).get('xgb_positive_count', 0)}/12",
+                    "RF Det (P≥0.5) [Reported]": f"{ml_summary.get('hardened_v11', {}).get('rf_positive_count', 0)}/12",
+                    "XGB Det (P≥0.5) [Reported]": f"{ml_summary.get('hardened_v11', {}).get('xgb_positive_count', 0)}/12",
                 },
                 {
-                    "Pipeline": "D. Hardened + Normalized",
+                    "Pipeline": "D. Hardened + Normalized [Reported]",
                     "Recovered (Exact)": findings.get("hardened_v11_normalized", {}).get("recovered", 0),
                     "Different Signal": findings.get("hardened_v11_normalized", {}).get("different_signal", 0),
                     "Missed (Evaded)": findings.get("hardened_v11_normalized", {}).get("missed", 0),
                     "Finding Evasion Rate": f"{findings.get('hardened_v11_normalized', {}).get('finding_level_evasion_rate_pct', 0)}%",
-                    "RF Det (P≥0.5)": f"{ml_summary.get('hardened_v11_normalized', {}).get('rf_positive_count', 0)}/12",
-                    "XGB Det (P≥0.5)": f"{ml_summary.get('hardened_v11_normalized', {}).get('xgb_positive_count', 0)}/12",
+                    "RF Det (P≥0.5) [Reported]": f"{ml_summary.get('hardened_v11_normalized', {}).get('rf_positive_count', 0)}/12",
+                    "XGB Det (P≥0.5) [Reported]": f"{ml_summary.get('hardened_v11_normalized', {}).get('xgb_positive_count', 0)}/12",
                 },
             ]
             st.table(comparison_rows)
@@ -261,16 +263,31 @@ def render(st: Any = None) -> None:
                     f"- **Holdout PR-AUC:** `{b_ho.get('pr_auc', 0):.4f}`"
                 )
 
+            # Feature Importance & SHAP Explainability
+            st.markdown("### Feature Importance & SHAP Explainability")
+            shap_plot_path = ROOT / "Person_B" / "models" / "saved" / "shap_summary_plot.png"
+            if shap_plot_path.exists():
+                st.image(str(shap_plot_path), caption="SHAP Summary Plot — Top Behavioral AST Features Driving Predictions")
+            cal_path = RESULTS_DIR / "day3_calibration_report.json"
+            if cal_path.exists():
+                try:
+                    cal_data = json.loads(cal_path.read_text(encoding="utf-8"))
+                    top_importances = cal_data.get("global_top20_importances", [])
+                    if top_importances:
+                        st.markdown("#### Global Top-20 Feature Importances (Tree Ensemble)")
+                        st.table([{"Rank": i + 1, "Feature": item["feature"], "Importance": f"{item['importance']:.6f}"} for i, item in enumerate(top_importances)])
+                except Exception:
+                    pass
+
     # ------------------------------------------------------------------
     # TAB 3: Size Confound & Peer Context
     # ------------------------------------------------------------------
     with tabs[2]:
         st.subheader("Size Confound Analysis & Peer-Group Stratification")
         st.markdown(
-            "> **The Size Confound Warning:** In the raw dataset, benign packages contain an average of 42.8 `.py` files, "
-            "whereas malicious packages contain an average of 2.1 `.py` files. Consequently, a trivial rule (`n_py_files <= 2`) "
-            "achieves high classification performance without learning any behavioral capability. "
-            "Person B separates size from behavior to avoid false security."
+            "> **The Size Confound Warning:** In the v1.1 rescan, the median analyzed `.py` file count was 12 for benign packages vs 2 for malicious packages (`results/rescan_v11_summary.md`). "
+            "A naive model using file count learns an artificial shortcut linking small codebase size directly to malice. "
+            "Person B separates size from behavior (`behavior_without_size`) to avoid relying on direct file counts, though residual correlation in counts and presence cannot be ruled out."
         )
 
         if peer_data:
