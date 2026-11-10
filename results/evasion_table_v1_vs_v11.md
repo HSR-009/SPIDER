@@ -55,6 +55,6 @@
 ---
 
 ## 4. Key Security Findings
-- **Direct AST Bypasses in v1:** `getattr(os, ...)` and `__import__` reliably blind baseline `v1` (ASR = 50.0%).
+- **Direct AST Bypasses in v1:** `getattr(os, ...)` and `__import__` reliably blind baseline `v1` (ASR = 66.67%).
 - **Rule Hardening in v1.1:** `v1.1` successfully catches obfuscation indicators (`obf.fromhex`, `obf.chr_join`, `base64`), lowering pure miss rates and converting evasions to `different_signal`.
 - **Defense Recovery via Normalization:** Adding deterministic AST normalization (`spider/normalize.py`) folds string concatenations, resolves import aliases, and converts 2-arg `getattr` into standard attribute calls, recovering original call signatures before rules fire.

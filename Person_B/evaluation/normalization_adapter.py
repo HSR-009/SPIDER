@@ -56,7 +56,7 @@ NORMALIZATION_RULES = [
 
 # Explicit limitations of Person C's normalization module
 MODULE_LIMITATIONS = [
-    "Docstring in spider/normalize.py explicitly declares it as a placeholder / best-guess module.",
+    "Rewrites only constant string concatenation, import-as aliases, literal base64, and 2-arg getattr.",
     "Does not handle 'from ... import ... as ...' alias shapes.",
     "Does not normalize ROT13 encodings (e.g. codecs.decode(..., 'rot_13')).",
     "Does not normalize dynamic imports (e.g. __import__('o' + 's')).",
@@ -97,7 +97,7 @@ def get_normalization_metadata() -> Dict[str, Any]:
         "module": "spider.normalize",
         "source_tag": "adv-batch-v1",
         "available": NORMALIZATION_AVAILABLE,
-        "is_official_placeholder": True,
+        "is_official_placeholder": False,
         "rules": NORMALIZATION_RULES,
         "limitations": MODULE_LIMITATIONS,
     }
