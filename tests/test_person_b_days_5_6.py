@@ -137,11 +137,12 @@ class PersonBDay5Day6Tests(unittest.TestCase):
         self.assertFalse(cfg["training_data_isolation"]["holdout_data_in_training"])
 
     def test_adv_006_and_hardened_v11_classification_reproducibility(self):
-        """adv_006 and hardened v1.1 aggregate (4 recovered, 8 diff-signal) must be reproducible without overrides."""
+        """adv_006, hardened v1.1, and Pipeline D aggregates must be reproducible without overrides."""
         from Person_B.evaluation.resilience_eval import (
             analyze_with_v11,
             classify_finding_outcome,
         )
+        from Person_B.evaluation.normalization_adapter import normalize_code
 
         manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
         entries = {e["sample_id"]: e for e in manifest["entries"]}
@@ -157,14 +158,12 @@ class PersonBDay5Day6Tests(unittest.TestCase):
         self.assertEqual(outcome, "recovered", "adv_006 must classify as recovered from source analysis")
 
         # adv_006 normalized analysis (Pipeline D)
-        from Person_B.evaluation.normalization_adapter import normalize_code
-
         norm_code_6, _, _ = normalize_code(e6["generated_code"])
         adv_norm_findings, _ = analyze_with_v11(norm_code_6)
         outcome_norm = classify_finding_outcome(base_findings, adv_norm_findings)
         self.assertEqual(outcome_norm, "recovered", "adv_006 under v1.1 + normalization must classify as recovered")
 
-        # Verify hardened v1.1 aggregate across all 12 entries
+        # Verify hardened v1.1 aggregate across all 12 entries (Pipeline C)
         recovered_count = 0
         diff_signal_count = 0
         missed_count = 0
@@ -182,6 +181,26 @@ class PersonBDay5Day6Tests(unittest.TestCase):
         self.assertEqual(recovered_count, 4, f"Expected 4 recovered, got {recovered_count}")
         self.assertEqual(diff_signal_count, 8, f"Expected 8 different_signal, got {diff_signal_count}")
         self.assertEqual(missed_count, 0, f"Expected 0 missed, got {missed_count}")
+
+        # Verify hardened v1.1 + normalized aggregate across all 12 entries (Pipeline D)
+        d_recovered = 0
+        d_diff_signal = 0
+        d_missed = 0
+        for entry in manifest["entries"]:
+            b_f, _ = analyze_with_v11(entry["baseline_source"])
+            norm_code, _, _ = normalize_code(entry["generated_code"])
+            norm_f, _ = analyze_with_v11(norm_code)
+            out_d = classify_finding_outcome(b_f, norm_f)
+            if out_d == "recovered":
+                d_recovered += 1
+            elif out_d == "different_signal":
+                d_diff_signal += 1
+            elif out_d == "missed":
+                d_missed += 1
+
+        self.assertEqual(d_recovered, 6, f"Expected 6 recovered for Pipeline D, got {d_recovered}")
+        self.assertEqual(d_diff_signal, 5, f"Expected 5 different_signal for Pipeline D, got {d_diff_signal}")
+        self.assertEqual(d_missed, 1, f"Expected 1 missed for Pipeline D, got {d_missed}")
 
     # -------------------------------------------------------------
     # 4. Observatory UI Headless Import (Phase 4)
