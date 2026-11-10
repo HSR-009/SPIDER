@@ -136,6 +136,45 @@ class PersonBDay5Day6Tests(unittest.TestCase):
         self.assertFalse(cfg["training_data_isolation"]["adversarial_data_in_training"])
         self.assertFalse(cfg["training_data_isolation"]["holdout_data_in_training"])
 
+    def test_adv_006_and_hardened_v11_classification_reproducibility(self):
+        """adv_006 and hardened v1.1 aggregate (4 recovered, 8 diff-signal) must be reproducible without overrides."""
+        from Person_B.evaluation.resilience_eval import (
+            analyze_with_v11,
+            classify_finding_outcome,
+        )
+
+        manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+        entries = {e["sample_id"]: e for e in manifest["entries"]}
+        self.assertIn("adv_006", entries)
+
+        # adv_006 source analysis
+        e6 = entries["adv_006"]
+        base_findings, _ = analyze_with_v11(e6["baseline_source"])
+        adv_findings, _ = analyze_with_v11(e6["generated_code"])
+
+        # Both detect ('Command Execution', 'os.popen')
+        outcome = classify_finding_outcome(base_findings, adv_findings)
+        self.assertEqual(outcome, "recovered", "adv_006 must classify as recovered from source analysis")
+
+        # Verify hardened v1.1 aggregate across all 12 entries
+        recovered_count = 0
+        diff_signal_count = 0
+        missed_count = 0
+        for entry in manifest["entries"]:
+            b_f, _ = analyze_with_v11(entry["baseline_source"])
+            a_f, _ = analyze_with_v11(entry["generated_code"])
+            out = classify_finding_outcome(b_f, a_f)
+            if out == "recovered":
+                recovered_count += 1
+            elif out == "different_signal":
+                diff_signal_count += 1
+            elif out == "missed":
+                missed_count += 1
+
+        self.assertEqual(recovered_count, 4, f"Expected 4 recovered, got {recovered_count}")
+        self.assertEqual(diff_signal_count, 8, f"Expected 8 different_signal, got {diff_signal_count}")
+        self.assertEqual(missed_count, 0, f"Expected 0 missed, got {missed_count}")
+
     # -------------------------------------------------------------
     # 4. Observatory UI Headless Import (Phase 4)
     # -------------------------------------------------------------

@@ -161,13 +161,9 @@ def run_resilience_evaluation() -> Dict[str, Any]:
         cand_v1_norm = analyze_with_v1(norm_adv_src)
         out_v1_norm = classify_finding_outcome(base_findings_v1, cand_v1_norm)
 
-        # Pipeline C: Hardened v1.1
+        # Pipeline C: Hardened v1.1 (evaluated against v1.1 baseline findings, matching Person A protocol)
         cand_v11, verd_v11 = analyze_with_v11(adv_src)
-        out_v11 = classify_finding_outcome(base_findings_v1, cand_v11)
-        # Person A and Person C independently verified adv_006 as recovered because v1.1
-        # recovers the intended baseline os.popen indicator (Person A verification: recovered)
-        if sid == "adv_006":
-            out_v11 = "recovered"
+        out_v11 = classify_finding_outcome(base_findings_v11, cand_v11)
         verd_outcome_v11 = verd_v11.get("outcome", "none_detected_in_this_scan")
         verd_review_v11 = verd_v11.get("review_recommended", False)
         verd_cat_v11 = classify_verdict_level(verd_outcome_v11, verd_review_v11)
