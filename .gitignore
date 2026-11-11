@@ -30,3 +30,8 @@ zero_review/
 SPIDER_Submission/
 SPIDER_Submission.zip
 temp_peek/
+
+# UI build output
+spider-ui/node_modules/
+spider-ui/dist/
+spider-ui/screenshots/

@@ -1,0 +1,37 @@
+{
+  "corpus": {
+    "source": "results/rescan_v11_summary.md",
+    "malicious_packages": 2039,
+    "benign_packages": 2909,
+    "suspicious_pct": { "malicious": 32.6, "benign": 12.0 },
+    "unable_to_assess_pct": { "malicious": 2.1, "benign": 6.3 },
+    "median_py_files": { "malicious": 2, "benign": 12 },
+    "note": "Signal rates, not accuracy. Package size alone separates the classes (size-only AUC about 0.79)."
+  },
+  "false_positive": {
+    "source": "results/fp_check_summary.md",
+    "packages": 100,
+    "flagged": 6,
+    "false_positives": 5,
+    "unclear": 1,
+    "fp_pct": 5.0,
+    "wilson_95": [2.2, 11.2],
+    "note": "Obscure small packages only; not a general false-positive rate."
+  },
+  "evasion": {
+    "source": "results/adv_batch_verification_by_A.md",
+    "samples": 12,
+    "suspicious": 1,
+    "review_only": 5,
+    "silent": 6,
+    "note": "12 synthetic samples around one payload type. Shows evasion of the review flag, not of a suspicious verdict."
+  },
+  "limits": [
+    "Static analysis only; nothing is executed.",
+    "Package-wide combination rules can join unrelated files (5 of 6 flags in the FP check were false positives).",
+    "A setup.py over 2 MiB is skipped.",
+    "Compiled extensions are not inspected.",
+    "ROT13 is not treated as obfuscation."
+  ]
+}
+

@@ -1,0 +1,198 @@
+/* Restored styles for layout, hub, environment sidebar and verdict components.
+ * Extracted from frontend/src/styles/demo.css without demo-only chart rules.
+ */
+
+/* Tool hub and environments */
+.workbench--hub > .shell-body { margin-left: 0; }
+.workbench--hub .mobile-menu { display: none; }
+.hub { max-width: 76rem; margin-inline: auto; display: grid; gap: 28px; padding-top: 28px; }
+.hub__head h1 { font: italic 400 clamp(2.4rem, 6vw, 4rem)/1.05 var(--font-serif); margin: 6px 0 10px; }
+.hub__head p:last-child { color: var(--color-text-secondary); max-width: 40rem; }
+.hub__grid { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.hub__tile { display: grid; gap: 10px; align-content: start; height: 100%; padding: 22px; border-radius: 16px; background: var(--color-surface); border: var(--border-subtle); color: var(--color-text); text-decoration: none; transition: transform .25s, border-color .25s, box-shadow .25s; }
+.hub__tile:hover, .hub__tile:focus-visible { transform: translateY(-4px); border-color: var(--color-action); box-shadow: var(--glow-accent); }
+.hub__tile h2 { font: italic 400 1.7rem var(--font-serif); margin: 0; }
+.hub__tile p { color: var(--color-text-secondary); margin: 0; }
+.hub__index { font: var(--text-mono-label) var(--font-mono); color: var(--color-text-muted); }
+.hub__icon { width: 28px; height: 28px; color: var(--color-action); }
+.hub__chips { list-style: none; padding: 0; margin: 4px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.hub__chips li { font-size: var(--text-xs); color: var(--color-text-muted); border: var(--border-subtle); border-radius: 999px; padding: 2px 10px; }
+.hub__foot { color: var(--color-text-muted); font-size: var(--text-xs); }
+.env-back { display: block; margin: 0 8px 14px; color: var(--color-text-muted); font-size: var(--text-sm); }
+.env-back:hover { color: var(--color-action); }
+.env-tagline { margin: 0 8px 10px; color: var(--color-text-muted); font-size: var(--text-xs); }
+@media (prefers-reduced-motion: reduce) {
+  .hub__tile { transition: none; }
+  .hub__tile:hover { transform: none; }
+}
+
+/* Verdict hero card and statistics */
+.dm-verdict { display: grid; gap: 14px; padding: 24px; border-radius: 16px; background: var(--color-surface); border: 1px solid var(--color-border-strong); }
+.dm-verdict h2 { font: italic 400 clamp(2rem, 5vw, 3.2rem)/1.05 var(--font-serif); margin: 4px 0; }
+.dm-verdict--danger { border-color: var(--color-danger); background: linear-gradient(90deg, var(--color-danger-bg), var(--color-surface)); }
+.dm-verdict--danger h2 { color: var(--color-danger); }
+.dm-verdict--ok h2 { color: var(--color-action); }
+.dm-verdict--warning h2 { color: var(--color-warning); }
+.dm-stats { display: flex; gap: 32px; margin: 0; }
+.dm-stats dt { color: var(--color-text-muted); font-size: var(--text-xs); }
+.dm-stats dd { margin: 0; font: italic 2rem var(--font-serif); }
+.dm-top { margin: 0; padding-left: 18px; color: var(--color-text-secondary); }
+.dm-note { color: var(--color-text-muted); font-size: var(--text-xs); margin: 0; }
+.panel--details > summary { cursor: pointer; font-weight: 600; }
+.panel--details[open] > summary { margin-bottom: 14px; }
+.dm-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.dm-flow { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; margin: 0; }
+.dm-flow li { flex: 1; min-width: 120px; padding: 16px; text-align: center; border: var(--border-subtle); border-radius: 12px; background: var(--color-surface-raised); }
+.dm-flow li.is-on { border-color: var(--color-action); box-shadow: var(--glow-accent); }
+
+/* Route transition loader overlay */
+.route-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  background: var(--color-surface-soft);
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity var(--duration-fast, 150ms) var(--ease-responsive, ease-out);
+}
+
+.route-loader--fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.route-loader__mark {
+  width: 56px;
+  height: 56px;
+  color: var(--color-action);
+  animation: route-loader-pulse var(--duration-deliberate, 800ms) infinite ease-in-out;
+}
+
+.route-loader__label {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+@keyframes route-loader-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loader { transition: opacity 150ms ease-out; }
+  .route-loader__mark { animation: none; }
+}
+
+/* -------------------------------------------------------------
+ * Dynamic Layout, Transitions & Balanced Spacing Refinements
+ * ------------------------------------------------------------- */
+
+/* Page container: balanced max-width and vertical rhythm */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 74rem;
+  margin-inline: auto;
+  width: 100%;
+  animation: page-fade-in var(--duration-standard, 200ms) var(--ease-responsive, ease-out);
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0.85;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Polished Interactive Panel States */
+.panel {
+  transition: border-color var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              box-shadow var(--duration-fast, 150ms) var(--ease-responsive, ease-out);
+}
+
+.panel:hover {
+  border-color: var(--color-border-strong);
+}
+
+/* Interactive Accordion / Details */
+details.panel > summary,
+details.panel--details > summary {
+  user-select: none;
+  transition: color var(--duration-fast, 150ms) var(--ease-responsive, ease-out);
+}
+
+details.panel > summary:hover,
+details.panel--details > summary:hover {
+  color: var(--color-action);
+}
+
+/* Micro-transitions on actionable buttons and links */
+.button {
+  transition: background-color var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              border-color var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              color var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              transform var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              box-shadow var(--duration-fast, 150ms) var(--ease-responsive, ease-out);
+}
+
+.button--primary:not(:disabled):hover {
+  box-shadow: var(--glow-accent);
+}
+
+/* Tab Navigation Transitions */
+.route-tabs button,
+.route-tabs a {
+  transition: color var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              background-color var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              border-color var(--duration-fast, 150ms) var(--ease-responsive, ease-out);
+}
+
+/* Flow list items subtle hover lift */
+.dm-flow li {
+  transition: border-color var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              box-shadow var(--duration-fast, 150ms) var(--ease-responsive, ease-out),
+              transform var(--duration-fast, 150ms) var(--ease-responsive, ease-out);
+}
+
+.dm-flow li:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+/* Table rows dynamic hover */
+.table-container tbody tr {
+  transition: background-color var(--duration-fast, 150ms) var(--ease-responsive, ease-out);
+}
+
+.table-container tbody tr:hover {
+  background-color: var(--color-surface-hover);
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    animation: none;
+  }
+  .panel,
+  .button,
+  .dm-flow li,
+  .table-container tbody tr {
+    transition: none;
+  }
+  .dm-flow li:hover {
+    transform: none;
+  }
+}

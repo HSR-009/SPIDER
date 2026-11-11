@@ -1,0 +1,125 @@
+/* SPIDER design-spec tokens (docs/DESIGN_SPEC.md §1). Exact values; color
+   combinations verified against WCAG AA in the implemented UI. Installed fonts
+   only — no remote font or image requests; no font files are bundled. */
+:root {
+  color-scheme: dark;
+
+  /* Palette */
+  --color-canvas: #0B0D10;
+  --color-surface: #11151A;         /* surface-1: primary panels, sidebar */
+  --color-surface-raised: #181E25;  /* surface-2: raised cards, inputs */
+  --color-surface-hover: #222B35;   /* surface-3: hovered or selected */
+  --color-surface-active: #29323B;  /* secondary active background */
+  --color-surface-soft: var(--color-canvas);
+  --color-glass: var(--color-surface);
+
+  --color-text: #F2F5F7;
+  --color-text-secondary: #BEC8D2;
+  --color-text-muted: #91A0AE;
+
+  --color-action: #62E6C5;
+  --color-action-hover: #83EBD1;
+  --color-action-active: #45D8B5;
+  --color-primary-text: #0B0D10;
+  --color-glow: rgb(98 230 197 / 18%);
+  --glow-accent: 0 0 0 3px rgb(98 230 197 / 18%);
+
+  --color-warning: #F4C56A;
+  --color-warning-bg: #2A2114;
+  --color-danger: #FF7D82;
+  --color-danger-bg: #2B171A;
+  --color-info: #84B9FF;
+  --color-info-bg: #152232;
+
+  /* Legacy aliases keep existing rule names on spec values. */
+  --color-amber: var(--color-warning);
+  --color-crimson: var(--color-danger);
+  --color-crimson-text: var(--color-danger);
+  --color-cyan: var(--color-action);
+  --color-cyan-hover: var(--color-action-hover);
+  --color-violet: var(--color-info);
+  --color-violet-text: var(--color-info);
+
+  --color-border: #29323B;
+  --color-border-strong: #43505C;
+  --color-focus: var(--color-action);
+  --border-subtle: 1px solid var(--color-border);
+  --border-strong-line: 1px solid var(--color-border-strong);
+  --border-focus: 2px solid var(--color-action);
+
+  /* Typography — requested local stacks only; the browser takes the next
+     installed font when a named one is unavailable. */
+  --font-sans: "Anthropic Sans", "Styrene A", "Segoe UI", sans-serif;
+  --font-serif: "Anthropic Serif", "Iowan Old Style", Georgia, serif;
+  --font-mono: "Anthropic Mono", "Cascadia Code", Consolas, monospace;
+
+  --text-mono-label: 0.75rem; /* 12px: labels, never essential data */
+  --text-xs: 0.875rem;
+  --text-sm: 0.875rem;  /* Small 14px */
+  --text-base: 1rem;    /* Body 16px */
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-display: 3.5rem; /* 56px Display */
+  --line-display: 1.07;
+  --text-h1: 2.5rem;    /* 40px */
+  --line-h1: 1.15;
+  --text-h2: 1.75rem;   /* 28px */
+  --line-h2: 1.25;
+  --text-h3: 1.25rem;   /* 20px */
+  --line-h3: 1.35;
+  --line-body: 1.55;
+  --line-secondary: 1.45;
+
+  /* Spacing — strict 4px base, 8px primary scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Radii */
+  --radius-control: 0.5rem;
+  --radius-panel: 0.75rem;
+  --radius-dialog: 1rem;
+  --radius-pill: 999px;
+  --radius-sm: var(--radius-control);
+  --radius-md: var(--radius-panel);
+  --radius-lg: var(--radius-panel);
+  --radius-xl: var(--radius-dialog);
+
+  /* Layout tiers */
+  --control-height: 3rem;
+  --sidebar-width: 16rem;   /* 256px at >=1440px */
+  --content-width: 80rem;   /* 1280px container */
+  --page-padding: var(--space-8);
+  --grid-gutter: var(--space-6);
+  --sticky-header-height: 4rem;
+  --scroll-clearance: calc(var(--sticky-header-height) + var(--space-4));
+
+  /* Elevation */
+  --shadow-panel: 0 8px 24px rgb(0 0 0 / 24%);
+  --shadow-dialog: var(--shadow-panel);
+
+  /* Motion (spec §4) */
+  --duration-hover: 140ms;
+  --duration-rail: 180ms;
+  --duration-reveal: 240ms;
+  --duration-crossfade: 220ms;
+  --duration-artifact: 360ms;
+  --duration-headline: 420ms;
+  --ease-responsive: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expressive: var(--ease-out-soft);
+  /* Legacy aliases so existing rules keep their durations. */
+  --duration-instant: var(--duration-hover);
+  --duration-standard: var(--duration-hover);
+  --duration-emphasis: var(--duration-rail);
+  --duration-cinematic: var(--duration-reveal);
+}
