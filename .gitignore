@@ -35,3 +35,6 @@ temp_peek/
 spider-ui/node_modules/
 spider-ui/dist/
 spider-ui/screenshots/
+
+# Local FP-check downloads
+fp_check/
