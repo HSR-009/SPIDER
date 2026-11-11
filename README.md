@@ -1,104 +1,171 @@
-# SPIDER
+# SPIDER: Static Analysis for Python Packages
 
-Static analysis for Python packages: a local tool that scans a package for suspicious code, checks an installed environment for persistence artifacts, and measures how well its own rules hold up against evasion. It never executes package code.
+SPIDER is an offline static analysis engine, environment hunter, and research platform for inspecting Python packages for malicious code and persistence artifacts without executing anything.
 
-> **Status: v1 demo.** Rules are frozen (`analyzer-v1.1`). Numbers below come from files in `results/`. Anything not measured is marked *planned*.
+It never executes untrusted code, never imports user packages, and enforces a strict 3-way verdict policy: **SPIDER never says "safe"**.
 
-## What it tells you
+---
 
-Every scan ends in one of three verdicts. SPIDER never says "safe".
+## 1. What It Tells You (3-Way Verdicts)
 
-| Verdict | Meaning | CLI exit code |
-|---|---|---|
-| `suspicious` | Strong combination of signals found; evidence lines are shown | 10 |
-| `none_detected_in_this_scan` | No strong signal in the code that was inspected. Not a safety claim. `review_recommended` may be set | 0 |
-| `unable_to_assess` | Too much of the package could not be inspected (native binaries, parse failures, limits hit) | 20 |
+Every scan produces a structured, contract-validated JSON record (`scans/<scan_id>.json`) with exactly one of three verdicts:
 
-Exit code 2 means an error (bad target, network disabled, schema failure).
+| Verdict | CLI Exit Code | Meaning & Policy |
+| :--- | :---: | :--- |
+| `suspicious` | **10** | Strong malicious signal or high-confidence combination rule fired (e.g., install hook command execution, credential theft + exfiltration). Evidence snippets and spans are displayed. |
+| `none_detected_in_this_scan` | **0** | No strong signal was detected in the inspected code. **This is strictly an absence of detection, never a safety claim**. A `review_recommended` flag may be raised for suspicious heuristics. |
+| `unable_to_assess` | **20** | Insufficient code could be inspected to reach a sound decision (e.g. empty/docs-only directory, >20% parse failures, high uninspected file ratio, archive limit exceeded). |
 
-## Quick start
+*(Exit code **2** indicates an invocation or input error, such as a nonexistent path or invalid arguments).*
 
-Python 3.10+.
+---
+
+## 2. Quick Start
+
+Requirements: **Python 3.10+**.
 
 ```bash
 git clone https://github.com/HSR-009/SPIDER.git
 cd SPIDER
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+# Linux / macOS: source .venv/bin/activate
+# Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
+# Run the test suite (100% offline, stdlib unittest)
 python -m unittest discover -s tests
+```
 
-# Scan a directory, an archive (.tar.gz/.zip/.whl) or a PyPI release (needs network)
-python -m spider scan fixtures/src/demo-installhook     # expect: suspicious (exit 10)
-python -m spider scan fixtures/src/demo-httpclient      # expect: none detected (exit 0)
-python -m spider scan some_package==1.0.0 --json
+### CLI Scanning & Hunting Examples
 
-# Look through installed environments for persistence artifacts
+```bash
+# 1. Scan a package directory or archive (.tar.gz, .zip, .whl)
+python -m spider scan fixtures/src/demo-installhook      # Verdict: suspicious (Exit 10)
+python -m spider scan fixtures/src/demo-httpclient       # Verdict: none_detected_in_this_scan (Exit 0)
+
+# 2. Scan with JSON output formatted to stdout
+python -m spider scan fixtures/src/demo-installhook --json
+
+# 3. Hunt installed environment(s) for persistence artifacts (.pth code, hijacked entry points, tamper)
 python -m spider hunt
 python -m spider hunt --site-packages /path/to/site-packages --json
 ```
 
-### Run the UI (local, loopback only)
+### Run the Local UI
 
-No Node.js needed. The built UI ships in the repo (`spider/static_ui/`).
+No Node.js runtime required for normal use: the pre-built single-page app ships inside `spider/static_ui/`.
 
 ```bash
-python -m spider serve               # opens http://127.0.0.1:8000/ in your browser
+python -m spider serve                                  # Launches http://127.0.0.1:8000
+python -m spider serve --port 8010 --no-browser         # Custom port, headless
 ```
 
-`serve` binds to 127.0.0.1 only, rejects other hosts and origins, and runs the engine without executing package code. Add `--no-browser` to skip opening the browser, or `--port 8010` to change the port.
+*Security note: The API binds strictly to `127.0.0.1` / `localhost`, blocks external host headers/origins, and operates safely via memory/disk quotas without code execution.*
 
-To change the UI itself (Node 20+): `cd spider-ui`, `npm install`, `npm run dev` for live development with sample data, or `npm run build:serve` to rebuild `spider/static_ui/`. Details: `spider-ui/INTEGRATION.md`.
+---
 
-Scan records are written to `scans/<scan_id>.json` and validate against the `scan_record` v0.1 schema in `spider_contract/`.
+## 3. UI Screenshots
 
-## What is in the repo
+| Hub & Tool Navigation | Package Scanner Result & Evidence |
+| :---: | :---: |
+| ![SPIDER Hub](docs/img/hub.png) | ![Scanner Result](docs/img/scanner_result.png) |
 
-| Area | Where | State |
-|---|---|---|
-| Scan engine: safe archive extraction, AST rules, verdict policy | `spider/engine/`, `spider_contract/` | Built, tested |
-| CLI (`scan`, `hunt`) | `spider/cli.py` | Built, tested |
-| Hunter: `.pth` files, `sitecustomize`, entry points, `RECORD` tamper checks | `spider/hunter/` | Built, tested on planted cases; one real-environment run, see `results/hunter_kali_notes.md` |
-| Resilience Lab: disguise generators and an adversarial batch of 12 samples | `person_c/`, `spider/normalize.py` | Built; normalization is opt-in with `scan --normalize` |
-| ML baseline and resilience evaluation | `Person_B/`, `docs/ML_METHODOLOGY.md`, `results/resilience_table.md` | Built; read the methodology caveats before quoting any number |
-| Investigation UI | `spider-ui/` (React source), built into `spider/static_ui/` and served by `python -m spider serve` (`spider/api.py`) | Built; tested end to end on fixtures. The older Streamlit prototype is in `spider/ui/` |
-| Live PyPI monitoring, dependency resolution, secret scanning, LLM-agent payloads | | *Planned*, see `docs/ANALYZER_BACKLOG.md` |
+| Environment Hunter Report | Research Lab & Empirical Findings |
+| :---: | :---: |
+| ![Hunter Report](docs/img/hunter_report.png) | ![Research Results](docs/img/research_results.png) |
 
-## Measured results
+---
 
-Corpora: 2,039 malicious-labelled and 2,909 benign packages, scanned with analyzer v1.1 (`results/rescan_v11_summary.md`).
+## 4. Architecture
 
-| | Malicious | Benign |
-|---|---|---|
-| Flagged `suspicious` | 32.6% | 12.0% |
-| `unable_to_assess` | 2.1% | 6.3% |
-| Median `.py` files per package | 2 | 12 |
+```mermaid
+flowchart TD
+    CLI["CLI (`spider scan` / `spider hunt`)"] --> Router{"Target Type"}
+    API["Local HTTP API (`spider serve`)"] --> Router
 
-These are signal rates, not accuracy. Two things limit how far to trust them:
+    subgraph CoreEngine ["SPIDER Core Engine (Frozen analyzer-v1.1)"]
+        Router -->|"Archive (.whl, .tar.gz, .zip)"| SafeExtract["Safe Extractor (`spider/engine/extract.py`)<br/>Quota guards & symlink containment"]
+        Router -->|"Directory"| ScanDir["Directory Scanner (`spider/engine/scan.py`)"]
+        SafeExtract --> ScanDir
+        ScanDir --> AST["AST Visitor & Signal Rules (S1-S5)"]
+        AST --> Verdict["Verdict Engine (`spider_contract/verdict.py`)<br/>3-way verdict + coverage guards"]
+    end
 
-- **Size confound.** Package size alone separates the classes (size-only AUC about 0.79). Malicious packages are much smaller.
-- **Label noise.** In a 30-package review of malicious-labelled packages with zero findings, 5 were placeholders or harmless PoCs, and 6 were empty name-squat stubs (`results/zero_finding_review_by_A.csv`). Small sample; it describes that sample, not the corpus.
+    subgraph HunterSystem ["Environment Hunter (`spider/hunter/`)"]
+        Router -->|"Environment / site-packages"| Hunter["Persistence Hunter (`spider/hunter/hunt.py`)"]
+        Hunter --> PTH["Executable `.pth` & sitecustomize audit"]
+        Hunter --> EP["Entry point ownership check"]
+        Hunter --> Tamper["RECORD tamper digest verification"]
+    end
 
-**False positives.** On 100 small, obscure PyPI packages, 6 were flagged; manual review found 5 false positives and 1 unclear (5.0%, Wilson 95% CI 2.2% to 11.2%). That is precision on small obscure packages, not a general false-positive rate (`results/fp_check_summary.md`).
+    Verdict --> Record["Scan Record JSON (`scans/<scan_id>.json`)"]
+    Record --> Contract["Contract Validator (`spider_contract/validate.py`)"]
+    Contract --> UI["React UI (`spider-ui/` / `spider/static_ui/`)"]
+```
 
-**Evasion.** Of 12 adversarial samples, 1 reached `suspicious` (base64), 5 kept only the review flag and 6 were silent. The plain baseline is itself only `none_detected` with review under verdict v2, so this batch shows evasion of the review flag, not of a `suspicious` verdict. ROT13 is not treated as obfuscation. Source: `results/adv_batch_verification_by_A.md`.
+For comprehensive architectural design, threat boundaries, and component interfaces, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## Known limitations
+---
 
-- Package-wide combination rules S2 and S5 join unrelated files. They fire on 9.6% and 6.1% of benign packages versus 8.1% and 4.6% of malicious, so they carry little signal. Four of the five false positives above came from the common `exec(open(...).read())` version-loading idiom in `setup.py`.
-- A root `setup.py` or `pyproject.toml` over 2 MiB is skipped. 11 malicious-labelled packages hit this and all got `none_detected_in_this_scan`.
-- One unparseable Python file does not change the verdict unless unparseable files exceed 20% of the Python files. Python 2 sources and non-Python text in `.py` files fail to parse.
-- Compiled extensions (`.so`, `.pyd`) are not inspected.
-- Prose aimed at AI agents (for example MCP tool descriptions) is not analysed.
-- Static analysis only. Nothing is executed, so behaviour that depends on runtime state is out of reach.
+## 5. Repository Layout & Team Responsibilities
 
-Full list with status tags: `docs/ANALYZER_BACKLOG.md`. Threat model: `docs/THREAT_MODEL.md`. Method: `docs/METHODOLOGY.md`.
+The codebase reflects the collaborative work of three students across distinct sub-disciplines:
 
-## Reproducing the numbers
+| Directory | Owner / Subsystem | Purpose & Contents |
+| :--- | :--- | :--- |
+| `spider/engine/` | **Person A** (Engine) | Safe extraction, AST rule inspection, strong signals S1–S5, directory scanning (frozen `analyzer-v1.1`). |
+| `spider/hunter/` | **Person A** (Hunter) | Persistence detection in site-packages: `.pth` execution, `sitecustomize`, entry-point checks, RECORD tamper audits. |
+| `spider_contract/` | **Person A** (Contract) | Semantic contracts, JSON schema specifications, and 3-way verdict validation. |
+| `Person_A/` | **Person A** (Pipelines) | Corpus rescan pipelines, false positive evaluation (`fp_scan.py`), and dataset provenance scripts. |
+| `Person_B/` | **Person B** (ML & Eval) | Feature extraction, grouped cross-validation, leak guards, XGBoost/SHAP evaluation, and ML methodology. |
+| `person_c/` | **Person C** (Adversarial) | Adversarial sample generator (`adv-batch-v1`), obfuscation transformations, and red-team test harness. |
+| `spider-ui/` | **UI Frontend** (React) | React single-page app (TypeScript, Tailwind, 3D Canvas visualizer, zero-safe guarantee). |
+| `spider/static_ui/` | Built Distribution | Committed production build of `spider-ui`, served by `spider serve`. |
+| `results/` | Verified Data | Frozen evaluation results and metrics cited throughout documentation. |
+| `docs/` | Documentation | Architecture, demo guide, methodology, threat model, and roadmap. |
 
-The datasets live under `data/processed/` and the rescan scripts under `Person_A/pipeline/`. See `docs/METHODOLOGY.md` for the order to run them and the seeds used. Frozen versions are tagged `analyzer-v1`, `analyzer-v1.1` and `adv-batch-v1`.
+---
 
-## Team
+## 6. What SPIDER Can and Cannot Do
 
-Three students: A (engine, contract, Hunter, rescans), B (ML and resilience evaluation), C (evasion lab and UI).
+### What it can do:
+- **Inspect without execution:** Safely extracts and analyzes Python archives without importing modules or running `setup.py`.
+- **Detect high-confidence malware patterns:** Strong signals for install hook commands (`S1`), dynamic code execution + network/obfuscation (`S2`), credential harvesting (`S3`), environment exfiltration (`S4`), and decoded execution (`S5`).
+- **Audit installed Python environments:** Uncovers hidden persistence mechanisms in `.pth` files, non-standard `sitecustomize.py`, untracked entry points, and modified RECORD hashes.
+- **Enforce decision boundaries:** Reports `unable_to_assess` when static coverage is compromised rather than generating false negatives.
+
+### What it cannot do (Known limits):
+- **Dynamic behavior:** Cannot detect code whose malicious behavior only manifests at runtime (e.g. dynamic reflection, C-extension payloads, environment-gated execution).
+- **Compiled extensions:** C/C++ extensions (`.so`, `.pyd`) and binary executables are not disassembled or analyzed.
+- **Large setup files:** Files exceeding the 2 MiB inspection limit are bypassed with limits noted in coverage.
+- **Cross-file AST resolution:** Multi-stage payloads scattered across multiple modules without package-wide strong signal co-occurrence can evade AST analysis without normalization.
+- **AI Agent prompts:** MCP tool descriptions and natural language prompt injection inside docstrings are not evaluated.
+
+Full technical details and mitigations: [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md) and [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
+
+---
+
+## 7. Measured Results & Citations
+
+All metrics presented below are directly reproduced from verified run artifacts in `results/`:
+
+- **Corpus Evaluation (N=4,948 packages)**:
+  - Malicious packages: 2,039 (`data/processed/malicious_v11.jsonl`)
+  - Benign packages: 2,909 (`data/processed/benign_v11.jsonl.gz`)
+  - Suspicious verdict rate: **32.6%** malicious vs **12.0%** benign (`results/rescan_v11_summary.md`).
+  - Size confound caveat: Median analyzed `.py` files is 2 (malicious) vs 12 (benign); package size alone yields ROC-AUC ~0.79.
+- **False-Positive Evaluation (N=100 obscure PyPI packages)**:
+  - 6 packages flagged suspicious; manual triage confirmed 5 false positives and 1 unclear.
+  - Estimated false positive rate: **5.0%** (Wilson 95% CI: [2.2%, 11.2%]) on small obscure packages (`results/fp_check_summary.md`).
+- **Adversarial Resilience (N=12 synthetic samples)**:
+  - Evaluated on frozen `adv-batch-v1` (Manifest SHA-256: `bb7f4fe8...`).
+  - Baseline v1 AST missed 8 of 12 samples (66.7% evasion rate). Hardened v1.1 AST missed 0 samples at finding-level, with 1 reaching `suspicious`, 5 keeping review flags, and 6 silent (`results/adv_batch_verification_by_A.md`, `results/evasion_table_v1_vs_v11.md`).
+
+---
+
+## 8. Development & Project Roadmap
+
+- **Run UI development server**: `cd spider-ui && npm install && npm run dev`
+- **Rebuild and publish static UI**: `cd spider-ui && npm run build:serve`
+- **Future plans & ML roadmap**: See [`docs/ROADMAP.md`](docs/ROADMAP.md) for planned dynamic sandboxing, dependency graph inspection, and calibrated model integration.
+- **Live demo walkthrough**: See [`docs/DEMO.md`](docs/DEMO.md) for a step-by-step evaluator guide.

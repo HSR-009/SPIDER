@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import importlib.util
 import json
 import unittest
 from pathlib import Path
@@ -136,6 +137,7 @@ class PersonBDay5Day6Tests(unittest.TestCase):
         self.assertFalse(cfg["training_data_isolation"]["adversarial_data_in_training"])
         self.assertFalse(cfg["training_data_isolation"]["holdout_data_in_training"])
 
+    @unittest.skipUnless(importlib.util.find_spec("joblib") is not None, "joblib required for resilience evaluation")
     def test_adv_006_and_hardened_v11_classification_reproducibility(self):
         """adv_006, hardened v1.1, and Pipeline D aggregates must be reproducible without overrides."""
         from Person_B.evaluation.resilience_eval import (
