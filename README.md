@@ -41,17 +41,15 @@ python -m spider hunt --site-packages /path/to/site-packages --json
 
 ### Run the UI (local, loopback only)
 
-Needs Node 20+. The UI talks to the same engine through a small local API.
+No Node.js needed. The built UI ships in the repo (`spider/static_ui/`).
 
 ```bash
-cd spider-ui
-npm install
-VITE_BACKEND=http npm run build      # Windows PowerShell: $env:VITE_BACKEND="http"; npm run build
-cd ..
-python -m spider serve               # then open http://127.0.0.1:8000/
+python -m spider serve               # opens http://127.0.0.1:8000/ in your browser
 ```
 
-`serve` binds to 127.0.0.1 only, rejects other hosts and origins, and runs the engine without executing package code. Without `VITE_BACKEND=http` the UI uses built-in sample data and says so on screen. Details: `spider-ui/INTEGRATION.md`.
+`serve` binds to 127.0.0.1 only, rejects other hosts and origins, and runs the engine without executing package code. Add `--no-browser` to skip opening the browser, or `--port 8010` to change the port.
+
+To change the UI itself (Node 20+): `cd spider-ui`, `npm install`, `npm run dev` for live development with sample data, or `npm run build:serve` to rebuild `spider/static_ui/`. Details: `spider-ui/INTEGRATION.md`.
 
 Scan records are written to `scans/<scan_id>.json` and validate against the `scan_record` v0.1 schema in `spider_contract/`.
 
@@ -62,9 +60,9 @@ Scan records are written to `scans/<scan_id>.json` and validate against the `sca
 | Scan engine: safe archive extraction, AST rules, verdict policy | `spider/engine/`, `spider_contract/` | Built, tested |
 | CLI (`scan`, `hunt`) | `spider/cli.py` | Built, tested |
 | Hunter: `.pth` files, `sitecustomize`, entry points, `RECORD` tamper checks | `spider/hunter/` | Built, tested on planted cases; one real-environment run, see `results/hunter_kali_notes.md` |
-| Resilience Lab: disguise generators and an adversarial batch of 12 samples | `person_c/`, `spider/normalize.py` | Built; normalization still being tidied |
+| Resilience Lab: disguise generators and an adversarial batch of 12 samples | `person_c/`, `spider/normalize.py` | Built; normalization is opt-in with `scan --normalize` |
 | ML baseline and resilience evaluation | `Person_B/`, `docs/ML_METHODOLOGY.md`, `results/resilience_table.md` | Built; read the methodology caveats before quoting any number |
-| Investigation UI | `spider-ui/` (React) served by `python -m spider serve` (`spider/api.py`) | Built; tested end to end on fixtures. The older Streamlit prototype is in `spider/ui/` |
+| Investigation UI | `spider-ui/` (React source), built into `spider/static_ui/` and served by `python -m spider serve` (`spider/api.py`) | Built; tested end to end on fixtures. The older Streamlit prototype is in `spider/ui/` |
 | Live PyPI monitoring, dependency resolution, secret scanning, LLM-agent payloads | | *Planned*, see `docs/ANALYZER_BACKLOG.md` |
 
 ## Measured results

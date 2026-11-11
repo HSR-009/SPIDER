@@ -82,6 +82,13 @@ class ApiTests(unittest.TestCase):
         finally:
             shutil.rmtree(td, ignore_errors=True)
 
+    def test_built_ui_is_served(self):
+        st, body = call(self.base, "/")
+        self.assertEqual(st, 200)
+        self.assertIn(b"<div id=\"root\">", body)
+        st, _ = call(self.base, "/scanner/result")  # single-page-app fallback
+        self.assertEqual(st, 200)
+
     def test_results_and_empty_hunt(self):
         st, body = call(self.base, "/api/results")
         self.assertEqual(st, 200)
