@@ -39,6 +39,20 @@ python -m spider hunt
 python -m spider hunt --site-packages /path/to/site-packages --json
 ```
 
+### Run the UI (local, loopback only)
+
+Needs Node 20+. The UI talks to the same engine through a small local API.
+
+```bash
+cd spider-ui
+npm install
+VITE_BACKEND=http npm run build      # Windows PowerShell: $env:VITE_BACKEND="http"; npm run build
+cd ..
+python -m spider serve               # then open http://127.0.0.1:8000/
+```
+
+`serve` binds to 127.0.0.1 only, rejects other hosts and origins, and runs the engine without executing package code. Without `VITE_BACKEND=http` the UI uses built-in sample data and says so on screen. Details: `spider-ui/INTEGRATION.md`.
+
 Scan records are written to `scans/<scan_id>.json` and validate against the `scan_record` v0.1 schema in `spider_contract/`.
 
 ## What is in the repo
@@ -50,7 +64,7 @@ Scan records are written to `scans/<scan_id>.json` and validate against the `sca
 | Hunter: `.pth` files, `sitecustomize`, entry points, `RECORD` tamper checks | `spider/hunter/` | Built, tested on planted cases; one real-environment run, see `results/hunter_kali_notes.md` |
 | Resilience Lab: disguise generators and an adversarial batch of 12 samples | `person_c/`, `spider/normalize.py` | Built; normalization still being tidied |
 | ML baseline and resilience evaluation | `Person_B/`, `docs/ML_METHODOLOGY.md`, `results/resilience_table.md` | Built; read the methodology caveats before quoting any number |
-| Investigation UI | `spider/ui/` | Prototype |
+| Investigation UI | `spider-ui/` (React) served by `python -m spider serve` (`spider/api.py`) | Built; tested end to end on fixtures. The older Streamlit prototype is in `spider/ui/` |
 | Live PyPI monitoring, dependency resolution, secret scanning, LLM-agent payloads | | *Planned*, see `docs/ANALYZER_BACKLOG.md` |
 
 ## Measured results

@@ -1,0 +1,271 @@
+/* elevation.css - Stage 1 additive styles. Never overrides tokens.css */
+
+/* Elevation badge styling for preview */
+.badge--amber {
+  background: var(--color-surface-raised);
+  color: var(--color-accent-amber);
+  border: 1px solid var(--color-border);
+}
+
+/* Stat strip enhancement */
+.stat-strip--cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.stat-card {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stat-card strong {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.stat-card span {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Planned chart frame */
+.planned-chart-frame {
+  position: relative;
+  border: 1px dashed var(--color-border);
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.planned-tag {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-accent-amber);
+}
+
+.illustrative-tag {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-accent-cyan);
+}
+
+/* Red Team Sample table */
+.sample-table-wrap {
+  overflow-x: auto;
+  margin-top: var(--space-4);
+}
+
+.sample-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.sample-table th,
+.sample-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sample-table th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sample-table tr:hover td {
+  background: var(--color-surface-raised);
+}
+
+
+/* Stage 2: Hub card elevation (CSS-only tilt, border glow, per-tile micro-animation) */
+.hub__tile {
+  position: relative;
+  transition: transform var(--motion-duration-standard) var(--motion-easing-standard),
+              border-color var(--motion-duration-standard) var(--motion-easing-standard),
+              box-shadow var(--motion-duration-standard) var(--motion-easing-standard);
+  perspective: 1000px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hub__tile:hover {
+    transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-2px);
+    border-color: rgba(98, 230, 197, 0.45);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45), 0 0 16px -2px rgba(98, 230, 197, 0.15);
+  }
+}
+
+/* Reduced motion disables tilt */
+@media (prefers-reduced-motion: reduce) {
+  .hub__tile:hover {
+    transform: none !important;
+  }
+}
+
+/* Tile border light shimmer */
+.hub__tile::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(98, 230, 197, 0.6), transparent);
+  opacity: 0;
+  transition: opacity var(--motion-duration-standard) var(--motion-easing-standard);
+  pointer-events: none;
+}
+
+.hub__tile:hover::after {
+  opacity: 1;
+}
+
+/* Micro-animation on tile icon on hover */
+.hub__tile .hub__icon {
+  transition: transform var(--motion-duration-standard) var(--motion-easing-standard),
+              stroke var(--motion-duration-standard) var(--motion-easing-standard);
+}
+
+.hub__tile:hover .hub__icon {
+  transform: scale(1.08);
+  stroke: var(--color-accent-mint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub__tile .hub__icon,
+  .hub__tile:hover .hub__icon {
+    transform: none !important;
+  }
+}
+
+/* Hunter radar animation shown strictly while hunting */
+.hunter-radar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 1px solid rgba(98, 230, 197, 0.4);
+  position: relative;
+  overflow: hidden;
+  margin: var(--space-4) auto;
+  background: radial-gradient(circle, rgba(98, 230, 197, 0.05) 0%, transparent 70%);
+}
+
+.hunter-radar::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(98, 230, 197, 0.3);
+}
+
+.hunter-radar__sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(98, 230, 197, 0.5) 0deg, transparent 60deg, transparent 360deg);
+  animation: radar-sweep 2s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes radar-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hunter-radar__sweep {
+    animation: none;
+    background: rgba(98, 230, 197, 0.15);
+  }
+}
+
+/* Stage 5 Polish: Focus indicators and skeleton loading */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-accent-mint) !important;
+  outline-offset: 2px !important;
+}
+
+.skeleton-box {
+  background: linear-gradient(90deg, var(--color-surface-sunken) 25%, var(--color-surface-raised) 50%, var(--color-surface-sunken) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-box {
+    animation: none;
+    background: var(--color-surface-raised);
+  }
+}
+
+/* 390px mobile responsiveness improvements */
+@media (max-width: 480px) {
+  .stat-strip--cards {
+    grid-template-columns: 1fr;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hub__grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -263,8 +263,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     show_parser.add_argument("--json", action="store_true", help="Print the saved scan record")
 
+    serve_parser = subparsers.add_parser("serve", help="Run the local API and UI on 127.0.0.1")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port (default: 8000)")
+    serve_parser.add_argument("--out", default="scans", help="Directory for scan records (default: scans/)")
+    serve_parser.add_argument("--db", help="Path to SQLite hunter database")
+
     args = parser.parse_args(argv)
 
+    if args.subcommand == "serve":
+        from spider.api import serve
+        serve(port=args.port, scans_dir=args.out, db_path=args.db)
+        return 0
     if args.subcommand == "scan":
         return scan_target(
             args.target,
