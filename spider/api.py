@@ -12,7 +12,7 @@ Endpoints (see spider-ui/INTEGRATION.md):
   POST /api/hunt            {"roots": [...]}  -> hunt result
   POST /api/hunter/allow    {"sha256": "...", "note": "..."}
   GET  /api/results         verified figures shown on the Results page
-Anything else is served from spider-ui/dist (single-page app) when it is built.
+Anything else is served from spider/static_ui (the built single-page app).
 """
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ from spider.hunter.store import HunterStore
 from spider_contract.validate import validate_record
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DIST_DIR = REPO_ROOT / "spider-ui" / "dist"
+DIST_DIR = Path(__file__).resolve().parent / "static_ui"  # built UI (VITE_BACKEND=http), committed
 RESULTS_FILE = REPO_ROOT / "results" / "ui_results.json"
 ARCHIVE_EXTENSIONS = (".tar.gz", ".tgz", ".tar.bz2", ".tar.xz", ".tar", ".zip", ".whl")
 MAX_UPLOAD_BYTES = 100 * 1024 * 1024
@@ -261,7 +261,7 @@ def make_handler(scans_dir: Path, db_path: Optional[str]):
             if not DIST_DIR.is_dir():
                 return self._send(
                     200,
-                    raw=b"SPIDER API is running. The UI is not built: run `npm install && npm run build` in spider-ui/.",
+                    raw=b"SPIDER API is running, but spider/static_ui is missing. Run `npm install` and `npm run build:serve` in spider-ui/.",
                     ctype="text/plain; charset=utf-8",
                 )
             rel = unquote(path).lstrip("/") or "index.html"
@@ -276,11 +276,16 @@ def make_handler(scans_dir: Path, db_path: Optional[str]):
     return Handler
 
 
-def serve(host: str = "127.0.0.1", port: int = 8000, scans_dir: str = "scans", db_path: Optional[str] = None) -> None:
+def serve(host: str = "127.0.0.1", port: int = 8000, scans_dir: str = "scans", db_path: Optional[str] = None, open_browser: bool = True) -> None:
     if host not in ("127.0.0.1", "localhost"):
         raise SystemExit("Refusing to bind to a non-loopback address.")
     httpd = ThreadingHTTPServer((host, port), make_handler(Path(scans_dir), db_path))
-    print(f"SPIDER running at http://{host}:{port}/  (Ctrl+C to stop)")
+    url = f"http://{host}:{port}/"
+    print(f"SPIDER running at {url}  (Ctrl+C to stop)")
+    if open_browser:
+        import threading
+        import webbrowser
+        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

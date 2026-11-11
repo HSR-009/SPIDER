@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node scripts/run-tests.mjs"
+    "test": "node scripts/run-tests.mjs",
+    "build:http": "tsc --noEmit && vite build --mode http",
+    "build:serve": "npm run build:http && node scripts/publish-ui.mjs"
   },
   "dependencies": {
     "@types/three": "^0.187.0",

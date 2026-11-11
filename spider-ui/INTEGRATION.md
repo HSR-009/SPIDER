@@ -164,7 +164,7 @@ export interface SpiderBackend {
 
 ## 5. Connecting the Real Backend
 
-The real backend is `spider/api.py` in the repository root, started with `python -m spider serve` (port 8000, loopback only). It serves the built UI and the `/api/*` endpoints below, so for a normal run you only need: `VITE_BACKEND=http npm run build`, then `python -m spider serve`. For development, run `python -m spider serve` in one terminal and `VITE_BACKEND=http npm run dev` in another; Vite proxies `/api` to it.
+The real backend is `spider/api.py` in the repository root, started with `python -m spider serve` (port 8000, loopback only). It serves the built UI and the `/api/*` endpoints below, so for a normal run you only need `python -m spider serve`; the built UI is committed in `spider/static_ui/`. After changing the UI, run `npm run build:serve` in `spider-ui/` to rebuild it (this uses `.env.http`, so no environment variable is needed). For development, run `python -m spider serve` in one terminal and `VITE_BACKEND=http npm run dev` in another; Vite proxies `/api` to it.
 
 Notes on the real API: `GET /api/explain` is not implemented (Astra is not connected; the UI does not call it). Hunter paths are returned with the home directory shown as `~`. `/api/results` serves `results/ui_results.json`, a copy of `src/backend/results.json`; keep the two in sync.
 

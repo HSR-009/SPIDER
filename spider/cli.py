@@ -267,12 +267,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     serve_parser.add_argument("--port", type=int, default=8000, help="Port (default: 8000)")
     serve_parser.add_argument("--out", default="scans", help="Directory for scan records (default: scans/)")
     serve_parser.add_argument("--db", help="Path to SQLite hunter database")
+    serve_parser.add_argument("--no-browser", action="store_true", help="Do not open the browser automatically")
 
     args = parser.parse_args(argv)
 
     if args.subcommand == "serve":
         from spider.api import serve
-        serve(port=args.port, scans_dir=args.out, db_path=args.db)
+        serve(port=args.port, scans_dir=args.out, db_path=args.db, open_browser=not args.no_browser)
         return 0
     if args.subcommand == "scan":
         return scan_target(
