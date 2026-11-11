@@ -1,7 +1,7 @@
 # SPIDER — Machine Learning Methodology & Evaluation Whitepaper
 
 **Author:** Person B (Machine Learning Lead)  
-**Project:** SPIDER (Supply-chain Package Inspection, Detection & Extraction Engine)  
+**Project:** SPIDER (Supply Chain Packages Intelligence for Detection, Evasion and Resilience)  
 **Date:** 2026-11-08  
 **Repository Branch:** `feat/person-b-ml`  
 **Dataset Version:** v1.1 Rescan (`malicious_v11.jsonl`, `benign_v11.jsonl.gz`)  
@@ -28,11 +28,11 @@
 ## 1. Executive Summary
 
 SPIDER’s Machine Learning component bridges static AST (Abstract Syntax Tree) rule analysis and operational supply-chain triage. Rather than attempting to replace human review or rule-based detection, Person B's ML system provides:
-1. **Calibrated Risk Scoring:** Aggregating 54 static behavioral indicators into unified package-level probabilities.
-2. **Confound-Free Behavioral Classification:** Explicitly isolating code behavior from package size artifacts (`n_py_files`) to avoid spurious classification shortcuts.
-3. **Defense-in-Depth Triage:** Seamlessly integrating AST rules, ML probability scoring, normalization transformations, and peer-group context.
+1. **Model Risk Scores:** Aggregating 54 static behavioral indicators into package-level model scores. The probabilities reported here are not established as calibrated.
+2. **Behavioral-Feature Classification:** The production feature set excludes `n_py_files` as a direct input. This does not establish that all package-size confounding is removed; category counts and indicator presence may still correlate with package size.
+3. **Defense-in-Depth Triage:** Seamlessly integrating AST rules, ML model risk scoring, normalization transformations, and peer-group context.
 
-The resulting production models achieve **0.878 CV ROC-AUC** and **0.865 Holdout ROC-AUC** on pure behavioral signals without relying on size bias, while demonstrating resilience against adversarial evasions and zero false alarms on high-severity thresholds in obscure PyPI packages.
+The resulting production models achieve **0.878 CV ROC-AUC** and **0.865 Holdout ROC-AUC** on a feature set that excludes `n_py_files` as a direct input; residual size correlation has not been ruled out. In a curated 100-package obscure-PyPI evaluation, 6 engine suspicious flags were raised; Person A's manual review classified 5 as false positives, 1 as unclear, and 0 as confirmed true positives.
 
 ---
 
@@ -115,18 +115,18 @@ The holdout was generated once prior to Day 4 model development and was **never 
 ## 5. The Package-Size Confound & Ablation Experiments
 
 ### 5.1 The Confound Phenomenon
-In public package repositories, benign packages (often established libraries) contain on average **42.8 `.py` files**, whereas malicious packages (often rapid-fire typosquats or single-stage droppers) contain on average **2.1 `.py` files**.
+In the v1.1 rescan, the median analyzed `.py` file count was 12 for benign packages and 2 for malicious packages (`results/rescan_v11_summary.md`). The previously reported means (42.8 and 2.1) are not supported by that verified summary.
 
 $$\mathbb{E}[\text{files} \mid \text{Benign}] \approx 42.8 \gg \mathbb{E}[\text{files} \mid \text{Malicious}] \approx 2.1$$
 
 A naive machine learning model will discover that classifying any package with $n_{\text{py\_files}} \le 2$ as malicious yields high accuracy **without inspecting any code behavior**. This creates a dangerous false sense of security: sophisticated malware with 10 files easily bypasses the classifier, while single-file benign utility scripts are falsely blocked.
 
 ### 5.2 Three-Way Feature Ablation
-To expose and eliminate this confound, Person B established three parallel feature experiments:
+To expose and evaluate this confound, Person B established three parallel feature experiments:
 
 | Experiment | Features Used | Dimension | Purpose |
 |---|---|---:|---|
-| **`behavior_without_size`** *(Production)* | 14 category metrics + 40 indicator flags | 54 | Pure behavioral classification; invariant to file count |
+| **`behavior_without_size`** *(Production)* | 14 category metrics + 40 indicator flags | 54 | Excludes `n_py_files` as a direct input; other features may still correlate with package size |
 | **`behavior_with_size`** | 54 behavioral features + `n_py_files` | 55 | Combined model demonstrating marginal size gain |
 | **`size_only`** *(Benchmark)* | Only `n_py_files` | 1 | Negative control illustrating pure size bias |
 
@@ -141,7 +141,7 @@ To expose and eliminate this confound, Person B established three parallel featu
 | **Recall** | **0.6650** | 0.8680 | 0.8851 |
 | **False Positive Rate** | **7.39%** (43/582) | 5.67% (33/582) | 7.90% (46/582) |
 
-**Conclusion:** Although `size_only` achieves 0.9497 ROC-AUC, it possesses **zero behavioral awareness**. In deployment, `behavior_without_size` is the official model because its decisions are grounded exclusively in verified AST actions.
+**Conclusion:** `behavior_without_size` excludes `n_py_files` as a direct feature, but is not demonstrated to be confound-free. The reported size-only holdout AUC is 0.9497. The v1.1 corpus-level `n_py_files` AUC of 0.2094 (approximately 0.79 when direction is inverted) is a different measurement; the gap has not been reproduced and reconciled.
 
 ---
 
@@ -153,7 +153,7 @@ Two complementary ensemble architectures are trained across all experiments:
    - Excels at capturing non-linear combinations of sparse indicator flags without overfitting.
 2. **XGBoost Classifier:**
    - `n_estimators=250`, `max_depth=6`, `learning_rate=0.05`, `scale_pos_weight=1.427`, `random_state=42`.
-   - Gradient boosted trees optimizing weighted log-loss for calibrated probability outputs.
+   - Gradient boosted trees optimizing weighted log-loss; probability calibration is not established by this report.
 
 ---
 
@@ -162,7 +162,7 @@ Two complementary ensemble architectures are trained across all experiments:
 TreeSHAP analysis confirms that model decisions are driven by high-threat behavioral combinations:
 1. **Dynamic Execution Dominance:** `category_present__dynamic_code_execution` and `indicator_present__eval` contribute the largest positive SHAP values toward a malicious verdict.
 2. **Install-Time Execution:** `category_present__install_time_package_execution` combined with `subprocess` execution strongly pushes predictions toward maliciousness.
-3. **Dual-Use Suppression:** Benign packages often contain isolated `os.environ` or `requests.get` indicators; tree splits require the co-occurrence of dynamic code execution or obfuscation before assigning high probability.
+3. **Dual-Use Suppression:** Benign packages often contain isolated `os.environ` or `requests.get` indicators; tree splits require the co-occurrence of dynamic code execution or obfuscation before assigning high model risk scores.
 
 ---
 
@@ -178,11 +178,14 @@ On Day 5, Person B evaluated the official frozen adversarial batch (**`adv-batch
 
 ### 8.2 Three-Way Comparison Results (Denominator: 12 Samples)
 
-| Detection Pipeline | Recovered (Exact Match) | Different Signal | Missed (Evaded) | Finding Evasion Rate | RF Detection (P≥0.5) | XGB Detection (P≥0.5) |
+> [!NOTE]
+> Pipelines B and D (incorporating Person C's `spider.normalize` prototype) and all machine learning detection counts (RF and XGBoost) are Reported/Experimental figures by Person B and were not independently verified by Person A (`results/adv_batch_verification_by_A.md`). The adversarial batch was never used for training or tuning.
+
+| Detection Pipeline | Recovered (Exact Match) | Different Signal | Missed (Evaded) | Finding Evasion Rate | RF Detection (P≥0.5) [Reported] | XGB Detection (P≥0.5) [Reported] |
 |---|---:|---:|---:|---:|---:|---:|
 | **A. Baseline (AST v1)** | 2 (16.67%) | 2 (16.67%) | **8** | **66.67%** | 4/12 (33.33%) | 3/12 (25.0%) |
 | **B. Normalized (v1 + Norm)** | 5 (41.67%) | 2 (16.67%) | **5** | **41.67%** | 7/12 (58.33%) | 6/12 (50.0%) |
-| **C. Hardened (AST v1.1)** | 3 (25.00%) | 9 (75.00%) | **0** | **0.00%** | 7/12 (58.33%) | 6/12 (50.0%) |
+| **C. Hardened (AST v1.1)** | 4 (33.33%) | 8 (66.67%) | **0** | **0.00%** | 7/12 (58.33%) | 6/12 (50.0%) |
 | **D. Hardened + Normalized** | 5 (41.67%) | 6 (50.00%) | **1** | **8.33%** | **9/12 (75.00%)** | **8/12 (66.67%)** |
 
 ### 8.3 Finding-Level vs Verdict-Level Separation
@@ -200,36 +203,66 @@ The Machine Learning model plays a critical compensating role: because the RF mo
 ## 9. False-Positive Evaluation on Obscure PyPI Packages
 
 On Day 6, Person B evaluated 100 obscure PyPI packages from Person A's curated low-download corpus (`results/fp_check_selection.csv` and `results/fp_check_archives.sha256`):
+
+> [!IMPORTANT]
+> This evaluation was performed on a curated sample of 100 small, obscure PyPI packages (`results/fp_check_summary.md`). It evaluates precision on this specific subset and is not the false-positive rate of SPIDER or PyPI in general. The model scores reported are uncalibrated and do not establish perfect separation or zero false alarms.
+
 - **Archive Verification:** 100/100 archives verified against expected SHA-256 checksums (0 mismatches).
 - **Safe Extraction:** 100/100 extracted via `spider.engine.extract.safe_extract` (0 path traversals, 0 zip bomb limits hit).
-- **Engine Suspicious Rate:** **6.0%** (6/100). Only 6 packages triggered high-severity strong AST signals (typically combining dynamic code evaluation with external subprocess invocations).
+- **Engine Suspicious Rate:** **6.0%** (6/100 flagged suspicious).
+- **Engine Unable-to-Assess:** **2.0%** (2/100 hit coverage limits: `dbt-dremio`, `editdistpy`).
 - **Engine Review Rate:** **27.0%** (27/100) routed to review triage due to routine packaging hooks (`setup.py cmdclass`, compiler capability checks).
-- **Machine Learning False Positive Rate:**
-  - At uncalibrated $P \ge 0.50$: Random Forest = 13%, XGBoost = 11%.
-  - At high-confidence operational threshold $P \ge 0.80$: **Random Forest = 2%**, **XGBoost = 1%**.
+- **Engine `none_detected_in_this_scan`:** **92.0%** (92/100; 27 with review recommended, 65 silent).
+- **Manual Triage Breakdown (Person A, `results/fp_check_v11.csv`):**
+  - **False Positives (FP):** **5** (5.0%, Wilson 95% CI [0.0215, 0.1118]).
+  - **Unclear:** **1** (`circus`, due to buildout bootstrap pattern).
+  - **Confirmed True Positives (TP):** **0**.
+  - **Documented Root Cause:** For 4 of the 5 false positives (`blackduck`, `django-oidc-provider`, `medspacy-quickumls`, and `percy-appium-app`/`llm`), the root cause was the package-wide co-occurrence of dynamic execution in one file (notably version-loading `exec(open(...).read())` in `setup.py`) with an unrelated network or base64 call elsewhere, rather than a subprocess-based cause.
+- **Machine Learning Scores (Uncalibrated):**
+  - At uncalibrated $P \ge 0.50$: Random Forest = 13% (13/100), XGBoost = 11% (11/100).
+  - At operational threshold $P \ge 0.80$: **Random Forest = 2%** (2/100), **XGBoost = 1%** (1/100).
+- **Operational Policy:** No automatic block or automatic installation-allow policy is recommended. All `suspicious`, `review_recommended`, and `unable_to_assess` cases must be routed to human review, and `none_detected_in_this_scan` does not authorize installation.
 
 ---
 
 ## 10. Zero-Finding Malicious Review (Failure Modes Post-Mortem)
 
-Person B conducted an in-depth post-mortem of **30 malicious packages** from `data/processed/zero_finding_triage.csv` that completely evaded static AST detection ($N_{\text{findings}} = 0$):
+In Day 6, an analysis of malicious packages with zero AST findings ($N_{\text{findings}} = 0$) was conducted:
+
+> [!NOTE]
+> **Dataset & Family Distinction:** Person B's preliminary triage evaluated 30 package-version rows from an earlier 166-row export (`data/processed/zero_finding_triage.csv`). This export is separate from the final v1.1 rescan count of 140 zero-finding malicious packages (among 2,039 in `data/processed/malicious_v11.jsonl`). These 30 rows represent package-version entries (e.g. multiple versions of `d0rk3r`, `mathepy`, and `mybiubiubiu`), not 30 independent package families.
+
+### 10.1 Preliminary Triage Distribution (Reported / Provisional, N=30 Package-Version Rows)
 
 ```mermaid
-pie title Zero-Finding Malicious Failure Modes (N=30)
-    "Parse Failures (Syntax/Encoding)" : 10
+pie title Preliminary Triage Failure Modes (Reported, N=30 rows)
+    "Parse Failures (All 10 from 166-row export)" : 10
     "No Python Source (Native Binary/Data)" : 6
     "No Risky Keywords (Typosquat/Phishing)" : 7
     "Risky Keywords Unflagged (AST Evasion)" : 7
 ```
 
-1. **Parse Failures (10 cases):** Python 2 syntax idioms (`except Exception, e:`, `exec code in scope`) and non-UTF-8 encodings (GBK without coding declaration).  
-   *Fix:* Implement multi-encoding fallback (`errors='surrogateescape'`) and regex token fallback on parse errors.
-2. **No Python Source (6 cases):** Packages with zero `.py` files delivering payloads via native `.so`/`.pyd` binaries or standalone data files.  
-   *Fix:* Enforce static archive inventory rule: zero `.py` packages must never produce a clean pass; inspect binary headers.
-3. **No Risky Keywords (7 cases):** Typosquats, dependency confusion placeholders, and SEO phishing lure packages.  
-   *Fix:* Incorporate naming distance heuristics and metadata analysis from Person C's Capability Web.
-4. **Risky Keywords Unflagged (7 cases):** Keywords present (`getattr`, `urllib`, `requests`) but hidden inside string formatting or serialized pickles (`pickle.loads`).  
-   *Fix:* Add AST indicator rules for deserialization exploits and string format resolution.
+In Person B's initial triage of `zero_finding_triage.csv`:
+1. **Parse Failures (10 rows):** Sampled all 10 `parse_failed` rows present in the 166-row triage export (10/166 = 6.02% of that export; 10/30 = 33.33% of the reviewed sample).
+2. **No Python Source (6 rows):** Packages with zero `.py` files delivering payloads via native `.so`/`.pyd` binaries or standalone data files (e.g. `d0rk3r` versions).
+3. **No Risky Keywords (7 rows):** Typosquats, dependency confusion stubs, and SEO phishing lure packages.
+4. **Risky Keywords Unflagged (7 rows):** Keywords present but concealed via string formatting or dynamic reflection.
+
+### 10.2 Verification Against Repository Evidence (Person A & v1.1 Rescan)
+
+Subsequent manual source inspection and scan record verification by Person A (`results/zero_finding_review_by_A.csv`, `docs/ANALYZER_BACKLOG.md`) disproved several early assumptions:
+- **Python 2 syntax is not a general cause of zero findings:**
+  - Across the entire v1.1 malicious rescan of 2,039 packages, `parse_failure_ratio` occurred in only 14 packages (0.69%, `results/rescan_v11_summary.md`).
+  - In Person A's verified stratified sample of 30 packages from `malicious_v11.jsonl` (stratified by size tercile, 10 each), only 2 packages had Python 2 syntax in `setup.py`: `bzip==0.98` (octal literal syntax) and `mybiubiubiu==0.1.4` (Python 2 `print` statement).
+  - Crucially, both packages received `unable_to_assess` verdicts with coverage problem `parse_failure_ratio`, not silent passes (`none_detected_in_this_scan`).
+- **`mathepy` was not a Python 2 parse failure:**
+  - The 3 `mathepy` packages in the verified review failed parsing in only 1 of 22 `.py` files (`vlz_help.py` line 322) due to a markdown cheat sheet inside a docstring, not Python 2 syntax.
+  - This represented ~5% of files, well below the 20% `unable_to_assess` threshold, and did not alter the verdict.
+  - The actual root cause was classified as `api_not_in_ruleset` (LLM API client modules with hard-coded API keys).
+- **Provisional vs Verified Explanations:**
+  - Package-specific root causes in Person B's preliminary triage that lack cited source evidence remain classified as **Reported / Provisional**.
+  - Person A's verified breakdown of 30 stratified packages (`results/zero_finding_review_by_A.csv`) establishes: `non_python_payload` (6), `empty_or_stub` (6), `actually_benign_label` (5, 3 provisional), `install_via_other_mechanism` (4, 1 provisional), `other` (6: 3 MCP tool descriptions, 1 oversized `setup.py` >2 MiB, 2 Python 2 syntax), and `api_not_in_ruleset` (3).
+  - Verdict breakdown of the verified 30: 24 `none_detected_in_this_scan` and 6 `unable_to_assess`.
 
 ---
 
@@ -263,9 +296,6 @@ To support Person C's Capability Web and anomaly detection, Person B generated `
 
 ### 12.2 Production Triage Policy Recommendation
 For SOC and CI/CD supply-chain gatekeeping:
-1. **Automated Block:** Assign immediate malicious block if:
-   $$\text{Verdict} == \text{'suspicious'} \quad \lor \quad P_{\text{RF}}(\text{malicious}) \ge 0.80$$
-2. **Security Triage Queue:** Route package to human security review if:
-   $$\text{Verdict} == \text{'review\_recommended'} \quad \lor \quad P_{\text{RF}}(\text{malicious}) \in [0.50, 0.80) \quad \lor \quad N_{\text{parse\_errors}} > 0$$
-3. **Passed:** Allow package installation only if:
-   $$\text{Verdict} == \text{'none\_detected\_in\_this\_scan'} \quad \land \quad P_{\text{RF}}(\text{malicious}) < 0.50 \quad \land \quad N_{\text{py\_files}} > 0$$
+1. **Human review:** Route `suspicious`, `review_recommended`, and `unable_to_assess` cases to a human security reviewer. On the curated 100-package sample, 5 of 6 `suspicious` flags were false positives and 1 was unclear; this sample does not support automatic blocking.
+2. **Prioritization signals:** Use model scores, parse/coverage problems, and package context to prioritize human review. The reported model thresholds are uncalibrated and are not validated as automatic policy gates.
+3. **No safe/allow conclusion:** `none_detected_in_this_scan` means no configured signal was detected in this scan. It does not establish that a package is safe or authorize installation.

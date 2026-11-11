@@ -10,6 +10,9 @@
 
 ## 1. Executive Summary & Key Metrics
 
+> [!IMPORTANT]
+> On a curated sample of 100 small, obscure PyPI packages (`results/fp_check_summary.md`), 6 were flagged suspicious; after manual review 5 were false positives (plus 1 unclear) (5.0%, 95% CI [0.0215, 0.1118]). This evaluates precision on small, obscure PyPI packages and is not the false-positive rate of SPIDER or PyPI in general. The model scores reported are uncalibrated and do not establish perfect separation or zero false alarms.
+
 A critical objective of Day 6 is evaluating false-positive behavior on real-world, obscure PyPI packages. Because obscure packages frequently contain unconventional packaging scripts, telemetry, or custom build routines, they represent a stress-test for both AST static analysis and Machine Learning classifiers.
 
 | Evaluation Metric | Measured Value | Operational Assessment |
@@ -18,13 +21,17 @@ A critical objective of Day 6 is evaluating false-positive behavior on real-worl
 | **Verified Archive Checksums** | 100/100 (100.0%) | Zero corrupt or tampered downloads |
 | **Packages with Zero AST Findings** | 28 (28%) | Fully unflagged clean packages |
 | **Packages with ≥1 AST Finding** | 72 (72%) | Contains dual-use packaging/runtime indicators |
-| **Engine Suspicious Verdicts** | **6** (6.0%) | Dual-use packages triggering strong high-severity AST rules |
+| **Engine Suspicious Verdicts** | **6** (6.0%) | Flagged suspicious by strong high-severity AST rules |
+| **Engine Unable to Assess** | **2** (2.0%) | Coverage limits hit (`dbt-dremio`, `editdistpy`) |
 | **Engine Review-Recommended** | 27 (27.0%) | Flagged for security triage due to dual-use hooks |
-| **Engine None-Detected (Silent)** | 92 (92.0%) | Clear static baseline |
+| **Engine `none_detected_in_this_scan`** | 92 (92.0%) | Includes 27 review-recommended cases and 65 silent cases |
+| **Manually Reviewed False Positives (FP)** | **5** (5.0%) | 5 of 6 suspicious cases confirmed legitimate (Wilson 95% CI [0.0215, 0.1118]) |
+| **Unclear Triage Verdict** | **1** (1.0%) | `circus` (`bootstrap.py` buildout `exec(urlopen().read())`) |
+| **Confirmed True Positives (TP)** | **0** (0.0%) | Zero confirmed malware in curated benign sample |
 | **Random Forest FPR (P≥0.5)** | 13% (13/100) | Moderate FP rate at uncalibrated 0.5 threshold |
-| **Random Forest FPR (P≥0.8)** | 2% (2/100) | Low FP rate at high-confidence operational threshold |
-| **XGBoost FPR (P≥0.5)** | 11% (11/100) | Model baseline without size confound |
-| **XGBoost FPR (P≥0.8)** | 1% (1/100) | High-confidence operational threshold |
+| **Random Forest FPR (P≥0.8)** | 2% (2/100) | Low FP rate at operational threshold |
+| **XGBoost FPR (P≥0.5)** | 11% (11/100) | Model score baseline (excluding `n_py_files` feature) |
+| **XGBoost FPR (P≥0.8)** | 1% (1/100) | Operational threshold |
 
 ---
 
@@ -66,7 +73,7 @@ Across all 100 packages, **420 individual findings** were triggered. The distrib
 
 ## 3. Machine Learning Score Distribution (Probability of Maliciousness)
 
-Because Person B's production model (`behavior_without_size`) does not use file count (`n_py_files`), it cannot cheat by simply observing that packages have multiple files. Instead, it evaluates the presence and frequency of behavioral AST indicators:
+Because Person B's production model (`behavior_without_size`) does not use file count (`n_py_files`) as a direct input, it cannot directly branch on file count (though category counts and indicator presence may still correlate with package size). Instead, it evaluates the presence and frequency of behavioral AST indicators:
 
 | Score Percentile | Random Forest | XGBoost |
 |---|---:|---:|
@@ -78,7 +85,7 @@ Because Person B's production model (`behavior_without_size`) does not use file 
 | Maximum | 0.8597 | 0.9360 |
 
 > [!IMPORTANT]
-> **Operational Threshold Recommendation:** At the default, uncalibrated threshold of $P \ge 0.5$, the Random Forest flags 13% of obscure packages. When tuned to a high-confidence operational threshold of $P \ge 0.8$, the false-positive rate drops to **2%**, perfectly separating routine packaging hooks from multi-category attack behaviors.
+> **Operational Threshold Recommendation:** At the default, uncalibrated threshold of $P \ge 0.5$, the Random Forest flags 13% of obscure packages. At $P \ge 0.8$, the RF flagged 2 of 100 packages and XGBoost flagged 1 of 100. These are observed rates on this curated sample, not calibrated probabilities or evidence of perfect separation.
 
 ---
 
@@ -101,6 +108,8 @@ Below is the complete triage record for packages flagged by either the AST engin
 | `medspacy-quickumls` | `3.2` | 3 | `suspicious` | 0.54 | 0.55 | High-Attention Benign (Dual-Use Triggers Strong Signal) | Dynamic code evaluation used in configuration parsing, template rendering, or macro expansion. |
 | `requests-html` | `0.10.0` | 6 | `none_detected_in_this_scan (review)` | 0.50 | 0.30 | Dual-Use Benign (Subprocess Execution) | Custom setuptools build/install hook for compiling native C/Cython extensions or generating metadata. Shell command execution in utility or maintenance script. |
 | `django-oidc-provider` | `0.9.0` | 6 | `suspicious` | 0.50 | 0.22 | High-Attention Benign (Dual-Use Triggers Strong Signal) | Base64 encoding/decoding of bundled binary blobs, icon assets, or serialized schemas. Dynamic code evaluation used in configuration parsing, template rendering, or macro expansion. |
+| `circus` | `0.19.0` | 21 | `suspicious` | 0.11 | 0.06 | Unclear (Engine Suspicious Signal) | `bootstrap.py` executes `exec(urlopen(url).read())` (old buildout bootstrap pattern, not run at install); real pattern in a legitimate project. |
+| `llm` | `0.37.1` | 13 | `suspicious` | 0.11 | 0.04 | High-Attention Benign (Engine Suspicious Signal) | `exec` runs user-supplied functions by documented design; `base64` for attachments; `os.environ` for API keys. |
 | `qualname` | `0.1.0` | 1 | `none_detected_in_this_scan` | 0.39 | 0.37 | Dual-Use Benign (Low Risk) | General dual-use behavioral indicator present without malicious execution pattern. |
 | `asciichartpy` | `1.5.25` | 1 | `none_detected_in_this_scan` | 0.39 | 0.37 | Dual-Use Benign (Low Risk) | General dual-use behavioral indicator present without malicious execution pattern. |
 | `nc-time-axis` | `1.4.1` | 1 | `none_detected_in_this_scan` | 0.39 | 0.37 | Dual-Use Benign (Low Risk) | General dual-use behavioral indicator present without malicious execution pattern. |
@@ -118,7 +127,7 @@ Below is the complete triage record for packages flagged by either the AST engin
 
 ## 5. Methodological Conclusions & Production Guidance
 
-1. **Engine Suspicious Rate Remains Low (6%):** The Verdict v2 ruleset produced only 6 `suspicious` verdicts across 100 obscure packages, isolated to packages combining dynamic execution and subprocess calls.
+1. **Engine Suspicious Flags (6/100):** Person A's manual review classified 5 of the 6 suspicious packages as false positives, 1 as unclear, and 0 as confirmed true positives. A's verified `fp_check_v11.csv` and `ANALYZER_BACKLOG.md` report that 4 of the 5 false positives involved `exec(open(...).read())` version loading in `setup.py` plus a network or base64 call elsewhere; this was not a subprocess-based root cause.
 2. **Triage Tiering Functions as Intended:** Packages containing build hooks (such as custom `cmdclass` or subprocess compilation probes) were accurately routed to `review_recommended`, preserving security vigilance without declaring malicious verdicts.
 3. **Dual-Use Indicators are Pervasive:** Over 50% of obscure packages legitimately execute subprocesses or decode assets. AST indicators alone cannot prove malice without behavioral intent or external peer context.
-4. **Deployment Threshold Guidance:** For automated blocking, use Engine `suspicious` verdict OR ML score $P \ge 0.80$. For human review routing, use $P \in [0.50, 0.80)$ or `review_recommended: true`.
+4. **Review Guidance:** Route `suspicious`, `review_recommended`, and `unable_to_assess` cases to human review. Do not automatically block based on `suspicious` or automatically allow installation based on `none_detected_in_this_scan`. The ML scores here are uncalibrated and are not validated as automatic decision thresholds.
