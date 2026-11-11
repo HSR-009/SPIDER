@@ -65,7 +65,7 @@ class PersonBDay5Day6Tests(unittest.TestCase):
 
         meta = get_normalization_metadata()
         self.assertTrue(meta["available"])
-        self.assertTrue(meta["is_official_placeholder"])
+        self.assertFalse(meta["is_official_placeholder"])
         self.assertEqual(len(meta["rules"]), 4)
 
         # Rule 1: String concat

@@ -1,0 +1,291 @@
+{
+  "schema_version": "0.1",
+  "scan_id": "c70c8e6f-eb07-57b0-83a9-17aff20ed093",
+  "created_at": "2026-11-09T00:00:00Z",
+  "record_origin": "analyzer",
+  "tool": {
+    "spider_version": "0.1.0-dev",
+    "analyzer_version": "analyzer-v1.1",
+    "ruleset_version": "rules-v1.1"
+  },
+  "target": {
+    "kind": "directory",
+    "name": "fixture_04_custom_install",
+    "version": "1.0.0",
+    "artifact": {
+      "filename": null,
+      "sha256": "b51a9606c3f98e035bc5175389e72e302dc360b380d626f2d37a3f09aab759d5",
+      "size_bytes": 305,
+      "format": "dir"
+    },
+    "hash_verified": null
+  },
+  "inventory": {
+    "coverage_known": true,
+    "files_total": 1,
+    "python_files": 1,
+    "files_inspected": 1,
+    "uninspected": [],
+    "parse_failures": [],
+    "vendored_paths": [],
+    "limits_hit": []
+  },
+  "files": [
+    {
+      "path": "setup.py",
+      "kind": "python",
+      "sha256": "beecef0f1ce1e0d68160d2d1546f7dd82c9a68bed3de99b12334c58f25fa69ad",
+      "lines": 14,
+      "inspected": true,
+      "roles": [
+        "install_hook"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "inst.install_import",
+      "category": "install_time",
+      "indicator": "setuptools.command.install",
+      "severity": "high",
+      "confidence": "high",
+      "file": "setup.py",
+      "span": {
+        "start_line": 2,
+        "start_col": 0,
+        "end_line": 2,
+        "end_col": 46
+      },
+      "snippet": "from setuptools.command.install import install",
+      "explanation": "Custom setuptools install command detected",
+      "trigger_phase": "install",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    },
+    {
+      "id": "F002",
+      "rule_id": "inst.install_override",
+      "category": "install_time",
+      "indicator": "install_command_override",
+      "severity": "high",
+      "confidence": "high",
+      "file": "setup.py",
+      "span": {
+        "start_line": 5,
+        "start_col": 0,
+        "end_line": 8,
+        "end_col": 25
+      },
+      "snippet": "class CustomInstall(install):",
+      "explanation": "install command overrides run()",
+      "trigger_phase": "install",
+      "context": {
+        "enclosing_function": "CustomInstall",
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    },
+    {
+      "id": "F003",
+      "rule_id": "cmd.os_system",
+      "category": "command_execution",
+      "indicator": "os.system",
+      "severity": "high",
+      "confidence": "high",
+      "file": "setup.py",
+      "span": {
+        "start_line": 7,
+        "start_col": 8,
+        "end_line": 7,
+        "end_col": 27
+      },
+      "snippet": "os.system(\"whoami\")",
+      "explanation": "os.system() call detected",
+      "trigger_phase": "call",
+      "context": {
+        "enclosing_function": "run",
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    },
+    {
+      "id": "F004",
+      "rule_id": "inst.plain_setup",
+      "category": "install_time",
+      "indicator": "setuptools.setup",
+      "severity": "low",
+      "confidence": "high",
+      "file": "setup.py",
+      "span": {
+        "start_line": 10,
+        "start_col": 0,
+        "end_line": 14,
+        "end_col": 1
+      },
+      "snippet": "setup(",
+      "explanation": "setuptools.setup() call detected",
+      "trigger_phase": "install",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    },
+    {
+      "id": "F005",
+      "rule_id": "inst.cmdclass",
+      "category": "install_time",
+      "indicator": "setuptools.setup.cmdclass",
+      "severity": "medium",
+      "confidence": "medium",
+      "file": "setup.py",
+      "span": {
+        "start_line": 10,
+        "start_col": 0,
+        "end_line": 14,
+        "end_col": 1
+      },
+      "snippet": "setup(",
+      "explanation": "setup(cmdclass=...) overrides build commands",
+      "trigger_phase": "install",
+      "context": {
+        "enclosing_function": null,
+        "after_normalization": false,
+        "in_vendored_path": false
+      },
+      "evidence_class": "static_indicator",
+      "limitations": [
+        "Static pattern match; no execution was performed."
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "R001",
+      "from": "F001",
+      "to": "F002",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R002",
+      "from": "F001",
+      "to": "F003",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R003",
+      "from": "F001",
+      "to": "F004",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R004",
+      "from": "F001",
+      "to": "F005",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R005",
+      "from": "F002",
+      "to": "F003",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R006",
+      "from": "F002",
+      "to": "F004",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R007",
+      "from": "F002",
+      "to": "F005",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R008",
+      "from": "F003",
+      "to": "F004",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R009",
+      "from": "F003",
+      "to": "F005",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    },
+    {
+      "id": "R010",
+      "from": "F004",
+      "to": "F005",
+      "type": "co_occurrence",
+      "basis": "co-occur in same file",
+      "confidence": "medium"
+    }
+  ],
+  "model_assessment": {
+    "status": "not_run",
+    "model_name": null,
+    "model_version": null,
+    "label": null,
+    "score": null,
+    "calibrated": false,
+    "illustrative": false,
+    "top_features": [],
+    "note": null
+  },
+  "verdict": {
+    "outcome": "suspicious",
+    "reasons": [
+      "S1_install_command"
+    ],
+    "limitations": [
+      "Static analysis only: 'none detected in this scan' does not mean the package is safe."
+    ]
+  },
+  "timings_ms": {
+    "acquire": null,
+    "extract": null,
+    "analyze": null,
+    "features": null,
+    "model": null
+  }
+}

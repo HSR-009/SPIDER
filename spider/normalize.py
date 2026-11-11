@@ -1,28 +1,21 @@
 """
 spider/normalize.py
 --------------------
-⚠️ PLACEHOLDER / BEST-GUESS MODULE ⚠️
-Built without access to the real repo's actual module layout, so the
-import path `spider.normalize` and any integration points (e.g. a
-`--normalize` CLI flag) are GUESSED to match the sprint plan's stated
-target path. Verify this is where the real codebase expects it before
-merging.
+Deterministic source-to-source normalization. It rewrites four patterns
+so a later static scan can see the underlying call:
 
-PURPOSE (per Day 4 spec):
-Deterministic source-to-source normalization. Reverses specific
-obfuscation patterns so a normalized file is easier for the analyzer to
-read. Never executes the source it processes - everything here works by
-parsing, transforming, and unparsing the AST only.
+  1. concat folding    - "a" + "b"            ->  "ab"
+  2. import-as aliases - import os as x       ->  os, and uses of x in that scope
+  3. literal base64    - base64.b64decode("…") with a constant string
+                         -> the decoded bytes literal
+  4. 2-arg getattr     - getattr(obj, "name") ->  obj.name
 
-Four rules, one per Day 4 requirement:
-  1. constant_fold_string_concat  - "a" + "b"  ->  "ab"
-  2. resolve_import_aliases       - import os as x; x.system(...)  ->  os.system(...)
-  3. decode_literal_base64        - base64.b64decode("...") with a constant
-                                     string argument -> the decoded bytes literal
-  4. getattr_to_attribute         - getattr(obj, "literal")  ->  obj.literal
+Alias rewrite is scope-sensitive: a function-local `import os as x` rewrites
+`x` only inside that function. It does not rewrite `x` in other functions or
+in the enclosing module.
 
-Each rule is implemented as its own ast.NodeTransformer so they can be
-tested and reasoned about independently, then composed in normalize_source().
+Nothing here executes the source. Parsing, transforming, and unparsing only.
+A RecursionError on a deeply nested expression returns the original source.
 """
 
 import ast
@@ -41,7 +34,7 @@ class ConstantFoldStringConcat(ast.NodeTransformer):
     """
 
     def visit_BinOp(self, node: ast.BinOp):
-        self.generic_visit(node)  # fold children first (handles chains)
+        self.generic_visit(node)
 
         if (
             isinstance(node.op, ast.Add)
@@ -57,30 +50,131 @@ class ConstantFoldStringConcat(ast.NodeTransformer):
 
 
 # ---------------------------------------------------------------------------
-# Rule 2: resolve import aliases
+# Rule 2: resolve import aliases (per scope)
 # ---------------------------------------------------------------------------
+
+def _bindings(stmts, args):
+    """Alias map and names bound directly in this scope.
+
+    Nested function and class bodies are separate scopes: an assignment or
+    import inside them does not bind the name here, except for the
+    function or class name itself.
+    """
+    aliases = {}
+    bound = set()
+    if args is not None:
+        for arg in list(args.posonlyargs) + list(args.args) + list(args.kwonlyargs):
+            bound.add(arg.arg)
+        if args.vararg is not None:
+            bound.add(args.vararg.arg)
+        if args.kwarg is not None:
+            bound.add(args.kwarg.arg)
+
+    def collect(stmt):
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            bound.add(stmt.name)
+            return
+        if isinstance(stmt, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith)):
+            for child in ast.iter_child_nodes(stmt):
+                if isinstance(child, list):
+                    for sub in child:
+                        if isinstance(sub, ast.stmt):
+                            collect(sub)
+            return
+        if isinstance(stmt, ast.Try):
+            for sub in list(stmt.body) + list(stmt.orelse) + list(stmt.finalbody):
+                collect(sub)
+            for handler in stmt.handlers:
+                if handler.name:
+                    bound.add(handler.name)
+                for sub in handler.body:
+                    collect(sub)
+            return
+        if isinstance(stmt, (ast.Import, ast.ImportFrom)):
+            for alias in stmt.names:
+                local = alias.asname or alias.name.split(".")[0]
+                bound.add(local)
+                if isinstance(stmt, ast.Import) and alias.asname:
+                    aliases[alias.asname] = alias.name
+            return
+        stack = [stmt]
+        while stack:
+            node = stack.pop()
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    bound.add(node.name)
+                continue
+            if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
+                bound.add(node.id)
+            else:
+                stack.extend(ast.iter_child_nodes(node))
+
+    for stmt in stmts:
+        collect(stmt)
+    return aliases, bound
+
 
 class ResolveImportAliases(ast.NodeTransformer):
     """
-    Finds `import X as alias` statements, builds an alias->real-name map,
-    then rewrites `alias.attr` usages to `X.attr`. The import statement
-    itself is rewritten to drop the alias (import X), so the file is
-    self-consistent after normalization.
+    Rewrites `import module as alias` and uses of `alias` in the same
+    scope (and enclosing scopes, unless a closer scope binds the name).
 
-    Limitation (documented, not silently hidden): only handles simple
-    `import module as alias` - does not handle `from X import Y as alias`
-    (that's a different AST shape and was out of scope for Day 4's stated
-    four rules).
+    A function-local alias does not leak into other functions or the
+    enclosing module. `from X import Y as alias` is left unchanged.
     """
 
     def __init__(self):
-        self.alias_map = {}  # alias name -> real module name
+        self.scopes = []
+
+    def _push(self, stmts, args):
+        aliases, bound = _bindings(stmts, args)
+        self.scopes.append({"aliases": aliases, "bound": bound})
+
+    def _pop(self):
+        self.scopes.pop()
+
+    def visit_Module(self, node: ast.Module):
+        self._push(node.body, None)
+        node.body = [self.visit(stmt) for stmt in node.body]
+        self._pop()
+        return node
+
+    def visit_FunctionDef(self, node: ast.FunctionDef):
+        node.decorator_list = [self.visit(item) for item in node.decorator_list]
+        node.args.defaults = [self.visit(item) for item in node.args.defaults]
+        node.args.kw_defaults = [
+            self.visit(item) if item is not None else None for item in node.args.kw_defaults
+        ]
+        self._push(node.body, node.args)
+        node.body = [self.visit(stmt) for stmt in node.body]
+        self._pop()
+        return node
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef):
+        node.decorator_list = [self.visit(item) for item in node.decorator_list]
+        node.args.defaults = [self.visit(item) for item in node.args.defaults]
+        node.args.kw_defaults = [
+            self.visit(item) if item is not None else None for item in node.args.kw_defaults
+        ]
+        self._push(node.body, node.args)
+        node.body = [self.visit(stmt) for stmt in node.body]
+        self._pop()
+        return node
+
+    def visit_ClassDef(self, node: ast.ClassDef):
+        node.decorator_list = [self.visit(item) for item in node.decorator_list]
+        node.bases = [self.visit(item) for item in node.bases]
+        node.keywords = [self.visit(item) for item in node.keywords]
+        self._push(node.body, None)
+        node.body = [self.visit(stmt) for stmt in node.body]
+        self._pop()
+        return node
 
     def visit_Import(self, node: ast.Import):
+        aliases = self.scopes[-1]["aliases"] if self.scopes else {}
         new_names = []
         for alias in node.names:
-            if alias.asname:
-                self.alias_map[alias.asname] = alias.name
+            if alias.asname and alias.asname in aliases and aliases[alias.asname] == alias.name:
                 new_names.append(ast.alias(name=alias.name, asname=None))
             else:
                 new_names.append(alias)
@@ -88,10 +182,16 @@ class ResolveImportAliases(ast.NodeTransformer):
         return node
 
     def visit_Name(self, node: ast.Name):
-        if node.id in self.alias_map:
-            return ast.copy_location(
-                ast.Name(id=self.alias_map[node.id], ctx=node.ctx), node
-            )
+        for scope in reversed(self.scopes):
+            if node.id in scope["bound"] and node.id not in scope["aliases"]:
+                return node
+            if node.id in scope["aliases"]:
+                real = scope["aliases"][node.id]
+                if "." in real:
+                    return node
+                return ast.copy_location(
+                    ast.Name(id=real, ctx=node.ctx), node
+                )
         return node
 
 
@@ -106,8 +206,7 @@ class DecodeLiteralBase64(ast.NodeTransformer):
     whole call with the decoded bytes as a literal.
 
     If decoding fails (invalid base64), the call is left untouched rather
-    than crashing normalization - malformed input should not break the
-    pipeline.
+    than crashing normalization.
     """
 
     def visit_Call(self, node: ast.Call):
@@ -126,7 +225,7 @@ class DecodeLiteralBase64(ast.NodeTransformer):
                     decoded = base64.b64decode(arg_value)
                     return ast.copy_location(ast.Constant(value=decoded), node)
                 except Exception:
-                    return node  # leave malformed base64 untouched
+                    return node
         return node
 
 
@@ -139,9 +238,7 @@ class GetattrToAttribute(ast.NodeTransformer):
     Finds `getattr(obj, "literal_name")` with exactly 2 args, the second
     being a constant string, and rewrites it to `obj.literal_name`.
 
-    Does NOT touch 3-arg getattr (the default-value form), since that's
-    not equivalent to plain attribute access and rewriting it would change
-    behavior - only the exact 2-arg literal form is safe to normalize.
+    Does not touch 3-arg getattr (the default-value form).
     """
 
     def visit_Call(self, node: ast.Call):
@@ -169,22 +266,21 @@ class GetattrToAttribute(ast.NodeTransformer):
 
 def normalize_source(source: str) -> str:
     """
-    Applies all four normalization rules in sequence and returns the
-    normalized source as a string. Never executes the input - parsing,
-    transforming, and unparsing only.
+    Apply all four rules and return the normalized source.
 
-    Raises SyntaxError if the input itself doesn't parse (propagated, not
-    swallowed - the caller should decide how to handle unparseable input).
+    Raises SyntaxError if the input itself does not parse.
+    On RecursionError (deeply nested expressions), returns `source` unchanged.
     """
-    tree = ast.parse(source)
-
-    tree = ConstantFoldStringConcat().visit(tree)
-    tree = ResolveImportAliases().visit(tree)
-    tree = DecodeLiteralBase64().visit(tree)
-    tree = GetattrToAttribute().visit(tree)
-
-    ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    try:
+        tree = ast.parse(source)
+        tree = ConstantFoldStringConcat().visit(tree)
+        tree = ResolveImportAliases().visit(tree)
+        tree = DecodeLiteralBase64().visit(tree)
+        tree = GetattrToAttribute().visit(tree)
+        ast.fix_missing_locations(tree)
+        return ast.unparse(tree)
+    except RecursionError:
+        return source
 
 
 if __name__ == "__main__":

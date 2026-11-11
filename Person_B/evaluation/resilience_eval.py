@@ -35,6 +35,7 @@ from Person_B.evaluation.normalization_adapter import (
     get_normalization_metadata,
     normalize_code,
 )
+from person_c.evasion_table import union_findings
 from Person_B.evaluation.verify_adv_batch import (
     EXPECTED_MANIFEST_HASH,
     TAG_NAME,
@@ -157,8 +158,9 @@ def run_resilience_evaluation() -> Dict[str, Any]:
         cand_v1 = analyze_with_v1(adv_src)
         out_v1 = classify_finding_outcome(base_findings_v1, cand_v1)
 
-        # Pipeline B: Normalized v1
-        cand_v1_norm = analyze_with_v1(norm_adv_src)
+        # Pipeline B: Normalized v1. Union with the raw scan so a rewrite
+        # cannot drop a finding v1 already emitted.
+        cand_v1_norm = union_findings(cand_v1, analyze_with_v1(norm_adv_src))
         out_v1_norm = classify_finding_outcome(base_findings_v1, cand_v1_norm)
 
         # Pipeline C: Hardened v1.1 (evaluated against v1.1 baseline findings, matching Person A protocol)
@@ -168,9 +170,12 @@ def run_resilience_evaluation() -> Dict[str, Any]:
         verd_review_v11 = verd_v11.get("review_recommended", False)
         verd_cat_v11 = classify_verdict_level(verd_outcome_v11, verd_review_v11)
 
-        # Pipeline D: Hardened v1.1 + Normalized (evaluated against v1.1 baseline findings)
-        cand_v11_norm, verd_v11_norm = analyze_with_v11(norm_adv_src)
+        # Pipeline D: Hardened v1.1 + Normalized.
+        # Union with raw findings so normalization cannot drop existing findings.
+        cand_v11_norm_only, verd_v11_norm = analyze_with_v11(norm_adv_src)
+        cand_v11_norm = union_findings(cand_v11, cand_v11_norm_only)
         out_v11_norm = classify_finding_outcome(base_findings_v11, cand_v11_norm)
+
         verd_outcome_v11_norm = verd_v11_norm.get("outcome", "none_detected_in_this_scan")
         verd_review_v11_norm = verd_v11_norm.get("review_recommended", False)
         verd_cat_v11_norm = classify_verdict_level(verd_outcome_v11_norm, verd_review_v11_norm)
@@ -407,7 +412,7 @@ def build_resilience_markdown(payload: Dict[str, Any]) -> None:
         "1. **AST Rewriting Scope:** Person C's `spider.normalize` implements 4 specific AST transformations (constant string concat folding, `import as` alias resolution, literal base64 decoding, and 2-arg `getattr` rewriting).",
         "2. **Effective Recoveries:** Normalization successfully recovers 3 additional techniques that evaded v1 AST analysis: String split (`adv_000`), Import alias + Getattr (`adv_010`), and Import alias + String split + Getattr (`adv_011`).",
         "3. **Uncovered Techniques:** Normalization has zero effect on ROT13 (`adv_002`), Delay counters (`adv_004`, `adv_005`), `__import__` dunder calls (`adv_007`), `chr()` joins (`adv_008`), or `bytes.fromhex()` escapes (`adv_009`).",
-        "4. **Module Status:** The docstring in `spider/normalize.py` explicitly notes that it is a placeholder/best-guess module built outside the repository layout. Its results are treated as a research defense prototype.",
+        "4. **Module Status:** `spider/normalize.py` rewrites constant string concatenation, `import as` aliases, literal base64, and 2-arg `getattr`. It does not claim to reverse every disguise in the batch.",
         "",
         "## 5. Machine Learning Evaluation on Adversarial Batch",
         "",

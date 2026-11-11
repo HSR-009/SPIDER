@@ -60,6 +60,7 @@ def scan_target(
     out_dir: Path,
     json_output: bool = False,
     no_network: bool = False,
+    normalize: bool = False,
 ) -> int:
     target_path = Path(target)
     temp_dir_to_clean: Optional[Path] = None
@@ -102,7 +103,7 @@ def scan_target(
             return 2
 
         # Run directory scan
-        record = scan_directory(scan_dir, name=pkg_name, version=pkg_version)
+        record = scan_directory(scan_dir, name=pkg_name, version=pkg_version, normalize=normalize)
 
         if hash_verified is not None:
             record["target"]["hash_verified"] = hash_verified
@@ -241,6 +242,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     scan_parser.add_argument("--json", action="store_true", help="Output full JSON scan record")
     scan_parser.add_argument("--out", default="scans", help="Output directory for scan records (default: scans/)")
     scan_parser.add_argument("--no-network", action="store_true", help="Disable network operations")
+    scan_parser.add_argument("--normalize", action="store_true", help="Normalize Python source in memory before static analysis")
 
     hunt_parser = subparsers.add_parser("hunt", help="Scan installed environments for persistence artifacts")
     hunt_parser.add_argument("--site-packages", action="append", help="Extra site-packages directory to scan")
@@ -248,6 +250,18 @@ def main(argv: Optional[List[str]] = None) -> int:
     hunt_parser.add_argument("--allow", help="Allowlist a sha256 hash")
     hunt_parser.add_argument("--note", help="Note for allowlisted sha256")
     hunt_parser.add_argument("--db", help="Path to SQLite hunter database")
+
+    show_parser = subparsers.add_parser(
+        "show",
+        help="Explain a saved scan record, including coverage gaps",
+    )
+    show_parser.add_argument("record", help="Scan id, or path to a scan record JSON file")
+    show_parser.add_argument(
+        "--scans",
+        default="scans",
+        help="Directory of saved scan records when RECORD is a scan id (default: scans/)",
+    )
+    show_parser.add_argument("--json", action="store_true", help="Print the saved scan record")
 
     args = parser.parse_args(argv)
 
@@ -257,6 +271,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             out_dir=Path(args.out),
             json_output=args.json,
             no_network=args.no_network,
+            normalize=args.normalize,
         )
     elif args.subcommand == "hunt":
         return hunt_target(
@@ -265,6 +280,14 @@ def main(argv: Optional[List[str]] = None) -> int:
             allow_sha256=args.allow,
             allow_note=args.note,
             db_path=args.db,
+        )
+    elif args.subcommand == "show":
+        from spider.show import show_target
+
+        return show_target(
+            args.record,
+            scans_dir=Path(args.scans),
+            json_output=args.json,
         )
     else:
         parser.print_help()

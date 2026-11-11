@@ -56,7 +56,7 @@
 1. **AST Rewriting Scope:** Person C's `spider.normalize` implements 4 specific AST transformations (constant string concat folding, `import as` alias resolution, literal base64 decoding, and 2-arg `getattr` rewriting).
 2. **Effective Recoveries:** Normalization successfully recovers 3 additional techniques that evaded v1 AST analysis: String split (`adv_000`), Import alias + Getattr (`adv_010`), and Import alias + String split + Getattr (`adv_011`).
 3. **Uncovered Techniques:** Normalization has zero effect on ROT13 (`adv_002`), Delay counters (`adv_004`, `adv_005`), `__import__` dunder calls (`adv_007`), `chr()` joins (`adv_008`), or `bytes.fromhex()` escapes (`adv_009`).
-4. **Module Status:** The docstring in `spider/normalize.py` explicitly notes that it is a placeholder/best-guess module built outside the repository layout. Its results are treated as a research defense prototype.
+4. **Module Status:** `spider/normalize.py` rewrites constant string concatenation, `import as` aliases, literal base64, and 2-arg `getattr`. It does not claim to reverse every disguise in the batch.
 
 ## 5. Machine Learning Evaluation on Adversarial Batch
 
