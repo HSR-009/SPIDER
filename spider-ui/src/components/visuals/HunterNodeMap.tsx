@@ -8,6 +8,7 @@ interface HunterNodeMapProps {
 
 export function HunterNodeMap({ huntResult }: HunterNodeMapProps) {
   const [selectedNode, setSelectedNode] = useState<string | null>(huntResult.roots[0] ?? null);
+  const [lowExpanded, setLowExpanded] = useState(false);
 
   const roots = huntResult.roots;
   const items = huntResult.items;
@@ -18,6 +19,47 @@ export function HunterNodeMap({ huntResult }: HunterNodeMapProps) {
   };
 
   const selectedFindings = selectedNode ? findingsForRoot(selectedNode) : [];
+  const highMediumFindings = selectedFindings.filter((it) => it.severity.toUpperCase() !== 'LOW');
+  const lowFindings = selectedFindings.filter((it) => it.severity.toUpperCase() === 'LOW');
+  const lowPackagesCount = new Set(lowFindings.map((it) => it.dist || it.artifact || 'environment')).size;
+
+  const renderFindingItem = (item: HuntItem, idx: number | string) => (
+    <li
+      key={idx}
+      style={{
+        background: 'var(--color-surface-raised)',
+        border: '1px solid var(--color-border)',
+        borderRadius: 'var(--radius-sm)',
+        padding: 'var(--space-3)',
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
+        <strong><code>{item.artifact}</code></strong>
+        <Badge tone={item.severity.toUpperCase() === 'HIGH' ? 'danger' : item.severity.toUpperCase() === 'MEDIUM' ? 'amber' : 'neutral'}>
+          {item.severity}
+        </Badge>
+      </div>
+      <p style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>{item.reason}</p>
+      {item.evidence_snippet && (
+        <pre
+          style={{
+            background: 'var(--color-surface-sunken)',
+            border: '1px solid var(--color-border)',
+            padding: 'var(--space-2)',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--color-accent-mint)',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+            maxWidth: '100%',
+          }}
+        >
+          <code>{item.evidence_snippet}</code>
+        </pre>
+      )}
+    </li>
+  );
 
   return (
     <div className="panel" style={{ marginTop: 'var(--space-4)' }}>
@@ -85,41 +127,39 @@ export function HunterNodeMap({ huntResult }: HunterNodeMapProps) {
               {selectedFindings.length === 0 ? (
                 <p className="helper-text">No findings or anomalies recorded in this environment directory.</p>
               ) : (
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                  {selectedFindings.map((item, idx) => (
-                    <li
-                      key={idx}
-                      style={{
-                        background: 'var(--color-surface-raised)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: 'var(--space-3)',
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
-                        <strong><code>{item.artifact}</code></strong>
-                        <Badge tone={item.severity.toUpperCase() === 'HIGH' ? 'danger' : 'amber'}>
-                          {item.severity}
-                        </Badge>
-                      </div>
-                      <p style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>{item.reason}</p>
-                      {item.evidence_snippet && (
-                        <pre
-                          style={{
-                            background: 'var(--color-surface-sunken)',
-                            border: '1px solid var(--color-border)',
-                            padding: 'var(--space-2)',
-                            borderRadius: 'var(--radius-sm)',
-                            fontSize: 'var(--text-xs)',
-                            color: 'var(--color-accent-mint)',
-                          }}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                  {highMediumFindings.length > 0 && (
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                      {highMediumFindings.map((item, idx) => renderFindingItem(item, `hm-${idx}`))}
+                    </ul>
+                  )}
+
+                  {lowFindings.length > 0 && (
+                    <div style={{ marginTop: 'var(--space-2)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
+                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+                          Low severity ({lowFindings.length})
+                        </span>
+                        <button
+                          type="button"
+                          className="button button--secondary"
+                          onClick={() => setLowExpanded(!lowExpanded)}
+                          style={{ fontSize: 'var(--text-xs)', padding: '2px 8px' }}
                         >
-                          <code>{item.evidence_snippet}</code>
-                        </pre>
+                          {lowExpanded ? 'Collapse LOW findings' : `Expand ${lowFindings.length} low findings in ${lowPackagesCount} packages`}
+                        </button>
+                      </div>
+                      <p className="helper-text" style={{ margin: '0 0 var(--space-2)', fontSize: 'var(--text-xs)' }}>
+                        LOW findings are usually normal tooling code (e.g. build shims, namespace declarations, or system-managed hooks).
+                      </p>
+                      {lowExpanded && (
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                          {lowFindings.map((item, idx) => renderFindingItem(item, `low-${idx}`))}
+                        </ul>
                       )}
-                    </li>
-                  ))}
-                </ul>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           ) : (

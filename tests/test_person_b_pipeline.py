@@ -240,6 +240,7 @@ class TestDay3Predictor(unittest.TestCase):
             self.assertIsInstance(factor["shap_impact"], float)
 
 
+@unittest.skipUnless(has_sklearn, "scikit-learn required for Day 4 baseline tests")
 class TestDay4BaselineV11(unittest.TestCase):
     """Day 4 — v1.1 dataset validation, leakage guards, holdout preservation, and peer-context checks."""
 

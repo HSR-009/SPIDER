@@ -12,7 +12,7 @@ This document catalogs known engineering limitations, behavioral boundaries, and
 
 ### 1.2 Setup Script File Size Cap
 - **Issue**: Root setup scripts (`setup.py`, `pyproject.toml`) exceeding 2 MiB are skipped during AST extraction to prevent denial-of-service.
-- **Impact**: Oversized files are marked as uninspected. If a package contains no other inspectable Python files, the verdict becomes `unable_to_assess`. In corpus testing, 11 malicious packages triggered this limit and resolved to `none_detected_in_this_scan` (`results/rescan_v11_summary.md`).
+- **Impact**: Oversized files are recorded in coverage under `limits_hit` (or as uninspected files). In the v1.1 corpus rescan (`results/rescan_v11_summary.md`), `limits_hit` was recorded for 1 benign package (and 0 malicious packages) as an unable-to-assess reason.
 
 ### 1.3 Uninspected & Binary Artifacts
 - **Issue**: Compiled extensions (`.so`, `.pyd`, `.dll`), native binaries (`.exe`), and bytecode-only wheels (`.pyc`) are not disassembled.
@@ -34,14 +34,7 @@ This document catalogs known engineering limitations, behavioral boundaries, and
 - **Issue**: Some environments utilize complex symlinks pointing outside the site-packages root (e.g. editable installs, virtualenv shims).
 - **Behavior**: For safety against filesystem loops and out-of-boundary scans, the Hunter does not follow symlinks outside the specified environment root.
 
----
-
-## 3. UI & Platform Considerations
-
-### 3.1 Loopback Socket Constraints in Sandboxed Environments
-- **Issue**: Running the API server (`spider serve`) or socket-based tests inside certain restricted sandboxes (e.g. Windows AppContainer or strict loopback policies) can fail with `[WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions`.
-- **Mitigation**: `spider serve` handles port conflicts cleanly (exit code 2) and specifies `--port` instructions. Standard development should run outside isolation when binding loopback ports.
-
-### 3.2 Offline Browser Generation
-- **Issue**: The single-page React UI uses HTML5 Canvas and CSS animations. Generating headless screenshots on systems without Chrome or Edge requires pre-installed browser binaries.
+### 2.3 Setuptools `distutils-precedence.pth` Flagged as HIGH
+- **Issue**: Standard setuptools installations drop `distutils-precedence.pth` (and namespace stubs like `*-nspkg.pth`) containing one-line executable Python code (e.g. `enabled and __import__('_distutils_hack').add_shim();`).
+- **Behavior**: Because the Hunter inspects `.pth` files for arbitrary executable code, any line containing executable statements (like `import` or `__import__`) triggers a `HIGH` finding as designed. Users can allowlist known standard stubs by SHA-256 via the Hunter allowlist.
 

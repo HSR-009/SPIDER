@@ -30,7 +30,7 @@ cd SPIDER
 python -m venv .venv
 # Linux / macOS: source .venv/bin/activate
 # Windows PowerShell: .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+pip install -r requirements-core.txt    # Or requirements.txt for optional ML packages
 
 # Run the test suite (100% offline, stdlib unittest)
 python -m unittest discover -s tests
@@ -117,9 +117,9 @@ The codebase reflects the collaborative work of three students across distinct s
 | `spider/hunter/` | **Person A** (Hunter) | Persistence detection in site-packages: `.pth` execution, `sitecustomize`, entry-point checks, RECORD tamper audits. |
 | `spider_contract/` | **Person A** (Contract) | Semantic contracts, JSON schema specifications, and 3-way verdict validation. |
 | `Person_A/` | **Person A** (Pipelines) | Corpus rescan pipelines, false positive evaluation (`fp_scan.py`), and dataset provenance scripts. |
-| `Person_B/` | **Person B** (ML & Eval) | Feature extraction, grouped cross-validation, leak guards, XGBoost/SHAP evaluation, and ML methodology. |
+| `Person_B/` | **Person B** (ML & Eval) | Feature extraction, grouped cross-validation, leak guards, XGBoost/SHAP evaluation, and ML methodology (read `docs/ML_METHODOLOGY.md` caveats before quoting any ML number). |
 | `person_c/` | **Person C** (Adversarial) | Adversarial sample generator (`adv-batch-v1`), obfuscation transformations, and red-team test harness. |
-| `spider-ui/` | **UI Frontend** (React) | React single-page app (TypeScript, Tailwind, 3D Canvas visualizer, zero-safe guarantee). |
+| `spider-ui/` | **UI Frontend** (React) | React single-page app (TypeScript, Tailwind, 3D Canvas visualizer). |
 | `spider/static_ui/` | Built Distribution | Committed production build of `spider-ui`, served by `spider serve`. |
 | `results/` | Verified Data | Frozen evaluation results and metrics cited throughout documentation. |
 | `docs/` | Documentation | Architecture, demo guide, methodology, threat model, and roadmap. |
@@ -160,6 +160,7 @@ All metrics presented below are directly reproduced from verified run artifacts 
 - **Adversarial Resilience (N=12 synthetic samples)**:
   - Evaluated on frozen `adv-batch-v1` (Manifest SHA-256: `bb7f4fe8...`).
   - Baseline v1 AST missed 8 of 12 samples (66.7% evasion rate). Hardened v1.1 AST missed 0 samples at finding-level, with 1 reaching `suspicious`, 5 keeping review flags, and 6 silent (`results/adv_batch_verification_by_A.md`, `results/evasion_table_v1_vs_v11.md`).
+  - Note the distinction between finding-level and verdict-level: finding-level measures whether any indicator fired on the code, whereas verdict-level measures whether the package as a whole reached a `suspicious` decision.
 
 ---
 
