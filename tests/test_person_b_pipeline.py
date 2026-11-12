@@ -1,13 +1,21 @@
 import unittest
+import importlib.util
 
 import pandas as pd
 
 from Person_B.features.extract_features import extract_record_features
-from Person_B.models.splitting import (
-    assert_no_leakage,
-    grouped_cv_splits,
-    make_frozen_holdout,
-)
+
+has_sklearn = importlib.util.find_spec("sklearn") is not None
+if has_sklearn:
+    from Person_B.models.splitting import (
+        assert_no_leakage,
+        grouped_cv_splits,
+        make_frozen_holdout,
+    )
+else:
+    assert_no_leakage = None
+    grouped_cv_splits = None
+    make_frozen_holdout = None
 
 
 class PersonBPipelineTests(unittest.TestCase):
@@ -23,12 +31,14 @@ class PersonBPipelineTests(unittest.TestCase):
         self.assertEqual(features["category_count__command_execution"], 1)
         self.assertEqual(features["indicator_present__os.system"], 1)
 
+    @unittest.skipUnless(has_sklearn, "scikit-learn required for splitting tests")
     def test_leakage_guard_rejects_identifiers_and_diagnostics(self):
         with self.assertRaises(ValueError):
             assert_no_leakage(["n_py_files", "package_id"])
         with self.assertRaises(ValueError):
             assert_no_leakage(["parse_error_count"])
 
+    @unittest.skipUnless(has_sklearn, "scikit-learn required for splitting tests")
     def test_grouped_holdout_and_cv_do_not_split_package_versions(self):
         rows = []
         for label in (0, 1):
@@ -52,6 +62,10 @@ class PersonBPipelineTests(unittest.TestCase):
             valid_groups = set(development.iloc[valid_idx].group_id)
             self.assertTrue(train_groups.isdisjoint(valid_groups))
 
+    @unittest.skipUnless(
+        importlib.util.find_spec("xgboost") is not None,
+        "xgboost is not installed; skipping ML evaluation test",
+    )
     def test_score_predictions_handles_edge_cases(self):
         from Person_B.evaluation.day2_ablation import score_predictions
         scores = score_predictions([0, 1, 0, 1], [0.1, 0.9, 0.2, 0.8])
@@ -101,6 +115,10 @@ class PersonBPipelineTests(unittest.TestCase):
         self.assertIn("holdout_exclusive_indicator", leaked_vocab)
 
 
+@unittest.skipUnless(
+    importlib.util.find_spec("xgboost") is not None and importlib.util.find_spec("shap") is not None,
+    "xgboost or shap is not installed; skipping TestDay3Predictor",
+)
 class TestDay3Predictor(unittest.TestCase):
     """Day 3 — prediction wrapper, calibration, abstention, SHAP importances."""
 
@@ -222,6 +240,7 @@ class TestDay3Predictor(unittest.TestCase):
             self.assertIsInstance(factor["shap_impact"], float)
 
 
+@unittest.skipUnless(has_sklearn, "scikit-learn required for Day 4 baseline tests")
 class TestDay4BaselineV11(unittest.TestCase):
     """Day 4 — v1.1 dataset validation, leakage guards, holdout preservation, and peer-context checks."""
 

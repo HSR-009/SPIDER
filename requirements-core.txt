@@ -1,0 +1,4 @@
+# Core requirements for SPIDER engine, CLI, Hunter, API and tests
+jsonschema>=4.20.0
+pandas>=2.0.0
+

@@ -18,8 +18,10 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import os
 import re
 import shutil
+import sys
 import tempfile
 from email import policy
 from email.parser import BytesParser
@@ -279,7 +281,19 @@ def make_handler(scans_dir: Path, db_path: Optional[str]):
 def serve(host: str = "127.0.0.1", port: int = 8000, scans_dir: str = "scans", db_path: Optional[str] = None, open_browser: bool = True) -> None:
     if host not in ("127.0.0.1", "localhost"):
         raise SystemExit("Refusing to bind to a non-loopback address.")
-    httpd = ThreadingHTTPServer((host, port), make_handler(Path(scans_dir), db_path))
+    if not DIST_DIR.is_dir():
+        print("Note: spider/static_ui is missing. Run `npm install` and `npm run build:serve` in spider-ui/ to build the UI.")
+    try:
+        httpd = ThreadingHTTPServer((host, port), make_handler(Path(scans_dir), db_path))
+    except (OSError, PermissionError) as e:
+        # Check for address in use (WinError 10048, 10013, EADDRINUSE, or permission error binding port)
+        err_str = str(e).lower()
+        winerr = getattr(e, "winerror", None)
+        errno = getattr(e, "errno", None)
+        if winerr in (10048, 10013) or errno in (98, 48) or "address already in use" in err_str or "access permissions" in err_str:
+            sys.stderr.write(f"Error: Port {port} is busy or cannot be bound. Try passing a different port with --port (e.g. --port {port + 1}).\n")
+            sys.exit(2)
+        raise
     url = f"http://{host}:{port}/"
     print(f"SPIDER running at {url}  (Ctrl+C to stop)")
     if open_browser:

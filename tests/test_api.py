@@ -101,6 +101,57 @@ class ApiTests(unittest.TestCase):
         finally:
             shutil.rmtree(d, ignore_errors=True)
 
+    def test_unsupported_archive_extension_rejected(self):
+        boundary = "XBOUNDARYX"
+        body = (
+            f"--{boundary}\r\nContent-Disposition: form-data; name=\"archive\"; filename=\"test.exe\"\r\n"
+            "Content-Type: application/octet-stream\r\n\r\nMZ\r\n"
+            f"--{boundary}--\r\n"
+        ).encode()
+        st, out = call(self.base, "/api/scan", "POST", body, {"Content-Type": f"multipart/form-data; boundary={boundary}"})
+        self.assertEqual(st, 400)
+        self.assertIn(b"Unsupported archive type", out)
+
+    def test_corrupt_archive_handled_gracefully(self):
+        boundary = "XBOUNDARYX"
+        body = (
+            f"--{boundary}\r\nContent-Disposition: form-data; name=\"archive\"; filename=\"corrupt.zip\"\r\n"
+            "Content-Type: application/zip\r\n\r\nPK\x03\x04corrupteddata\r\n"
+            f"--{boundary}--\r\n"
+        ).encode()
+        st, out = call(self.base, "/api/scan", "POST", body, {"Content-Type": f"multipart/form-data; boundary={boundary}"})
+        self.assertEqual(st, 200)
+        sid = json.loads(out)["scan_id"]
+        st, rec_body = call(self.base, f"/api/scans/{sid}")
+        self.assertEqual(st, 200)
+        rec = json.loads(rec_body)
+        self.assertEqual(rec["verdict"]["outcome"], "unable_to_assess")
+
+    def test_folder_path_with_spaces_and_backslashes(self):
+        td = Path(tempfile.mkdtemp())
+        try:
+            space_dir = td / "folder with spaces" / "sub dir"
+            space_dir.mkdir(parents=True)
+            (space_dir / "clean.py").write_text("x = 1\n", encoding="utf-8")
+            st, body = self.post_json("/api/scan", {"path": str(space_dir)})
+            self.assertEqual(st, 200)
+            sid = json.loads(body)["scan_id"]
+            st, rec_body = call(self.base, f"/api/scans/{sid}")
+            self.assertEqual(st, 200)
+            rec = json.loads(rec_body)
+            self.assertEqual(rec["verdict"]["outcome"], "none_detected_in_this_scan")
+        finally:
+            shutil.rmtree(td, ignore_errors=True)
+
+    def test_upload_exceeding_size_limit(self):
+        import socket
+        port = self.httpd.server_address[1]
+        sock = socket.create_connection(("127.0.0.1", port))
+        sock.sendall(b"POST /api/scan HTTP/1.1\r\nHost: 127.0.0.1\r\nContent-Length: 105000000\r\n\r\n")
+        resp = sock.recv(1024)
+        sock.close()
+        self.assertTrue(resp.startswith(b"HTTP/1.0 413") or resp.startswith(b"HTTP/1.1 413"))
+
 
 if __name__ == "__main__":
     unittest.main()

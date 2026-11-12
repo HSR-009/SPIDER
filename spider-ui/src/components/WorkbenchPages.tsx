@@ -496,9 +496,22 @@ export function ScannerScorePage() {
             </dl>
           </div>
         ) : (
-          <p className="helper-text">
-            Model score: Not connected. The rule-based verdict above is what this scan used.
-          </p>
+          <div>
+            <div className="notice notice--cyan" role="status" style={{ marginBottom: 'var(--space-4)' }}>
+              ML Model: <strong>Not connected</strong>. This scan was evaluated solely by the frozen rule-based engine (analyzer-v1.1).
+            </div>
+            <p className="helper-text" style={{ marginBottom: 'var(--space-3)' }}>
+              When an ML scoring model is connected in a future release, this tab will display:
+            </p>
+            <ul className="info-steps" style={{ marginBottom: 'var(--space-4)' }}>
+              <li><strong>Calibrated malicious probability</strong> with isotonic regression bounds</li>
+              <li><strong>SHAP feature attributions</strong> explaining which AST indicators influenced the score</li>
+              <li><strong>Model version & lineage</strong> verified against frozen cross-validation artifacts</li>
+            </ul>
+            <p className="helper-text">
+              See the integration plan in <code>docs/ROADMAP.md</code>.
+            </p>
+          </div>
         )}
       </section>
     </div>
@@ -744,6 +757,7 @@ export function HunterScanPage() {
 export function HunterReportPage() {
   const { lastHuntResult, startHunt, isHunting } = useWorkbenchStore();
   const [showAllowlisted, setShowAllowlisted] = useState(false);
+  const [lowExpanded, setLowExpanded] = useState(false);
 
   useEffect(() => {
     if (!lastHuntResult) {
@@ -768,11 +782,14 @@ export function HunterReportPage() {
   const low = visibleItems.filter((i) => i.severity.toUpperCase() === 'LOW');
   const other = visibleItems.filter((i) => !['HIGH', 'MEDIUM', 'LOW'].includes(i.severity.toUpperCase()));
 
-  const renderHunterGroup = (title: string, list: HuntItem[]) => {
-    if (list.length === 0) return null;
+  const lowPackagesCount = new Set(low.map((it) => it.dist || it.artifact || 'environment')).size;
+
+  const renderPackageGroup = (pkgName: string, pkgItems: HuntItem[]) => {
     return (
-      <div style={{ marginBottom: 'var(--space-4)' }}>
-        <h3>{title} ({list.length})</h3>
+      <div key={pkgName} style={{ marginBottom: 'var(--space-3)' }}>
+        <h4 style={{ margin: 'var(--space-2) 0', color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+          Package: <code>{pkgName}</code> ({pkgItems.length} finding{pkgItems.length > 1 ? 's' : ''})
+        </h4>
         <div className="table-scroll">
           <table className="hunt-table">
             <thead>
@@ -786,7 +803,7 @@ export function HunterReportPage() {
               </tr>
             </thead>
             <tbody>
-              {list.map((it, idx) => (
+              {pkgItems.map((it, idx) => (
                 <tr key={idx}>
                   <td><code>{it.artifact}</code></td>
                   <td>{it.reason}</td>
@@ -809,6 +826,52 @@ export function HunterReportPage() {
             </tbody>
           </table>
         </div>
+      </div>
+    );
+  };
+
+  const renderHunterGroup = (title: string, list: HuntItem[], isLow: boolean = false) => {
+    if (list.length === 0) return null;
+
+    // Group items by package/dist name
+    const byPkg: Record<string, HuntItem[]> = {};
+    for (const it of list) {
+      const key = it.dist || (it.artifact === 'pth' ? '(site-packages .pth)' : '(environment root)');
+      if (!byPkg[key]) byPkg[key] = [];
+      byPkg[key].push(it);
+    }
+    const pkgEntries = Object.entries(byPkg);
+
+    if (isLow) {
+      return (
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
+            <h3>{title} ({list.length})</h3>
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={() => setLowExpanded(!lowExpanded)}
+              style={{ fontSize: 'var(--text-sm)' }}
+            >
+              {lowExpanded ? 'Collapse LOW findings' : `Expand ${list.length} low findings in ${lowPackagesCount} packages`}
+            </button>
+          </div>
+          <p className="helper-text" style={{ margin: 'var(--space-1) 0 var(--space-3)' }}>
+            LOW findings are usually normal tooling code (e.g. build shims, namespace declarations, or system-managed hooks).
+          </p>
+          {lowExpanded && (
+            <div>
+              {pkgEntries.map(([pkgName, pkgItems]) => renderPackageGroup(pkgName, pkgItems))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ marginBottom: 'var(--space-4)' }}>
+        <h3 style={{ marginBottom: 'var(--space-2)' }}>{title} ({list.length})</h3>
+        {pkgEntries.map(([pkgName, pkgItems]) => renderPackageGroup(pkgName, pkgItems))}
       </div>
     );
   };
@@ -855,7 +918,7 @@ export function HunterReportPage() {
           <>
             {renderHunterGroup('High severity', high)}
             {renderHunterGroup('Medium severity', medium)}
-            {renderHunterGroup('Low severity', low)}
+            {renderHunterGroup('Low severity', low, true)}
             {renderHunterGroup('Other findings', other)}
           </>
         )}

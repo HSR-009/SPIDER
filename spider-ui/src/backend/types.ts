@@ -13,7 +13,7 @@ export interface ScanRecord {
   ml?: { model: string; malicious_probability: number; calibrated?: boolean };
 }
 export interface HuntItem { severity: string; priority?: number; artifact: string; reason: string;
-  path?: string; evidence_snippet?: string; allowlisted?: boolean }
+  path?: string; evidence_snippet?: string; allowlisted?: boolean; dist?: string; version?: string; sha256?: string; }
 export interface HuntResult { hunt_id: string; created_at: string; roots: string[];
   distributions_count: number; items: HuntItem[];
   coverage?: { counts?: Record<string, number>; errors?: unknown[] }; limitations?: string[] }
